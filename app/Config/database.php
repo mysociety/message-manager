@@ -63,7 +63,7 @@ class DATABASE_CONFIG {
 		'datasource' => 'Database/Mysql',
 		'persistent' => false,
 		'host' => 'localhost',
-		'login' => 'user',
+		'login' => 'root',
 		'password' => 'user',
 		'database' => 'messages',
 		'prefix' => '',
@@ -80,4 +80,36 @@ class DATABASE_CONFIG {
 		'prefix' => '',
 		//'encoding' => 'utf8',
 	);
+	
+	// this quirky bit o' code lets Cake pull the database config from the general.yml file (if it
+	// exists): this is useful for mySociety because it fits in with our automatic deployment 
+	// mechanism, but is safe for others to skip.
+	// In fact, you can spare Cake the trouble of trying to read the file if you know it won't be
+	// there by setting  might_use_general_yml to 0 (see app/Config/MessageManager.php). 
+	function __construct () {
+		if (Configure::read('might_use_general_yml')==1) {
+			App::uses('Spyc', 'Lib');
+			$config = Spyc::YAMLLoad(APP . 'Config/general.yml'); 
+			if ( is_array($config) ) { 
+				foreach ( $config as $full_name=>$data ) {
+					if (! is_array($data)) { // safety check
+						$name = strtolower(str_replace('MESSAGEMANAGER_DB_', '', $full_name));
+						switch ($name) {
+							case 'name':
+								$this->default['database'] = $data;
+								break;
+							case 'pass':
+								$this->default['password'] = $data;
+								break;
+							case 'user':
+								$this->default['login'] = $data;
+								break;							
+							default:
+								$this->default[$name] = $data;
+						}
+					}
+				}
+			}
+		} 
+	}
 }

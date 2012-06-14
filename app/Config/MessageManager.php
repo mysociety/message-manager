@@ -47,5 +47,13 @@ $config = array(
 	 *-----------------------------------------------*/
     'lock_expiry_seconds' => 60 * 6,
 
-
+	/*-----------------------------------------------
+	 * mySociety's own deployment mechanism uses a 
+	 * general.yml file to populate the database config 
+	 * (amongst other things). If you /know/ your deployment 
+	 * won't, you can tell Cake not to bother looking for it:
+	 * 0 = don't try to read general.yml
+	 * 1 = look for it, and use it if it's there! 
+	 *-----------------------------------------------*/
+	'might_use_general_yml' => 1,
 );
