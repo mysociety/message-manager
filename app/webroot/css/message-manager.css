@@ -1,0 +1,191 @@
+/* status colours */
+body {
+  background-color: #663333;
+  line-height: 1.4em; }
+
+#container {
+  /* dirty bodging here to get the shorter fms-assign button on messages/view to play nicely */
+  /* dummy client is for testing/playing */ }
+  #container h2, #container h3, #container h4 {
+    color: #663333; }
+  #container h4 {
+    font-size: 110%;
+    font-weight: bold; }
+  #container #header {
+    text-align: right; }
+    #container #header h1 {
+      background-color: inherit;
+      background-image: none;
+      padding: 4px;
+      float: left;
+      font-size: 1.2em;
+      font-weight: bold; }
+    #container #header ul {
+      list-style-type: none; }
+      #container #header ul li {
+        display: inline;
+        margin: 0;
+        padding: 4px 1em 4px 0; }
+    #container #header a {
+      color: #fff;
+      margin-right: 0.5em;
+      padding: 4px;
+      text-decoration: none; }
+      #container #header a:hover {
+        background-color: #aa9999; }
+  #container a.no-decoration {
+    text-decoration: none; }
+  #container dl {
+    width: 100%;
+    line-height: 2em; }
+    #container dl p, #container dl li {
+      line-height: 1.4em;
+      padding-top: 0.2em; }
+  #container h3, #container h4 {
+    margin-top: 1.25em; }
+  #container .home-block h3, #container .home-block h4 {
+    margin-top: 0em; }
+  #container .mm-page ul {
+    margin-bottom: 1.2em; }
+  #container .message-text {
+    border: 1px solid black;
+    padding: 1em;
+    background-color: #fff4f4;
+    font-weight: bold;
+    min-height: 2em; }
+  #container p.footnote {
+    font-size: 80%;
+    margin-top: 2em;
+    padding-top: 1em; }
+  #container p.pagination-legend {
+    font-size: 80%;
+    color: #666666;
+    padding-top: 0.5em; }
+  #container .mm-messages .status-unknown {
+    background-color: #dddddd; }
+  #container .mm-messages .status-available {
+    background-color: #ddffdd; }
+  #container .mm-messages .status-locked {
+    background-color: #ffdddd; }
+  #container .mm-messages .status-unlocked {
+    background-color: inherit; }
+  #container .mm-messages .status-assigned {
+    background-color: #f8c75e; }
+  #container .mm-messages .status-hidden {
+    background-color: #ade0ed; }
+  #container .mm-messages dd {
+    padding-left: 4px; }
+  #container .home-block {
+    margin: 0 0 1.2em 0;
+    padding: 0.5em;
+    border: 1px solid #666666; }
+    #container .home-block p {
+      margin: 1em 0; }
+    #container .home-block dl {
+      width: 100%; }
+  #container #footer a.mm-link {
+    color: #fff;
+    float: left;
+    margin-right: 0.5em;
+    padding: 4px;
+    text-decoration: none; }
+    #container #footer a.mm-link:hover {
+      background-color: #aa9999; }
+  #container #assign-fms-id-action {
+    /* following to force short button, yuck */ }
+    #container #assign-fms-id-action div {
+      padding: 0 0 0 8px; }
+    #container #assign-fms-id-action .input.text {
+      width: 3em;
+      margin: 0;
+      display: inline-block; }
+      #container #assign-fms-id-action .input.text label {
+        display: none; }
+    #container #assign-fms-id-action .submit {
+      display: inline-block;
+      padding: 0;
+      margin: 0; }
+    #container #assign-fms-id-action .submit input[type=submit] {
+      width: 7em;
+      font-weight: normal;
+      font-size: 96%;
+      padding: 4px 8px 4px 0;
+      background: gainsboro;
+      background-image: -webkit-gradient(linear, left top, left bottom, from(#fefefe), to(gainsboro));
+      background-image: -webkit-linear-gradient(top, #fefefe, gainsboro);
+      background-image: -moz-linear-gradient(top, #fefefe, gainsboro);
+      background-image: -ms-linear-gradient(top, #fefefe, gainsboro);
+      background-image: -o-linear-gradient(top, #fefefe, gainsboro);
+      background-image: linear-gradient(top, #fefefe, gainsboro);
+      color: #333;
+      border: 1px solid #BBB;
+      -webkit-border-radius: 4px;
+      -moz-border-radius: 4px;
+      border-radius: 4px;
+      text-decoration: none;
+      text-shadow: white 0px 1px 0px;
+      min-width: 0;
+      -moz-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3), 0px 1px 1px rgba(0, 0, 0, 0.2);
+      -webkit-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3), 0px 1px 1px rgba(0, 0, 0, 0.2);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3), 0px 1px 1px rgba(0, 0, 0, 0.2);
+      -webkit-user-select: none;
+      user-select: none; }
+  #container .dummy-client {
+    border: 1px solid #663333;
+    margin: 1em 1em 0.2em 0;
+    padding: 0.5em;
+    background-color: #eeeeee;
+    width: 44%;
+    float: left;
+    min-width: 300px; }
+    #container .dummy-client h3, #container .dummy-client h4 {
+      margin-top: 0em; }
+    #container .dummy-client #mm-username {
+      float: right; }
+      #container .dummy-client #mm-username span {
+        font-weight: bold; }
+    #container .dummy-client #message-list ul {
+      list-style-type: none;
+      padding: 0;
+      margin: 0; }
+      #container .dummy-client #message-list ul li {
+        margin: 8px 0 0 0;
+        padding: 0;
+        background-color: white;
+        cursor: pointer; }
+        #container .dummy-client #message-list ul li:hover {
+          background-color: #efe; }
+        #container .dummy-client #message-list ul li div.msg-text {
+          padding: 12px; }
+    #container .dummy-client #message-list .msg-is-locked {
+      background-color: #fdd; }
+    #container .dummy-client #message-list .msg-is-owned {
+      background-color: #dfd; }
+    #container .dummy-client #message-list .msg-is-busy {
+      background-color: #ffd; }
+    #container .dummy-client #assign-fms-container div, #container .dummy-client #assign-fms-container form {
+      float: left;
+      clear: none;
+      padding: 4px;
+      margin: 0px; }
+    #container .dummy-client #assign-fms-container form {
+      padding: 0;
+      width: auto; }
+    #container .dummy-client #assign-fms-container input[type=text] {
+      width: 5em; }
+    #container .dummy-client #assign-fms-container input[type=submit] {
+      margin-top: 1em; }
+    #container .dummy-client .status-message-container {
+      min-height: 1.4em;
+      margin: 0 0 8px 0;
+      padding: 8px 4px;
+      border: 1px solid #a99;
+      background-color: #fcfcfc;
+      color: #caa;
+      font-style: italic; }
+
+.cake-sql-log {
+  margin-top: 2em;
+  background-color: #aa9999; }
+  .cake-sql-log caption {
+    color: #aa9999; }

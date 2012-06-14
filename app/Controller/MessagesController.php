@@ -1,0 +1,446 @@
+<?php
+
+class MessagesController extends AppController {
+	public $helpers = array('Js', 'Html', 'Form');
+	
+   //  RequestHandlerComponent lets json (and XML) work
+	public $components = array(
+		 'RequestHandler'
+	);
+	
+    public $paginate = array(
+        'order' => array('Message.created' => 'asc')
+    );
+	
+	public function beforeFilter() {
+		parent::beforeFilter();
+		$this->Auth->deny();
+		Controller::loadModel('ActionType'); // to access static methods on it
+		Controller::loadModel('Status'); // to access static methods on it
+	}
+	
+    public function index() {
+		$this->Message->recursive = 0;
+		$this->set('messages', $this->paginate());	
+    }
+
+	// get available messages: 
+	// provided as the main AJAX call for FMS to populate its messages
+	// NB strips unwanted message details, e.g., no MSISDN etc, because this is
+	// used to serve requests "outside" the Message Manager itself
+	// only serve messages with matching tag
+    public function available() {
+		$this->Message->recursive = 1;
+		$allowed_tags =  $this->Auth->user('allowed_tags');
+		$conditions = array('Message.status' => Status::$STATUS_AVAILABLE);
+		// TODO really, allowed tags should be comma-separated list; for now, consider it a single tag
+		if (! empty($allowed_tags)) {
+			$conditions['Message.tag'] = strtoupper(trim($allowed_tags));
+		}
+		$messages = $this->Message->find('all',
+			array(
+				'conditions' => $conditions,
+				'recursive' => 0,
+				'fields'	=> self::_json_fields(),
+				'order' => array('Message.created ASC'),
+				'limit' => 20 // for now FIXME -- paginate?
+			)
+		);
+		$this->set('messages', $messages);	
+	}
+
+	public function view($id = null) {
+		$this->Message->id = $id;
+		if (!$this->Message->exists()) { // kinder than a 404
+			$this->Session->setFlash(__('No such message (id ' . $id . ")"));
+			$this->redirect(array('action' => 'index'));
+		} else {
+			$this->helpers[] = 'MessageUtils';
+			$this->Message->recursive=2; // to get the user and type values
+			$this->set('message', $this->Message->read());
+			$this->set('is_locked', $this->Message->is_locked()? 1 : 0);
+			$this->set('seconds_until_lock_expiry', $this->Message->seconds_until_lock_expiry());
+		}
+    }
+
+	// note: better if JSON returned the message data even on failure to grant a lock,
+	// since it's an opportunity for the client to update the message list?
+	public function lock($id = null, $want_unique_lock = false) {
+		if (!$this->request->is('post')) {
+			throw new MethodNotAllowedException();
+		}
+		self::_load_record($id);
+		$flash_msg = "";
+		$lock_err = $this->Message->lock($this->Auth->user('id'));
+		if (empty($lock_err) && $this->Message->save()) {
+			self::_logAction(ActionType::$ACTION_LOCK);
+			$msg_unlocked = '';
+			if ($want_unique_lock) {
+				$all_locked = $this->Message->find('all', 
+					array(
+						'conditions' => array(
+							'Message.id !=' => $id,
+							'Message.owner_id' => $this->Auth->user('id'),
+							"NOT" => array("Message.lock_expires" => null)
+						)
+					)
+				);
+				if (count($all_locked)>0) {
+					foreach($all_locked as $message) {
+						$this->Message->read(null, $message['Message']['id']);
+						$this->Message->unlock();
+					    $this->Message->save();
+					}
+					$msg_unlocked = __(', other locks released: %s', count($all_locked));
+				}				
+			}
+			if ($this->RequestHandler->accepts('json')) {
+				$this->Message->recursive = 0;
+				$message = $this->Message->read(self::_json_fields());
+				return new CakeResponse(array(
+					'body' => json_encode(self::mm_json_response(true, $message))
+				));
+			} else {
+				$this->Session->setFlash(__('Message locked (expires in %s seconds)%s', 
+					Configure::read('lock_expiry_seconds'), $msg_unlocked));
+			}
+		} else {
+			$err_msg = __("Lock not granted: " . $lock_err );
+			if ($this->RequestHandler->accepts('json')) {
+				return new CakeResponse(array(
+					'body' => json_encode(self::mm_json_response(false, null, $err_msg))
+				));
+			}
+			$this->Session->setFlash(__($err_msg));
+		}
+		$this->redirect(array('action' => 'view', $id));
+	}
+
+	//-----------------------------------------------------------------
+	// TODO: reply not implemented yet
+	//-----------------------------------------------------------------
+	public function reply($id = null) {
+		if (!$this->request->is('post')) {
+			throw new MethodNotAllowedException();
+		}
+		self::_load_record($id);
+		$reply_text = $this->request->data('reply_text');
+		$err_msg = "Reply to message (via source) not implemented yet: TODO";
+		if (empty($reply_text)) {
+			$err_msg = "Empty reply text: won't send reply";
+		} elseif (! $this->Auth->user('can_reply')==1) {
+			$err_msg = "User " . $this->Auth->user('username') . " lacks reply privilege";
+			self::_logAction(ActionType::$ACTION_NOTE, "attempt to reply to message " . $id . " denied");
+		} else {
+			$lock_err = $this->Message->lock($this->Auth->user('id'));
+			if (empty($lock_err)) {
+				// fake success TODO
+				self::_logAction(ActionType::$ACTION_REPLY, "Reply: " . $reply_text);
+				if ($this->RequestHandler->accepts('json')) {
+					return new CakeResponse(array(
+						'body' => json_encode(self::mm_json_response(true, null))
+					));
+				} else {
+					$err_msg = "Reply sent OK.";
+				}
+			} else {
+				$err_msg = "reply failed: " . $lock_err;
+			}
+		}
+		if ($this->RequestHandler->accepts('json')) {
+			return new CakeResponse(array(
+				'body' => json_encode(self::mm_json_response(false, null, $err_msg))
+			));
+		}
+		$this->Session->setFlash($err_msg);
+		$this->redirect(array('action' => 'view', $id));
+	}
+	
+	// same as lock except also relinquishes all other locks held by this user
+	// note: maybe this should be for this user in this session? 
+	public function lock_unique($id = null) {
+		return self::lock($id, true);
+	}
+
+	public function unlock($id = null) {
+		if (!$this->request->is('post')) {
+			throw new MethodNotAllowedException();
+		}
+		$unlocked_msg = "";
+		self::_load_record($id);
+		$this->Message->unlock();
+		if ($this->Message->save()) {
+			self::_logAction(ActionType::$ACTION_UNLOCK);
+			$unlocked_msg=__('Removed lock from message');
+		} else {
+			$unlocked_msg__('Failed to release lock on message');
+		}
+		if ($this->RequestHandler->accepts('json')) {
+			return new CakeResponse(array(
+				'body' => json_encode(self::mm_json_response(false, null, $unlocked_msg))
+			));
+		}
+		$this->Session->setFlash($unlocked_msg);
+		$this->redirect(array('action' => 'view', $id));
+	}
+
+	public function unlock_all() {
+		if (!$this->request->is('post')) {
+			throw new MethodNotAllowedException();
+		}
+		$unlocked_msg = "";
+		$all_locked = $this->Message->find('all', 
+			array(
+				'conditions' => array(
+					'Message.owner_id' => $this->Auth->user('id'),
+					"NOT" => array("Message.lock_expires" => null)
+				)
+			)
+		);
+		if (count($all_locked)>0) {
+			foreach($all_locked as $message) {
+				$this->Message->read(null, $message['Message']['id']);
+				$this->Message->unlock();
+			    $this->Message->save();
+			}
+			$unlocked_msg = __('locks released: %s', count($all_locked));
+		} else {
+			$unlocked_msg = __('no locks to release');
+		}
+		if ($this->RequestHandler->accepts('json')) {
+			return new CakeResponse(array(
+				'body' => json_encode(self::mm_json_response(false, null, $unlocked_msg))
+			));
+		}
+		$this->Session->setFlash($unlocked_msg);
+		$this->redirect(array('action' => 'index'));
+	}
+
+	public function assign_fms_id($id = null) {
+		if (!$this->request->is('post')) {
+			throw new MethodNotAllowedException();
+		}
+		$fms_id = $this->request->data('fms_id');
+		if (empty($fms_id)) {
+			$err_msg = __("Not assigned: missing FMS ID");
+			if ($this->RequestHandler->accepts('json')) {
+				return new CakeResponse(array(
+					'body' => json_encode(self::mm_json_response(false, null, $err_msg))
+				));
+			}
+			$this->Session->setFlash($err_msg);
+		} else {
+			self::_load_record($id);
+			$lock_err = $this->Message->lock($this->Auth->user('id'));
+			if ($lock_err) {
+				$err_msg = __("Not assigned: " + $lock_err);
+				if ($this->RequestHandler->accepts('json')) {
+					return new CakeResponse(array(
+						'body' => json_encode(self::mm_json_response(false, null, $err_msg))
+					));
+				}
+				$this->Session->setFlash($err_msg);
+			} else {
+				$this->Message->assign_fms_id($fms_id);
+				if ($this->Message->save()) {
+					self::_logAction(ActionType::$ACTION_ASSIGN, $fms_id);
+					if ($this->RequestHandler->accepts('json')) {
+						return new CakeResponse(array(
+							'body' => json_encode(self::mm_json_response(true, null))
+						));
+					}
+					$this->Session->setFlash(__('Message assigned to FMS report %s', $fms_id));
+				} else {
+					$err_msg = __('Failed to assign FMS report %s to message', $fms_id);
+					if ($this->RequestHandler->accepts('json')) {
+						return new CakeResponse(array(
+							'body' => json_encode(self::mm_json_response(false, null, $err_msg))
+						));
+					}
+					$this->Session->setFlash($err_msg);
+				}
+			}
+		}
+		$this->redirect(array('action' => 'view', $id));
+	}
+
+	public function unassign_fms_id($id = null) {
+		self::_load_record($id);
+		$fms_id = $this->Message->fms_id;
+		$this->Message->unassign_fms_id();
+		if ($this->Message->save()) {
+			self::_logAction(ActionType::$ACTION_UNASSIGN);
+			$this->Session->setFlash(__('Unassigned message from FMS report %s', h($fms_id)));
+		} else {
+			$this->Session->setFlash(__('Failed to unassign message from FMS report %s',  h($fms_id)));
+		}
+		$this->redirect(array('action' => 'view', $id));
+	}
+	
+	public function hide($id = null) {
+		self::_load_record($id);
+		$this->Message->hide(); 
+		if ($this->Message->save()) {
+			self::_logAction(ActionType::$ACTION_HIDE);
+			$this->Session->setFlash(__('Message hidden'));
+		} else {
+			$this->Session->setFlash(__('Failed to hide message'));
+		}
+		$this->redirect(array('action' => 'view', $id));
+	}
+
+	public function unhide($id = null) {
+		self::_load_record($id);
+		$this->Message->unhide();
+		if ($this->Message->save()) {
+			self::_logAction(ActionType::$ACTION_UNHIDE);
+			$this->Session->setFlash(__('Message no longer hidden'));
+		} else {
+			$this->Session->setFlash(__('Failed to unhide message'));
+		}
+		$this->redirect(array('action' => 'view', $id));
+	}
+	
+	/**
+	 * delete method
+	 *
+	 * @param string $id
+	 * @return void
+	 */
+	public function delete($id = null) {
+		if (!$this->request->is('post')) {
+			throw new MethodNotAllowedException();
+		}
+		self::_load_record($id);
+		if ($this->Message->delete()) {
+			$this->Session->setFlash(__('Message deleted'));
+		} else {
+			$this->Session->setFlash(__('Message was not deleted'));
+		}
+		$this->redirect(array('action' => 'index'));
+	}
+	
+	// DON'T USE THIS! TODO: prevent?
+	// should be generated by incoming messages from gateway
+	public function add() {
+		if ($this->request->is('post')) {
+			$this->Message->create();
+			if ($this->Message->save($this->request->data)) {
+				$this->Session->setFlash(__('The message has been saved'));
+				$this->redirect(array('action' => 'index'));
+			} else {
+				$this->Session->setFlash(__('The message could not be saved. Please, try again.'));
+			}
+		} 
+		$this->set('sources', $this->Message->Source->find('list')); // populate the drop-down FIXME not working (should be username with group condition?)
+	}
+	
+	// alias for add... although this may be customised depending on currently unknown behaviour
+	// of message sources (e.g. might be a get not a post, etc)
+	// TODO check incoming 'external_id' does not already exist in database
+	public function incoming() {
+		$return_code = 200;
+		$response_text = "";
+		$this->Message->create();
+		$this->Message->set($this->request->data);
+		Controller::loadModel('MessageSource'); // really?  This needs tidying!
+		$source_user = $this->MessageSource->findById($this->Message->data['Message']['source_id'], array('fields'=>'user_id'));
+		if ($source_user['MessageSource']['user_id'] != $this->Auth->user('id')) {
+			$return_code = 403;
+			$response_text = __("Forbidden\nUser %s is not this source's allocated user.",  $this->Auth->user('username'));
+		} else {
+			$this->Message->set('status', Status::$STATUS_AVAILABLE);
+			$this->_detect_tag($this->request->data['Message']['message']);
+			if (! $this->Message->validates()) {
+				$response_text = __("Failed: the incoming message had validation errors:\n\n");
+				foreach ($this->Message->validationErrors as $field => $error) { 
+					$response_text .= __("error: %s\n", $error[0]); 
+				}
+			} else if ($this->Message->save($this->request->data)) {
+				$response_text = __("OK\nSaved message id=%s", $this->Message->id);
+			} else {
+				$return_code = 500;
+				$response_text = __('Failed: unexpected error, the message could not be saved.');
+			}
+		}
+		return new CakeResponse(array(
+			'statusCode' => $return_code,
+			'type' => 'text',
+			'body' => $response_text . "\n" 
+		));	}
+	
+	// purge all expired locks from the data
+	public function purge_locks() {
+		$this->Message->recursive = 0;
+		$this->Message->updateAll(
+		    array('Message.lock_expires' => null, 'Message.owner_id' => null),
+		    array('Message.lock_expires <=' => date('Y-m-d H:i:s', time()))
+		);
+		$this->Session->setFlash(__('All expired locks have been purged.'));
+		$this->redirect(array('action' => 'index'));
+	}
+
+	// scans the (presumably) incoming message for tags, possibly stripping them
+	// and storing in the record
+	// For example, incoming messages like "LUZ Hole in the road..." becomes
+	// tag: LUZ, message: "Hole in the road..."
+	// 
+	private function _detect_tag($message_text) {
+		$tags = Configure::read('tags');
+		foreach ($tags as $tag => $desc) {
+			$pattern = '/^\s*' . $tag . '\s*\b/i';
+			if ( preg_match($pattern, $message_text)) {
+				$this->Message->set('tag', $tag);
+				unset($this->request->data['Message']['message']); // ugh
+				if (true && Configure::read('remove_tags_when_matched')) {
+					$this->Message->set(
+						'message', 
+						preg_replace($pattern, "", $message_text)
+					);
+				}
+				break; // only test for one tag
+			}
+		}
+	}
+	
+	private function _load_record($id) {
+		$this->Message->id = $id;
+		if (!$this->Message->exists()) {
+			throw new NotFoundException(__('Invalid message'));
+		}
+		$this->Message->read(null, $id);
+	}
+	
+	// note: check for null is redundant when ACLs/Auth is enabled
+	private function _current_user_is_owner() {
+		return $this->Message->data['Message']['owner_id']==$this->Auth->user('id')
+			&& $this->Auth->user('id');
+	}
+	
+	// fields that are OK to send with available/lock/etc AJAX calls 
+	private function _json_fields() {
+		return array(
+			'id', 'source_id', 'external_id', 'message', 'created', 'received',
+			'replied', 'sender_token', 
+			'lock_expires', 'status', 'owner_id', 'fms_id', 'tag', 'Source.id',
+			'Source.name', 'Status.name', 'Lockkeeper.username'
+		);
+	}
+	
+	private function _logAction($action_type, $custom_param=null) {
+		$action = new Action;
+		$params = array(
+			'type_id' =>  $action_type,
+			'user_id' => $this->Auth->user('id'),
+			'message_id' => $this->Message->id,
+		);
+		if ($action_type==ActionType::$ACTION_NOTE || $action_type==ActionType::$ACTION_REPLY) {
+			$params['note'] = $custom_param;
+		} elseif ($action_type==ActionType::$ACTION_ASSIGN) {
+			$params['item_id'] = intval($custom_param);
+		}
+		$action->create($params);
+		$action->save();
+	}
+
+}

@@ -1,0 +1,256 @@
+$back_color:           #633;
+$pale_back_color:      #a99;
+$header_a_color:       #fff;
+$message_border_color: #000;
+$message_bg_color:     #fff4f4;
+$weak_text_color:      #666;
+$dummy_back_color:     #eee;
+
+/* status colours */
+$color_status_unknown:   #dddddd; 
+$color_status_available: #ddffdd;
+$color_status_locked:    #ffdddd;
+$color_status_assigned:  #f8c75e;
+$color_status_hidden:    #ade0ed;
+
+body {
+  background-color: $back_color;
+  line-height: 1.4em;
+}
+
+#container {
+  h2, h3, h4 {
+    color: $back_color;
+  }
+  h4 {
+    font-size: 110%;
+    font-weight: bold;
+  }
+  #header {
+    text-align: right;
+    h1 {
+      background-color: inherit;
+      background-image: none;
+      padding: 4px;
+      float: left;
+      font-size: 1.2em;
+      font-weight: bold;
+    }
+    ul {
+      list-style-type: none;
+      li {
+        display: inline;
+        margin: 0;
+        padding: 4px 1em 4px 0;
+      }
+    }
+    a {
+      color: #fff;
+      margin-right: 0.5em;
+      padding: 4px;
+      text-decoration: none;
+      &:hover {
+        background-color:$pale_back_color;
+      }
+    }
+  }
+  a.no-decoration {
+    text-decoration: none;
+  }
+  dl {
+    width: 100%;
+    line-height: 2em;
+    p, li {
+      line-height: 1.4em;
+      padding-top: 0.2em;
+    }
+  }
+  h3, h4 {
+    margin-top: 1.25em;
+  }
+  .home-block {
+    h3, h4 {
+      margin-top: 0em;
+    }
+  }
+  .mm-page {
+    ul {
+      margin-bottom: 1.2em;
+    }
+  }
+  .message-text {
+    border:1px solid $message_border_color;
+    padding: 1em;
+    background-color: $message_bg_color;
+    font-weight: bold;
+    min-height: 2em;
+  }
+  p.footnote  {
+    font-size: 80%;
+    margin-top:2em;
+    padding-top: 1em;
+  }
+  p.pagination-legend {
+    font-size:80%;
+    color: $weak_text_color;
+    padding-top:0.5em;
+  }
+  .mm-messages {
+    .status-unknown   {background-color: $color_status_unknown }
+    .status-available {background-color: $color_status_available }
+    .status-locked    {background-color: $color_status_locked }
+    .status-unlocked  {background-color: inherit }
+    .status-assigned  {background-color: $color_status_assigned }
+    .status-hidden    {background-color: $color_status_hidden }
+    dd {
+      padding-left: 4px;
+    }
+  }
+  .home-block {
+    margin: 0 0 1.2em 0;
+    padding: 0.5em;
+    border:1px solid $weak_text_color;
+    p {
+      margin: 1em 0;
+    }
+    dl {
+      width: 100%;
+    }
+  }
+  
+  #footer {
+    a.mm-link {
+      color: #fff;
+      float:left;
+      margin-right: 0.5em;
+      padding: 4px;
+      text-decoration: none;
+      &:hover {
+        background-color:$pale_back_color;
+      }
+    }
+  }
+  /* dirty bodging here to get the shorter fms-assign button on messages/view to play nicely */
+  #assign-fms-id-action { 
+    div {
+      padding: 0 0 0 8px;
+    }
+    .input.text {
+      width: 3em;
+      margin: 0;
+      display: inline-block;
+      label {
+        display: none; 
+      }
+    }
+    .submit {
+      display: inline-block;
+      padding:0;
+      margin:0;
+    }
+    /* following to force short button, yuck */
+    .submit input[type=submit] {
+      width: 7em;
+      font-weight: normal;
+      font-size: 96%;
+      padding: 4px 8px 4px 0;
+      background: gainsboro;
+      background-image: -webkit-gradient(linear, left top, left bottom, from(#FEFEFE), to(gainsboro));
+      background-image: -webkit-linear-gradient(top, #FEFEFE, gainsboro);
+      background-image: -moz-linear-gradient(top, #FEFEFE, gainsboro);
+      background-image: -ms-linear-gradient(top, #FEFEFE, gainsboro);
+      background-image: -o-linear-gradient(top, #FEFEFE, gainsboro);
+      background-image: linear-gradient(top, #FEFEFE, gainsboro);
+      color: #333;
+      border: 1px solid #BBB;
+      -webkit-border-radius: 4px;
+      -moz-border-radius: 4px;
+      border-radius: 4px;
+      text-decoration: none;
+      text-shadow: white 0px 1px 0px;
+      min-width: 0;
+      -moz-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3), 0px 1px 1px rgba(0, 0, 0, 0.2);
+      -webkit-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3), 0px 1px 1px rgba(0, 0, 0, 0.2);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3), 0px 1px 1px rgba(0, 0, 0, 0.2);
+      -webkit-user-select: none;
+      user-select: none;
+    }
+  }
+  
+  /* dummy client is for testing/playing */
+  .dummy-client {
+    border:1px solid $back_color;
+    margin: 1em 1em 0.2em 0;
+    padding: 0.5em;
+    background-color: $dummy_back_color;
+    width: 44%; 
+    float: left;
+    min-width: 300px;
+    h3, h4 {
+      margin-top: 0em;
+    }
+    #mm-username {
+      float: right;
+      span {
+        font-weight: bold;
+      }
+    }
+    #message-list {
+      ul {
+        list-style-type: none;
+        padding: 0;
+        margin: 0;
+        li {
+          margin: 8px 0 0 0;
+          padding: 0;
+          background-color: white;
+          cursor: pointer;
+          &:hover { background-color: #efe;}
+          div.msg-text {
+            padding: 12px;
+          }
+        }
+      }
+      .msg-is-locked { background-color: #fdd;}
+      .msg-is-owned { background-color: #dfd;}
+      .msg-is-busy { background-color: #ffd;}
+    }
+    #assign-fms-container {
+      div, form {
+        float: left;
+        clear: none;
+        padding: 4px;;
+        margin: 0px;
+      }
+      form {
+        padding:0;
+        width: auto;
+      }
+      input[type=text] {
+        width: 5em;
+      }
+      input[type=submit] {
+        margin-top:1em;
+      }
+    }
+    .status-message-container {
+      min-height: 1.4em;
+      margin: 0 0 8px 0;
+      padding: 8px 4px;
+      border: 1px solid #a99;
+      background-color: #fcfcfc;
+      color: #caa;
+      font-style: italic;
+    }
+  }
+  
+}
+
+.cake-sql-log {
+  margin-top:2em;
+  background-color:$pale_back_color;
+  caption {
+    color: $pale_back_color;
+  }
+}
+

@@ -1,0 +1,6 @@
+/app/tmp
+.DS_Store
+/app/Config/general.yml
+/lib/Cake/Console/Templates/skel/tmp/
+
+
