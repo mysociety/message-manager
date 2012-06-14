@@ -119,14 +119,19 @@ body {
   }
   
   #footer {
-    a.mm-link {
+    a {
       color: #fff;
-      float:left;
       margin-right: 0.5em;
       padding: 4px;
       text-decoration: none;
       &:hover {
         background-color:$pale_back_color;
+      }
+      &.mm-link {
+        float: left
+      }
+      &.cake-link:hover {
+        background-color: transparent;
       }
     }
   }

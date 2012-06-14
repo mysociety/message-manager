@@ -72,11 +72,12 @@ $cakeDescription = __d('cake_dev', 'CakePHP: the rapid development php framework
 			<?php echo $this->Html->link(__('help'), "/help", array('class'=>'mm-link')); ?>
 			<?php echo $this->Html->link(__('API'), array('controller' => 'pages', 'action' => 'api'), array('class'=>'mm-link')); ?>
 			
+			<?php echo $this->Html->link(__('mySociety'), "http://www.mysociety.org"); ?>
 			
 			<?php echo $this->Html->link(
 					$this->Html->image('cake.power.gif', array('alt' => $cakeDescription, 'border' => '0')),
 					'http://www.cakephp.org/',
-					array('target' => '_blank', 'escape' => false)
+					array('target' => '_blank', 'escape' => false, 'class'=>'cake-link')
 				);
 			?>
 		</div>

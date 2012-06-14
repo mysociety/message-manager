@@ -83,14 +83,17 @@ body {
       margin: 1em 0; }
     #container .home-block dl {
       width: 100%; }
-  #container #footer a.mm-link {
+  #container #footer a {
     color: #fff;
-    float: left;
     margin-right: 0.5em;
     padding: 4px;
     text-decoration: none; }
-    #container #footer a.mm-link:hover {
+    #container #footer a:hover {
       background-color: #aa9999; }
+    #container #footer a.mm-link {
+      float: left; }
+    #container #footer a.cake-link:hover {
+      background-color: transparent; }
   #container #assign-fms-id-action {
     /* following to force short button, yuck */ }
     #container #assign-fms-id-action div {
