@@ -24,18 +24,13 @@
 -- to stop anyone running this when they don't mean to.
 -- -----------------------------------------------------------------------
 
---
--- Dumping data for table aros
---
 
 INSERT INTO aros VALUES(1, NULL, 'Group', 1, NULL, 1, 2);
 INSERT INTO aros VALUES(2, NULL, 'Group', 2, NULL, 3, 4);
 INSERT INTO aros VALUES(3, NULL, 'Group', 3, NULL, 5, 6);
 INSERT INTO aros VALUES(4, NULL, 'Group', 4, NULL, 7, 8);
 
---
--- Dumping data for table acos
---
+SELECT pg_catalog.setval(pg_get_serial_sequence('aros', 'id'), (SELECT MAX(id) FROM aros)+1);
 
 INSERT INTO acos VALUES(158, NULL, NULL, NULL, 'controllers', 1, 106);
 INSERT INTO acos VALUES(159, 158, NULL, NULL, 'Actions', 2, 11);
@@ -91,10 +86,7 @@ INSERT INTO acos VALUES(208, 200, NULL, NULL, 'initDB', 99, 100);
 INSERT INTO acos VALUES(209, 200, NULL, NULL, 'mm_json_response', 101, 102);
 INSERT INTO acos VALUES(210, 158, NULL, NULL, 'AclExtras', 104, 105);
 
-
---
--- Dumping data for table aros_acos
---
+SELECT pg_catalog.setval(pg_get_serial_sequence('acos', 'id'), (SELECT MAX(id) FROM acos)+1);
 
 INSERT INTO aros_acos VALUES(140, 1, 158, '1', '1', '1', '1');
 INSERT INTO aros_acos VALUES(141, 2, 158, '-1', '-1', '-1', '-1');
@@ -122,4 +114,6 @@ INSERT INTO aros_acos VALUES(162, 4, 158, '-1', '-1', '-1', '-1');
 INSERT INTO aros_acos VALUES(163, 4, 194, '1', '1', '1', '1');
 INSERT INTO aros_acos VALUES(164, 4, 202, '1', '1', '1', '1');
 INSERT INTO aros_acos VALUES(165, 4, 177, '1', '1', '1', '1');
+
+SELECT pg_catalog.setval(pg_get_serial_sequence('aros_acos', 'id'), (SELECT MAX(id) FROM aros_acos)+1);
 
