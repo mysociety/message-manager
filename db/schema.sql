@@ -1,116 +1,108 @@
-SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
 
 CREATE TABLE acos (
-  id int(10) NOT NULL AUTO_INCREMENT,
-  parent_id int(10) DEFAULT NULL,
-  model varchar(255) DEFAULT NULL,
-  foreign_key int(10) DEFAULT NULL,
-  alias varchar(255) DEFAULT NULL,
-  lft int(10) DEFAULT NULL,
-  rght int(10) DEFAULT NULL,
-  PRIMARY KEY (id)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=211 ;
+  id serial not null primary key,
+  parent_id integer default null,
+  model varchar(255) default null,
+  foreign_key integer default null,
+  alias varchar(255) default null,
+  lft integer default null,
+  rght integer default null
+);
 
 CREATE TABLE actions (
-  id int(11) NOT NULL AUTO_INCREMENT,
-  created datetime DEFAULT NULL,
-  type_id int(11) NOT NULL DEFAULT '0',
-  user_id int(11) DEFAULT NULL,
-  message_id int(11) NOT NULL,
-  item_id int(11) DEFAULT NULL,
-  note text,
-  PRIMARY KEY (id),
-  KEY created_at (created,user_id)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=602 ;
+  id serial not null primary key,
+  created timestamp default null,
+  type_id integer not null default '0',
+  user_id integer default null,
+  message_id integer not null,
+  item_id integer default null,
+  note text
+);
+create index actions_idx on actions (created, user_id);
 
 CREATE TABLE action_types (
-  id int(11) NOT NULL,
-  `name` varchar(64) NOT NULL,
-  description text,
-  PRIMARY KEY (id)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+  id integer not null primary key,
+  name varchar(64) not null,
+  description text
+);
 
 CREATE TABLE aros (
-  id int(10) NOT NULL AUTO_INCREMENT,
-  parent_id int(10) DEFAULT NULL,
-  model varchar(255) DEFAULT NULL,
-  foreign_key int(10) DEFAULT NULL,
-  alias varchar(255) DEFAULT NULL,
-  lft int(10) DEFAULT NULL,
-  rght int(10) DEFAULT NULL,
-  PRIMARY KEY (id)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=5 ;
+  id serial not null primary key,
+  parent_id integer default null,
+  model varchar(255) default null,
+  foreign_key integer default null,
+  alias varchar(255) default null,
+  lft integer default null,
+  rght integer default null
+);
 
 CREATE TABLE aros_acos (
-  id int(10) NOT NULL AUTO_INCREMENT,
-  aro_id int(10) NOT NULL,
-  aco_id int(10) NOT NULL,
-  _create varchar(2) NOT NULL DEFAULT '0',
-  _read varchar(2) NOT NULL DEFAULT '0',
-  _update varchar(2) NOT NULL DEFAULT '0',
-  _delete varchar(2) NOT NULL DEFAULT '0',
-  PRIMARY KEY (id),
-  UNIQUE KEY ARO_ACO_KEY (aro_id,aco_id)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=166 ;
+  id serial not null primary key,
+  aro_id integer not null,
+  aco_id integer not null,
+  _create varchar(2) not null default '0',
+  _read varchar(2) not null default '0',
+  _update varchar(2) not null default '0',
+  _delete varchar(2) not null default '0'
+);
+create unique index aros_acos_unique_idx on aros_acos (aro_id,aco_id);
 
 CREATE TABLE groups (
-  id int(11) NOT NULL AUTO_INCREMENT,
-  `name` varchar(100) NOT NULL,
-  created datetime DEFAULT NULL,
-  modified datetime DEFAULT NULL,
-  PRIMARY KEY (id)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=9 ;
+  id serial not null primary key,
+  name varchar(100) not null,
+  created timestamp default null,
+  modified timestamp default null
+);
 
 CREATE TABLE messages (
-  id int(11) NOT NULL AUTO_INCREMENT,
-  source_id int(11) DEFAULT NULL,
-  external_id varchar(32) DEFAULT NULL,
-  msisdn varchar(24) DEFAULT NULL,
-  sender_token varchar(255) DEFAULT NULL,
+  id serial not null primary key,
+  source_id integer default null,
+  external_id varchar(32) default null,
+  msisdn varchar(24) default null,
+  sender_token varchar(255) default null,
   message text,
-  created datetime DEFAULT NULL,
-  received datetime DEFAULT NULL,
-  modified datetime DEFAULT NULL,
-  replied datetime DEFAULT NULL,
-  assigned datetime DEFAULT NULL,
-  lock_expires datetime DEFAULT NULL,
-  `status` smallint(6) NOT NULL DEFAULT '0',
-  owner_id int(11) DEFAULT NULL,
-  session_key varchar(255) DEFAULT NULL,
-  fms_id int(11) DEFAULT NULL,
-  tag varchar(64) DEFAULT NULL,
-  PRIMARY KEY (id),
-  KEY external_id (external_id,msisdn,`status`,owner_id)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2023 ;
-
+  created timestamp default null,
+  received timestamp default null,
+  modified timestamp default null,
+  replied timestamp default null,
+  assigned timestamp default null,
+  lock_expires timestamp default null,
+  status smallint not null default '0',
+  owner_id integer default null,
+  session_key varchar(255) default null,
+  fms_id integer default null,
+  tag varchar(64) default null
+);
+create index messages_external_id_idx on messages(external_id);
+create index messages_msisdn_idx on messages(msisdn);
+create index messages_status_idx on messages(status);
+create index messages_owner_id_idx on messages(owner_id);
+	
 CREATE TABLE message_sources (
-  id int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `name` varchar(64) NOT NULL,
+  id serial not null primary key,
+  name varchar(64) not null,
   description text,
-  url varchar(255) DEFAULT NULL,
+  url varchar(255) default null,
   ip_addresses text,
-  user_id int(11) DEFAULT NULL,
-  created datetime DEFAULT NULL,
-  modified datetime DEFAULT NULL,
-  PRIMARY KEY (id)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=7 ;
+  user_id integer default null,
+  created timestamp default null,
+  modified timestamp default null
+);
 
 CREATE TABLE statuses (
-  id int(11) NOT NULL,
-  `name` varchar(64) NOT NULL,
-  description text,
-  PRIMARY KEY (id)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+  id integer not null primary key,
+  name varchar(64) not null,
+  description text
+);
 
 CREATE TABLE users (
-  id int(11) NOT NULL AUTO_INCREMENT,
-  username varchar(255) NOT NULL,
-  `password` char(40) NOT NULL,
-  group_id int(11) NOT NULL,
-  allowed_tags varchar(255) DEFAULT NULL,
-  can_reply int(1) DEFAULT NULL,
-  created datetime DEFAULT NULL,
-  modified datetime DEFAULT NULL,
-  PRIMARY KEY (id),
-  UNIQUE KEY username (username)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=6 ;
+  id serial not null primary key,
+  username varchar(255) unique not null,
+  password char(40) not null,
+  group_id integer not null,
+  allowed_tags varchar(255) default null,
+  can_reply smallint default null,
+  created timestamp default null,
+  modified timestamp default null
+);
+create unique index users_username_idx on users(username);
