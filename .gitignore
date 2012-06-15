@@ -1,6 +1,10 @@
-/app/tmp
 .DS_Store
 /app/Config/general.yml
-/lib/Cake/Console/Templates/skel/tmp/
+/lib/Cake/Console/Templates/skel/tmp/.*
+/app/tmp/*
+
+/app/webroot/.htaccess
+
+
 
 
