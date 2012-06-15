@@ -36,7 +36,7 @@ class AppController extends Controller {
         'Acl',
         'Auth' => array(
             'authorize' => array(
-                'Actions' => array('actionPath' => 'controllers')
+                'Actions' => array('actionPath' => 'Controllers')
             )
         ),
         'Session'
@@ -45,8 +45,8 @@ class AppController extends Controller {
 
     public function beforeFilter() {
         //Configure AuthComponent
-		$this->Auth->authorize = 'actions';
-		$this->Auth->actionPath = 'controllers/';
+		$this->Auth->authorize = 'Actions';
+		$this->Auth->actionPath = 'Controllers/';
         $this->Auth->loginAction = array('controller' => 'users', 'action' => 'login');
         $this->Auth->logoutRedirect = array('controller' => 'users', 'action' => 'login');
         $this->Auth->loginRedirect = '/';
