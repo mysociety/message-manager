@@ -161,7 +161,7 @@ You should be able to log into the Message Manager with the default admin user.
 
 The Message Manager has a dummy client (that is, a page for testing/playing without needing to really
 integrate with an external service, that effectively behaves as a page on FixMyStreet would). 
-You can find it by logging into the Message Manager and going to `/messagesources/client`.
+You can find it by logging into the Message Manager and going to `/MessageSources/client`.
 Click "available messages" (at any time) to load the list of messages: clicking on them locks them,
 and clicking on "Assign FMS ID" will assign it -- if this operation succeeds, the message is
 removed from the list because it is no longer available for assignment. This demo implements
