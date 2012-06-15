@@ -243,6 +243,8 @@ $engine = 'File';
 if (extension_loaded('apc') && function_exists('apc_dec') && (php_sapi_name() !== 'cli' || ini_get('apc.enable_cli'))) {
 	$engine = 'Apc';
 }
+$engine = 'File'; ###### FIXME:DW -- no, really!
+
 
 // In development mode, caches should expire quickly.
 $duration = '+999 days';
