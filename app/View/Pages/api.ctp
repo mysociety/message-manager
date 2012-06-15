@@ -1,7 +1,83 @@
 <div class="mm-page view">
-	<h2>Message Manager JSON API</h2>
+	<h2>APIs</h2>
 	<p>
-		FMS communicates with the Message Manager with AJAX calls sending JSON.
+		There are two ways to interact with the Message Manager from outside: submit incoming messages,
+		or manipulate messages with the JSON API.
+	</p>
+	<h2 style="margin-top:2em;">Incoming Messages</h2>
+	<p>
+		Message sources can deliver incoming messages by POSTing to <code>/messages/incoming</code>.
+		Note that it is anticipated that each message source may send different params, so this is
+		currently the most "lazy" format.
+	</p>
+	<p>
+		The incoming request must be authorised &mdash; the user <em>must</em> be the one explicitly
+		associated with the message source. Usually this also implies that the user is in the
+		<code>message-sources</code> user group.
+	</p>
+	<dl>
+		<dt>address</dt>
+		<dd >
+			<code>/messages/incoming</code>
+		</dd>
+		<dt>params</dt>
+		<dd>
+			<p>
+				<strong>data[Message][source_id]</strong> <br/>
+				The ID of the message source.
+			</p>
+			<p>
+				<strong>data[Message][external_id]</strong> <br/>
+				If the message source has a unique ID for this message, it can provide it here.
+				These can be used to prevent duplicate submissions to the Message Manager. (Not yet implemented).
+			</p>
+			<p>
+				<strong>data[Message][msisdn]</strong><br/>
+				The phone number or other address of the sender.
+			</p>
+			<p>
+				<strong>data[Message][message]</strong><br/>
+				The message text (which may start with a tag).
+			</p>
+		</dd>
+		<dt>method</dt>
+		<dd>POST</dd>
+		<dt>operation</dt>
+		<dd>
+			<p>
+				The incoming message is accepted. Depending on configuration, if the message starts with
+				a recognised tag (keyword), it may be removed.
+			</p>
+		</dd>
+		<dt>returns</dt>
+		<dd>
+			<p> 
+				The default response is <code>text/plain</code> message. The HTTP status code of 200 does not imply the 
+				message was accepted: check for <code>OK</code> on the first line of the response.
+			</p>
+			<p>
+				If the message is rejected because of validation errors, these are returned as text.
+			</p>
+			<p>
+				Other status codes may be returned if the message is rejected (for example, 403 Forbidden if the user is not
+				authorised to submit incoming messages).
+			</p>
+		</dd>
+		<dt>example</dt>
+		<dd>
+			<p>
+				A message that is successfully saved:
+<pre>
+OK
+Saved message id=1382
+</pre>
+		</dd>
+	</dl>
+
+
+	<h2 style="margin-top: 2em;">Message Manager JSON API</h2>
+	<p>
+		FixMyStreet communicates with the Message Manager with AJAX calls sending JSON.
 	</p>
 	<p>
 		The Message Manager doesn't make all its data available over the API. For example,
@@ -28,7 +104,7 @@
 	<h3>404 errors for message not found</h3>
 	<p>
 		Calls with a message id in the URL which cannot be found return HTTP error code 404, rather than
-		a <code>success=false</code>. If you're implementing responses, remember to check the returned
+		<code>success=false</code>. If you're implementing responses, remember to check the returned
 		error code first!
 	</p>
 	<h3>Message data</h3>
@@ -68,7 +144,7 @@
 	<h4>Get available messages</h4>
 	<dl>
 		<dt>address</dt>
-		<dd class="mm-code">
+		<dd >
 			<code>/messages/available</code>
 		</dd>
 		<dt>params</dt>
@@ -111,7 +187,7 @@
 			</ul>
 		</dd>
 		<dt>example</dt>
-		<dd class="mm-code">
+		<dd >
 <pre>
 {"messages":
   [
@@ -131,7 +207,7 @@
 	<h4>Lock message</h4>
 	<dl>
 		<dt>address</dt>
-		<dd class="mm-code">
+		<dd >
 			<code>/messages/lock/<em>id</em></code>
 		</dd>
 		<dt>params</dt>
@@ -195,7 +271,7 @@
 	<h4>Lock message and relinquish all other locks</h4>
 	<dl>
 		<dt>address</dt>
-		<dd class="mm-code">
+		<dd >
 			<code>/messages/lock_unique/<em>id</em></code>
 		</dd>
 		<dt>params</dt>
@@ -220,7 +296,7 @@
 	<h4>Relinquish lock on message</h4>
 	<dl>
 		<dt>address</dt>
-		<dd class="mm-code">
+		<dd >
 			<code>/messages/unlock/<em>id</em></code>
 		</dd>
 		<dt>params</dt>
@@ -262,16 +338,19 @@
 }
 </pre>
 			<p>
-				Because there failure to relinquish a lock that was not locked, or that is locked by another
+				Because attempting to unlock a message that was not locked, or that is locked by another
 				user, is not reported as failure, a <code>false</code> response does not occur. However, 
 				other failures (such as 404 for message not found) return an explicit HTTP response code.
+			</p>
+			<p>
+				You cannot use the result of <code>unlock</code> to determine whether or not a message is now unlocked.
 			</p>
 		</dd>
 	</dl>
 	<h4>Relinquish lock on all messages</h4>
 	<dl>
 		<dt>address</dt>
-		<dd class="mm-code">
+		<dd >
 			<code>/messages/unlock_all</code>
 		</dd>
 		<dt>params</dt>
@@ -281,7 +360,7 @@
 		<dt>operation</dt>
 		<dd>
 			<p>
-				This is the same as <code>messages/unlock</em> except that it applies to all messages with a
+				This is the same as <code>messages/unlock</code> except that it applies to all messages with a
 				lock owned by this user. Like <code>unlock</code>, this won't report a fails silently for
 				unchanged locks. Specifically, if there are no locks, the call still succeeeds.
 			</p>
@@ -294,7 +373,7 @@
 	<h4>Reply to  message</h4>
 	<dl>
 		<dt>address</dt>
-		<dd class="mm-code">
+		<dd >
 			<code>/messages/reply/<em>id</em></code>
 		</dd>
 		<dt>params</dt>
@@ -317,7 +396,8 @@
 			</p>
 			<p>
 				You cannot inspect the progress of replies with the JSON API. A user in the managers
-				or administrators groups can log into the Message Manager and view them explicitly.
+				or administrators groups can log into the Message Manager and view replies explicitly
+				(they are listed as activity under the appropriate message).
 			</p>
 		</dd>
 		<dt>returns</dt>
@@ -365,7 +445,7 @@
 	<h4>Assign FMS ID</h4>
 	<dl>
 		<dt>address</dt>
-		<dd class="mm-code">
+		<dd >
 			<code>/messages/assign_fms_id/<em>id</em></code>
 		</dd>
 		<dt>params</dt>
@@ -419,6 +499,7 @@
 </pre>
 		</dd>
 	</dl>
+
 
 </div>
 <?php echo $this->element('sidebar/pages'); ?>
