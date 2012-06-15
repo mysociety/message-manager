@@ -1,3 +1,7 @@
+/*
+ * css produced from source in app/scss/
+ * do: scss --watch /path/app/scss/:/path/app/webroot/css/
+ */
 $back_color:           #633;
 $pale_back_color:      #a99;
 $header_a_color:       #fff;
@@ -6,7 +10,7 @@ $message_bg_color:     #fff4f4;
 $weak_text_color:      #666;
 $dummy_back_color:     #eee;
 
-/* status colours */
+// status colours
 $color_status_unknown:   #dddddd; 
 $color_status_available: #ddffdd;
 $color_status_locked:    #ffdddd;
@@ -135,7 +139,7 @@ body {
       }
     }
   }
-  /* dirty bodging here to get the shorter fms-assign button on messages/view to play nicely */
+  // dirty bodging here to get the shorter fms-assign button on messages/view to play nicely
   #assign-fms-id-action { 
     div {
       padding: 0 0 0 8px;
@@ -153,7 +157,7 @@ body {
       padding:0;
       margin:0;
     }
-    /* following to force short button, yuck */
+    // following to force short button, yuck
     .submit input[type=submit] {
       width: 7em;
       font-weight: normal;
@@ -182,7 +186,7 @@ body {
     }
   }
   
-  /* dummy client is for testing/playing */
+  // dummy client is for testing/playing 
   .dummy-client {
     border:1px solid $back_color;
     margin: 1em 1em 0.2em 0;
