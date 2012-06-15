@@ -5,6 +5,7 @@
 
 /app/webroot/.htaccess
 
+/app/Config/general.yml.deployed
 
 
 
