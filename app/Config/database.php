@@ -88,7 +88,12 @@ class DATABASE_CONFIG {
 	// there by setting  might_use_general_yml to 0 (see app/Config/MessageManager.php). 
 	function __construct () {
 		if (Configure::read('might_use_general_yml')==1) {
-			App::uses('Spyc', APP . 'Lib');
+			
+			// ** This is much nicer...
+			//     App::uses('Spyc', 'Lib');
+			// ** but on (fastcgi?) deployment, it won't play nicely, so instead do: 
+			include(APP . 'Lib' . DS . 'spyc.php' );
+
 			$config = Spyc::YAMLLoad(APP . 'Config/general.yml'); 
 			if ( is_array($config) ) { 
 				foreach ( $config as $full_name=>$data ) {
