@@ -41,7 +41,7 @@ class AppController extends Controller {
         ),
         'Session'
     );
-    public $helpers = array('Html', 'Form', 'Session', 'Js' => array('jQuery'));
+    public $helpers = array('Html', 'Form', 'Session', 'Js' => array('Jquery'));
 
     public function beforeFilter() {
         //Configure AuthComponent
