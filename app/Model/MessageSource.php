@@ -10,5 +10,5 @@ class MessageSource extends AppModel {
 			'order' => array('User.username' => 'ASC')
 		)
 	);
-
+	public $actsAs = array('PaginatesOnPostgres');
 }

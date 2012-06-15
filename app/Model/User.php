@@ -9,7 +9,7 @@ App::uses('AuthComponent', 'Controller/Component');
  */
 class User extends AppModel {
 	public $name = 'User';
-	public $actsAs = array('Acl' => array('type' => 'requester'));
+	public $actsAs = array('Acl' => array('type' => 'requester'), 'PaginatesOnPostgres');
 	public $belongsTo = array(
 		'Group' => array(
 			'className' => 'Group',
@@ -36,7 +36,6 @@ class User extends AppModel {
 	        return array('Group' => array('id' => $groupId));
 	    }
 	}
-	
 	
 /**
  * Validation rules
