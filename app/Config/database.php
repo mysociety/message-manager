@@ -88,7 +88,7 @@ class DATABASE_CONFIG {
 	// there by setting  might_use_general_yml to 0 (see app/Config/MessageManager.php). 
 	function __construct () {
 		if (Configure::read('might_use_general_yml')==1) {
-			App::uses('Spyc', 'Lib');
+			App::uses('Spyc', APP . 'Lib');
 			$config = Spyc::YAMLLoad(APP . 'Config/general.yml'); 
 			if ( is_array($config) ) { 
 				foreach ( $config as $full_name=>$data ) {
