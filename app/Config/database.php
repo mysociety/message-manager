@@ -92,13 +92,12 @@ class DATABASE_CONFIG {
 			// ** This is much nicer...
 			//     App::uses('Spyc', 'Lib');
 			// ** but on (fastcgi?) deployment, it won't play nicely, so instead do: 
-			include(APP . 'Lib' . DS . 'spyc.php' );
-
+			$got_spyc = include(APP . 'Lib' . DS . 'spyc.php' );
 			$config = Spyc::YAMLLoad(APP . 'Config/general.yml'); 
 			if ( is_array($config) ) { 
 				foreach ( $config as $full_name=>$data ) {
 					if (! is_array($data)) { // safety check
-						$name = strtolower(str_replace('MESSAGEMANAGER_DB_', '', $full_name));
+						$name = strtolower(str_replace('MESSAGE_MANAGER_DB_', '', $full_name));
 						switch ($name) {
 							case 'name':
 								$this->default['database'] = $data;
