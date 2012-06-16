@@ -76,6 +76,7 @@ class PagesController extends AppController {
 		if (!empty($path[$count - 1])) {
 			$title_for_layout = Inflector::humanize($path[$count - 1]);
 		}
+		$this->set('is_logged_in', $this->Auth->loggedIn());
 		$this->set(compact('page', 'subpage', 'title_for_layout'));
 		$this->render(implode('/', $path));
 	}
