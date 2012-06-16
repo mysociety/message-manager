@@ -16,15 +16,20 @@ class PaginatesOnPostgresBehavior extends ModelBehavior {
 
 	/* custom paginateCount method (for postgres) */
 	public function paginateCount(Model $model, $conditions = null, $recursive = 0, $extra = array()) {
-
 		if (!$model->useTable) {
 			return 0; // need a table to count in
 		} else {
-			$pk = $model->primaryKey;
-			$sql = "SELECT DISTINCT ON($pk) $pk FROM " . $model->table;
-		    $model->recursive = $recursive;
-		    $results = $model->query($sql);
-		    return count($results);
+			$dataSource = ConnectionManager::getDataSource($model->useDbConfig); // defaults to 'default'
+			$is_psql = $dataSource->config['datasource'] == 'Database/Postgres';
+			if ( $dataSource->config['datasource'] == 'Database/Postgres') {
+				$pk = $model->primaryKey;
+				$sql = "SELECT DISTINCT ON($pk) $pk FROM " . $model->table; // conditions!
+				$model->recursive = $recursive;
+				$results = $model->query($sql);
+				return count($results);
+			} else {
+				return $model->find('count', array_merge(compact('conditions', 'recursive'), $extra));
+			}
 		}
 	}
 	
