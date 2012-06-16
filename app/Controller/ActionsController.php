@@ -4,7 +4,7 @@ class ActionsController extends AppController {
 
 	public function beforeFilter() {
 	    parent::beforeFilter();
-	    $this->Auth->allow('*');
+	    $this->Auth->deny('');
 	}
 	
     public function index() {
