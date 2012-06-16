@@ -67,9 +67,20 @@
 		<dd>
 			<p>
 				A message that is successfully saved:
+			</p>
 <pre>
 OK
 Saved message id=1382
+</pre>
+			<p>
+				A message that is rejected because a message with the same external ID has already been submitted
+				(note that this check is only performed if an external ID has been explicitly provided):
+			</p>
+<pre>
+Failed
+the incoming message had validation errors:
+
+error: A message from this source with this external ID already exists
 </pre>
 		</dd>
 	</dl>

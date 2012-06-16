@@ -8,20 +8,25 @@ App::uses('AppController', 'Controller');
 class UsersController extends AppController {
 
 	public function beforeFilter() {
-	    parent::beforeFilter();
-	    $this->Auth->allow('initDB'); // uncomment to enable re-build of the aros_acos table
+		parent::beforeFilter();
+		// $this->Auth->allow('initDB'); // uncomment to enable re-build of the aros_acos table
 	}
 	
 	public $helpers = array('Js' =>  array('Jquery'));
 	
 	public function login() {
-	    if ($this->request->is('post')) {
-	        if ($this->Auth->login()) {
-	            $this->redirect($this->Auth->redirect());
-	        } else {
-	            $this->Session->setFlash('Your username or password was incorrect.');
-	        }
-	    }
+		if ($this->request->is('post')) {
+			if ($this->Auth->login()) {
+				// 'source' user has no useful access to anything (!) except maybe the dummy client
+				if ($this->Auth->user('group_id')==4) { // hard-coded!
+					$this->redirect(array('controller' => 'MessageSources', 'action' => 'client'));
+				} else {
+					$this->redirect($this->Auth->redirect());
+				}
+			} else {
+				$this->Session->setFlash('Your username or password was incorrect.');
+			}
+		}
 	}
 
 	public function logout() {

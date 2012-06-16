@@ -29,29 +29,59 @@ class Message extends AppModel {
 	public $validate = array(
 		'msisdn' => array(
 			'rule'    => '/^[0-9]{8,17}$/i',
-			'message'  => 'MSISDN must be comprised of 8-17 digits only',
-			'on'         => 'create'
+			'message' => 'MSISDN must be comprised of 8-17 digits only',
+			'on'      => 'create'
 		),
 		'message' => array(
 			'rule'    => 'notEmpty',
 			'message' => 'Message text may not be empty',
-			'on'         => 'create'
+			'on'      => 'create'
 		),
 		'source_id' => array(
 			'rule'    => 'source_exists',
 			'message' => 'Message source (source_id) provided did not match any known to Message Manager',
-			'on'         => 'create'
-		)
+			'on'      => 'create'
+		),
+		'external_id' => array(
+			'rule'    =>  'unique_id_by_source',
+			'message' => 'A message from this source with this external ID already exists',
+			'on'      => 'create'
+		),
 	);
 	
-	// save a unique-per-msisdn token (sender_token) so FMS users can tell when two messages
-	// are from the same sender without knowing their MSISDNs.
-	// In anticipation of MSISDNs being non-numeric (twitter handles, etc) this is done case-insensitively.
+	// beforeSave:
+	// * generate sender_token:
+	//   Save a unique-per-msisdn token (sender_token) so FMS users can tell when two messages
+	//   are from the same sender without knowing their MSISDNs.
+	//   In anticipation of MSISDNs being non-numeric (twitter handles, etc) this is done case-insensitively.
+	//
+	// * extract tag
+	//   Scans the (presumably) incoming message for tags, possibly stripping them
+	//   and storing in the record
+	//   For example, incoming messages like "LUZ Hole in the road..." becomes
+	//   tag: LUZ, message: "Hole in the road..."
+	
 	public function beforeSave() {
-	    if (!empty($this->data['Message']['msisdn'])) {
-	        $this->data['Message']['sender_token'] = hash('md5', strtolower(trim($this->data['Message']['msisdn'])));
-	    }
-	    return true;
+		if (!empty($this->data['Message']['msisdn'])) {
+			$this->data['Message']['sender_token'] = hash('md5', strtolower(trim($this->data['Message']['msisdn'])));
+		}
+		if (!empty($this->data['Message']['message'])) {
+			$message_text = $this->data['Message']['message'];
+			if (!empty($message_text)) {
+				$tags = Configure::read('tags');
+				foreach ($tags as $tag => $desc) {
+					$pattern = '/^\s*' . $tag . '\s*\b/i';
+					if (preg_match($pattern, $message_text)) {
+						$this->data['Message']['tag'] = $tag;
+						if (Configure::read('remove_tags_when_matched')) {
+							$this->data['Message']['message'] = preg_replace($pattern, "", $message_text);
+						}
+						break; // only test for one tag
+					}
+				}
+			}	
+		}
+		return true;
 	}
 	
 	
@@ -152,10 +182,29 @@ class Message extends AppModel {
 		}
 	}
 	
+	// validation 
+	public function unique_id_by_source($check) {
+		$ex_id = array_values($check);
+		$ex_id = $check['external_id'];
+		if (empty($ex_id)) {
+			return true;
+		} else {
+			$source_id = $this->data['Message']['source_id'];
+			if (empty($source_id)) {
+				$source_id = $this->Auth->user('source_id');
+			}
+			array_push($check, array('source_id' => $source_id));
+			$msgs_with_ext_id = $this->find('count', array(
+				'conditions' => $check,
+				'recursive' => -1
+			));
+			return $msgs_with_ext_id == 0;
+		}
+	}
+	
 	public function source_exists($check) {
 		$source = $this->Source->findById($check['source_id']);
 		return !empty($source['Source']['id']);
 	}
 
-		
 }

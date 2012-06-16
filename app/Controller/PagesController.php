@@ -81,8 +81,9 @@ class PagesController extends AppController {
 	}
 	
 	public function beforeFilter() {
-	    parent::beforeFilter();
-		$this->Auth->authError = 'Please log in to access the Message Manager.';
-	    $this->Auth->deny('');
+		parent::beforeFilter();
+		// after some dithering, best to allow all pages and be done with it!
+		// $this->Auth->authError = 'Please log in to access the Message Manager.';
+	    $this->Auth->allow('*'); 
 	}
 }
