@@ -58,9 +58,6 @@ echo $this->Html->script('client', false);
 			));
 			echo $this->Form->end();
 		?>
-	</div>
-	<!--<div class="dummy-client"><h3>AJAX: release all locks</h3></div>-->
-	<div class="dummy-client">
 		<div id="assign-fms-container">
 			<?php 
 				echo $this->Form->input('message_id', array('label'=>'Message ID', 'type'=>'text', 'name'=>'message_id', 'id'=>'message_id'));
@@ -74,6 +71,7 @@ echo $this->Html->script('client', false);
 			</p>
 		</div>
 	</div>
+	<!--<div class="dummy-client"><h3>AJAX: release all locks</h3></div>-->
 <?php } ?>
 
 <div style="clear:both;"></div>

@@ -225,6 +225,9 @@ body {
       .msg-is-busy { background-color: #ffd;}
     }
     #assign-fms-container {
+      margin-top: 2em;
+      padding-top: 1em;
+      border-top: 1px solid $weak_text_color;
       div, form {
         float: left;
         clear: none;

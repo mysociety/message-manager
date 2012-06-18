@@ -164,18 +164,22 @@ body {
     background-color: #dfd; }
   #container .dummy-client #message-list .msg-is-busy {
     background-color: #ffd; }
-  #container .dummy-client #assign-fms-container div, #container .dummy-client #assign-fms-container form {
-    float: left;
-    clear: none;
-    padding: 4px;
-    margin: 0px; }
-  #container .dummy-client #assign-fms-container form {
-    padding: 0;
-    width: auto; }
-  #container .dummy-client #assign-fms-container input[type=text] {
-    width: 5em; }
-  #container .dummy-client #assign-fms-container input[type=submit] {
-    margin-top: 1em; }
+  #container .dummy-client #assign-fms-container {
+    margin-top: 2em;
+    padding-top: 1em;
+    border-top: 1px solid #666666; }
+    #container .dummy-client #assign-fms-container div, #container .dummy-client #assign-fms-container form {
+      float: left;
+      clear: none;
+      padding: 4px;
+      margin: 0px; }
+    #container .dummy-client #assign-fms-container form {
+      padding: 0;
+      width: auto; }
+    #container .dummy-client #assign-fms-container input[type=text] {
+      width: 5em; }
+    #container .dummy-client #assign-fms-container input[type=submit] {
+      margin-top: 1em; }
   #container .dummy-client .status-message-container {
     min-height: 1.4em;
     margin: 0 0 8px 0;
