@@ -4,7 +4,8 @@ class MessageSourcesController extends AppController {
 
 	public function beforeFilter() {
 	    parent::beforeFilter();
-	    $this->Auth->deny();
+		
+	    $this->Auth->allow('client'); // allow access to the dummy client for testing Basic Auth
 	}
 	
     public function index() {

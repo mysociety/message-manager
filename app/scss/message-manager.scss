@@ -216,13 +216,26 @@ body {
           cursor: pointer;
           &:hover { background-color: #efe;}
           div.msg-text {
+            margin-left: 3.5em;
             padding: 12px;
+            border-left: 1px solid $dummy_back_color;
+          }
+          div.msg-tag {
+            padding: 12px;
+            width: 3em;
+            float:left;
           }
         }
       }
       .msg-is-locked { background-color: #fdd;}
       .msg-is-owned { background-color: #dfd;}
       .msg-is-busy { background-color: #ffd;}
+    }
+    #mm-login-container {
+      display: none; // only shown onafter a 403
+      border: 1px solid $weak_text_color;
+      padding: 1em;
+      margin: 1em;
     }
     #assign-fms-container {
       margin-top: 2em;

@@ -11,14 +11,13 @@ var want_unique_locks = true;
 
 //-----------------------------------------------------------------//
 
-
-
-
 var username = "";
 var msg_prefix = "msg-";
 
 function show_available_messages(data) {
     var messages = data['messages'];
+    username = data['username'];
+    $('#mm-received-username').text(username); // username is returned by API
     var $output = $('#message-list');
     if (messages instanceof Array) {
         if (messages.length==0) {
@@ -35,11 +34,17 @@ function show_available_messages(data) {
                 var lockkeeper = messages[i]['Lockkeeper']['username'];
                 if (lockkeeper) {
                     css_class = lockkeeper==username? 'msg-is-owned':'msg-is-locked'; 
-                } 
+                }
+                var escaped_text = $('<div/>').text(message['message']).html(); 
+                var tag = message['tag'];
+                if (tag == 'null' || tag == "") {
+                    tag = '&nbsp;'
+                }
                 $ul.append(
                     $('<li id="' + msg_prefix + message['id'] + '"></li>').
                         addClass(css_class).
-                        append($('<div class="msg-text"/>').text(message['message'])));
+                        append($('<div class="msg-tag"/>').html(message['tag'])).
+                        append($('<div class="msg-text"/>').html(escaped_text + '&nbsp;')));
             }
         }
     } else {
@@ -74,6 +79,28 @@ $(document).ready(function () {
             say_lock_status("message id=" + id + " is not locked... trying for lock");
         }
         mm_request_lock($li, id, want_unique_locks);
+    });
+    
+    $('#available-submit').click(function(){
+        $('#mm-login-container').stop().hide();
+        $.ajax({
+            dataType: "json", 
+            type:     "post", 
+            url:      message_manager_url_root +"messages/available.json",
+            username: $('#mm-htauth-username').val(),
+            password: $('#mm-htauth-password').val(),
+            success:  function(data, textStatus) {show_available_messages(data)}, 
+            error:    function(jqXHR, textStatus, errorThrown) {
+                        var st = jqXHR.status; 
+                        if (st == 401 || st == 403) {
+                            var msg = (st == 401)? "Invalid username or password" : "Access denied: please log in";
+                            $("#status-message").text(msg);
+                            $('#mm-login-container').stop().slideDown();
+                        } else {
+                            $("#status-message").text("Error: " + st + " " + textStatus);
+                        }
+                      }
+        });    
     });
     
     $('#assign-fms-submit').click(function() {

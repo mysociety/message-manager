@@ -59,7 +59,8 @@ class AppController extends Controller {
 	public function mm_json_response($success=true, $data, $err_msg = "") {
 		$retval = array(
 			'success' => $success,
-			'data'=> $data
+			'data'=> $data,
+			'username' => $this->Auth->user('id')
 		);
 		if (! $success) {
 			$retval['error'] = $err_msg;

@@ -157,13 +157,24 @@ body {
       #container .dummy-client #message-list ul li:hover {
         background-color: #efe; }
       #container .dummy-client #message-list ul li div.msg-text {
-        padding: 12px; }
+        margin-left: 3.5em;
+        padding: 12px;
+        border-left: 1px solid #eeeeee; }
+      #container .dummy-client #message-list ul li div.msg-tag {
+        padding: 12px;
+        width: 3em;
+        float: left; }
   #container .dummy-client #message-list .msg-is-locked {
     background-color: #fdd; }
   #container .dummy-client #message-list .msg-is-owned {
     background-color: #dfd; }
   #container .dummy-client #message-list .msg-is-busy {
     background-color: #ffd; }
+  #container .dummy-client #mm-login-container {
+    display: none;
+    border: 1px solid #666666;
+    padding: 1em;
+    margin: 1em; }
   #container .dummy-client #assign-fms-container {
     margin-top: 2em;
     padding-top: 1em;

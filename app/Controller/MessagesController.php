@@ -14,7 +14,32 @@ class MessagesController extends AppController {
 	
 	public function beforeFilter() {
 		parent::beforeFilter();
-		$this->Auth->deny();
+		// these are the API methods for which Basic HTTP Auth is enabled
+		$api_methods = array(
+			'assign_fms_id',
+			'available', 
+			'incoming',
+			'lock',
+			'lock_unique',
+			'reply',
+			'unlock',
+			'unlock_all',
+			);
+		// would prefer to try Form first, because Basic logins stick in htauth
+		// but contrary to expectations, that doesn't seem to be working (?)
+		if ($this->RequestHandler->accepts('json')) {
+			$this->Auth->authenticate = array('Basic','Form');
+			if ( in_array($this->action, $api_methods) ) {
+				if ($this->Auth->loggedIn() || $this->Auth->login()) {
+					$this->set('username', $this->Auth->user('username'));
+					// do nothing more: they're logged in
+			    } else {
+					throw new ForbiddenException('Not logged in');
+				}
+			}
+		} else {
+			$this->Auth->authenticate = array('Form');
+		}
 		Controller::loadModel('ActionType'); // to access static methods on it
 		Controller::loadModel('Status'); // to access static methods on it
 	}

@@ -35,33 +35,28 @@ echo $this->Html->script('client', false);
 	<div class="dummy-client">
 		<p id="mm-username">
 			tag:&nbsp;<?php echo (empty($allowed_tags)? "<i>any</i>":strtoupper($allowed_tags)); ?>,
-			username:&nbsp;<span><?php echo $username?></span> 
+			username:&nbsp;<span id="mm-received-username"><?php echo (empty($username)? "<i>none</li>":$username); ?></span> 
 		</p>
 		<h3>Mock FMS Client</h3>
 		<div class="status-message-container">
 			<div id="status-message"></div>
 		</div>
 		<div id="message-list" style="min-height:1em;"></div>
-		<?php 
-			echo $this->Form->create(); 
-			//echo $this->Form->submit('Get available messages', array('id' => 'available-submit'));
-			echo $this->Js->submit('Get available messages', array(
-				'id'      => 'available-submit',
-				'type'    => 'json',
-				'before'  => $this->Js->get('#status-message')->effect('fadeIn'),
-				'success'=> 'show_available_messages(data)',
-				'url' => $this->Html->url(array(
-					"controller" => "messages",
-					"action" => "available",
-					"ext" => "json"
-				))
-			));
+		<?php echo $this->Form->create(array('default' => false)); ?>
+			<div id="mm-login-container">
+				<?php
+					echo $this->Form->input('message_id', array('label'=>'MM username', 'type'=>'text', 'name'=>'mm-htauth-username', 'id'=>'mm-htauth-username'));
+					echo $this->Form->input('fms_id', array('label'=>'Password', 'type'=>'password', 'name'=>'mm-htauth-password', 'id'=>'mm-htauth-password'));
+				?>
+			</div>
+		<?php
+			echo $this->Form->submit('Get available messages', array('id' => 'available-submit'));
 			echo $this->Form->end();
 		?>
 		<div id="assign-fms-container">
 			<?php 
-				echo $this->Form->input('message_id', array('label'=>'Message ID', 'type'=>'text', 'name'=>'message_id', 'id'=>'message_id'));
 				echo $this->Form->create(array('id' => 'assign-fms-form','default'=>false));
+				echo $this->Form->input('message_id', array('label'=>'Message ID', 'type'=>'text', 'name'=>'message_id', 'id'=>'message_id'));
 				echo $this->Form->input('fms_id', array('label'=>'FMS ID', 'type'=>'text', 'name'=>'fms_id', 'id'=>'fms_id'));
 				echo $this->Form->submit(__('Assign FMS ID'), array('id' => 'assign-fms-submit'));
 				echo $this->Form->end();
