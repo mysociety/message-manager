@@ -28,7 +28,7 @@ class MessagesController extends AppController {
 		// would prefer to try Form first, because Basic logins stick in htauth
 		// but contrary to expectations, that doesn't seem to be working (?)
 		if ($this->RequestHandler->accepts('json')) {
-			$this->Auth->authenticate = array('Basic','Form');
+			$this->Auth->authenticate = array('Basic');
 			if ( in_array($this->action, $api_methods) ) {
 				if ($this->Auth->loggedIn() || $this->Auth->login()) {
 					$this->set('username', $this->Auth->user('username'));
