@@ -37,8 +37,8 @@ $cakeDescription = __d('cake_dev', 'CakePHP: the rapid development php framework
 		echo $this->fetch('script');
 	?>
 </head>
-<body>
-	<div id="container">
+<body class="<?php echo($site_css_class); ?>">
+	<div id="container" >
 		<div id="header">
 			<a href="/"><h1>Message Manager</h1></a>
 			<ul class="user-details">

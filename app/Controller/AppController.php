@@ -54,6 +54,10 @@ class AppController extends Controller {
 		// make current user available across the whole application
 		App::import('Model', 'User');
 		User::store($this->Auth->user());
+		
+		// allow easy flagging of (e.g., dev sites) by changing the background color
+		$site_css_class = "site-" . (preg_match("/(message-local|localhost)/i", $_SERVER['SERVER_NAME'])? "local":"default");
+		$this->set("site_css_class", $site_css_class); 
 	}
 	
 	public function mm_json_response($success=true, $data, $err_msg = "") {
