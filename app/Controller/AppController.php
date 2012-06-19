@@ -49,7 +49,7 @@ class AppController extends Controller {
 		$this->Auth->actionPath = 'Controllers/';
         $this->Auth->loginAction = array('controller' => 'users', 'action' => 'login');
         $this->Auth->logoutRedirect = array('controller' => 'users', 'action' => 'login');
-        $this->Auth->loginRedirect = '/';
+        $this->Auth->loginRedirect = array('controller' => 'pages', 'action' => 'display'); // to the home page
 
 		// make current user available across the whole application
 		App::import('Model', 'User');
