@@ -28,6 +28,7 @@
 	Router::connect('/', array('controller' => 'pages', 'action' => 'display', 'home'));
 	Router::connect('/about', array('controller' => 'pages', 'action' => 'display', 'about'));
 	Router::connect('/help', array('controller' => 'pages', 'action' => 'display', 'help'));
+	Router::connect('/dummy', array('controller' => 'MessageSources', 'action' => 'client'));
 	
 /**
  * ...and connect the rest of 'Pages' controller's urls.
