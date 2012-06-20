@@ -12,6 +12,7 @@ class Message extends AppModel {
 		'Status' => array(
 			'className' 	=> 'Status',
 			'foreignKey'	=> 'status',
+			'fields'		=> 'name'
 		),
 		'Lockkeeper' => array(
 			'className' 	=> 'User',

@@ -9,6 +9,7 @@ class UsersController extends AppController {
 
 	public function beforeFilter() {
 		parent::beforeFilter();
+		Controller::loadModel('Group'); // to access static methods on it
 		// $this->Auth->allow('initDB'); // uncomment to enable re-build of the aros_acos table
 	}
 	
@@ -18,7 +19,7 @@ class UsersController extends AppController {
 		if ($this->request->is('post')) {
 			if ($this->Auth->login()) {
 				// 'source' user has no useful access to anything (!) except maybe the dummy client
-				if ($this->Auth->user('group_id')==4) { // hard-coded!
+				if ($this->Auth->user('group_id')==Group::$SOURCE_USER_GROUP_ID) { // hard-coded!
 					$this->redirect(array('controller' => 'MessageSources', 'action' => 'client'));
 				} else {
 					$this->redirect($this->Auth->redirect());
@@ -127,18 +128,18 @@ class UsersController extends AppController {
 	public function initDB() {
 		//------------------------------ 
 		// safety! only run this once, if you need to!
-		$this->Session->setFlash(__('initDB is disabled!'));
-		$this->redirect(array('action' => 'index'));
-		return;
+		 $this->Session->setFlash(__('initDB is disabled!'));
+		 $this->redirect(array('action' => 'index'));
+		 return;
 		//------------------------------ 
 
 		$group = $this->User->Group;
 		// allow admins to do everything
-		$group->id = 1;
+		$group->id = Group::$ADMIN_GROUP_ID;
 		$this->Acl->allow($group, 'controllers');
 
 		// allow managers to deal with most things except users and groups
-		$group->id = 2;
+		$group->id = Group::$MANAGER_GROUP_ID;
 		$this->Acl->deny($group, 'controllers');
 		$this->Acl->allow($group, 'controllers/Actions/index');
 		$this->Acl->allow($group, 'controllers/Actions/view');
@@ -146,6 +147,7 @@ class UsersController extends AppController {
 		$this->Acl->allow($group, 'controllers/Groups/view');
 		$this->Acl->allow($group, 'controllers/Messages');
 		$this->Acl->allow($group, 'controllers/MessageSources/index');
+		$this->Acl->allow($group, 'controllers/MessageSources/edit'); // NB edit is restricted to certain fields within the code
 		$this->Acl->allow($group, 'controllers/MessageSources/view');
 		$this->Acl->allow($group, 'controllers/MessageSources/client');
 		$this->Acl->allow($group, 'controllers/Pages');
@@ -153,7 +155,7 @@ class UsersController extends AppController {
 
 		// allow api-users to only use the JSON API
 		// note nothing here gives access to MSISDNs
-		$group->id = 3;
+		$group->id = Group::$API_USER_GROUP_ID;
 		$this->Acl->deny($group, 'controllers');
 		$this->Acl->allow($group, 'controllers/Messages/assign_fms_id');
 		$this->Acl->allow($group, 'controllers/Messages/available');
@@ -163,10 +165,11 @@ class UsersController extends AppController {
 		$this->Acl->allow($group, 'controllers/Messages/unlock');
 		$this->Acl->allow($group, 'controllers/Messages/unlock_all');
 		$this->Acl->allow($group, 'controllers/MessageSources/client');
+		$this->Acl->allow($group, 'controllers/Pages');
 		$this->Acl->allow($group, 'controllers/Users/logout');
 
 		// allow message-sources to only use the incoming
-		$group->id = 4;
+		$group->id = Group::$SOURCE_USER_GROUP_ID;
 		$this->Acl->deny($group, 'controllers');
 		$this->Acl->allow($group, 'controllers/Messages/incoming');
 		$this->Acl->allow($group, 'controllers/Users/logout');

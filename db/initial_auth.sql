@@ -12,7 +12,13 @@
 -- -----------------------------------------------------------------------
 -- If you create a new group *within the Message Manager admin* the ARO
 -- table will automatically add it.
--- Then delete all records from aco and aros_acos then...
+--
+-- But if you add a new action to a controller, you'll need to add it to
+-- the ACOS table. Add it to the apprpriate user groups in 
+-- apps/Controllers/User.php's initDB action. 
+-- Then the safest approach is probably to rebuilt it all:
+--
+-- first delete all records from aco and aros_acos then...
 -- ...rebuild the aco table with:
 -- Console/cake AclExtras.AclExtras aco_sync
 -- ...and then (you'll need to edit the PHP to remove the redirect that
@@ -32,7 +38,7 @@ INSERT INTO aros VALUES(4, NULL, 'Group', 4, NULL, 7, 8);
 
 SELECT pg_catalog.setval(pg_get_serial_sequence('aros', 'id'), (SELECT MAX(id) FROM aros)+1);
 
-INSERT INTO acos VALUES(158, NULL, NULL, NULL, 'controllers', 1, 106);
+INSERT INTO acos VALUES(158, NULL, NULL, NULL, 'controllers', 1, 108);
 INSERT INTO acos VALUES(159, 158, NULL, NULL, 'Actions', 2, 11);
 INSERT INTO acos VALUES(160, 159, NULL, NULL, 'index', 3, 4);
 INSERT INTO acos VALUES(161, 159, NULL, NULL, 'view', 5, 6);
@@ -53,7 +59,7 @@ INSERT INTO acos VALUES(175, 171, NULL, NULL, 'edit', 33, 34);
 INSERT INTO acos VALUES(176, 171, NULL, NULL, 'add', 35, 36);
 INSERT INTO acos VALUES(177, 171, NULL, NULL, 'client', 37, 38);
 INSERT INTO acos VALUES(178, 171, NULL, NULL, 'mm_json_response', 39, 40);
-INSERT INTO acos VALUES(179, 158, NULL, NULL, 'Messages', 42, 77);
+INSERT INTO acos VALUES(179, 158, NULL, NULL, 'Messages', 42, 79);
 INSERT INTO acos VALUES(180, 179, NULL, NULL, 'index', 43, 44);
 INSERT INTO acos VALUES(181, 179, NULL, NULL, 'available', 45, 46);
 INSERT INTO acos VALUES(182, 179, NULL, NULL, 'view', 47, 48);
@@ -71,20 +77,21 @@ INSERT INTO acos VALUES(193, 179, NULL, NULL, 'add', 69, 70);
 INSERT INTO acos VALUES(194, 179, NULL, NULL, 'incoming', 71, 72);
 INSERT INTO acos VALUES(195, 179, NULL, NULL, 'purge_locks', 73, 74);
 INSERT INTO acos VALUES(196, 179, NULL, NULL, 'mm_json_response', 75, 76);
-INSERT INTO acos VALUES(197, 158, NULL, NULL, 'Pages', 78, 83);
-INSERT INTO acos VALUES(198, 197, NULL, NULL, 'display', 79, 80);
-INSERT INTO acos VALUES(199, 197, NULL, NULL, 'mm_json_response', 81, 82);
-INSERT INTO acos VALUES(200, 158, NULL, NULL, 'Users', 84, 103);
-INSERT INTO acos VALUES(201, 200, NULL, NULL, 'login', 85, 86);
-INSERT INTO acos VALUES(202, 200, NULL, NULL, 'logout', 87, 88);
-INSERT INTO acos VALUES(203, 200, NULL, NULL, 'index', 89, 90);
-INSERT INTO acos VALUES(204, 200, NULL, NULL, 'view', 91, 92);
-INSERT INTO acos VALUES(205, 200, NULL, NULL, 'add', 93, 94);
-INSERT INTO acos VALUES(206, 200, NULL, NULL, 'edit', 95, 96);
-INSERT INTO acos VALUES(207, 200, NULL, NULL, 'delete', 97, 98);
-INSERT INTO acos VALUES(208, 200, NULL, NULL, 'initDB', 99, 100);
-INSERT INTO acos VALUES(209, 200, NULL, NULL, 'mm_json_response', 101, 102);
-INSERT INTO acos VALUES(210, 158, NULL, NULL, 'AclExtras', 104, 105);
+INSERT INTO acos VALUES(197, 158, NULL, NULL, 'Pages', 80, 85);
+INSERT INTO acos VALUES(198, 197, NULL, NULL, 'display', 81, 82);
+INSERT INTO acos VALUES(199, 197, NULL, NULL, 'mm_json_response', 83, 84);
+INSERT INTO acos VALUES(200, 158, NULL, NULL, 'Users', 86, 105);
+INSERT INTO acos VALUES(201, 200, NULL, NULL, 'login', 87, 88);
+INSERT INTO acos VALUES(202, 200, NULL, NULL, 'logout', 89, 90);
+INSERT INTO acos VALUES(203, 200, NULL, NULL, 'index', 91, 92);
+INSERT INTO acos VALUES(204, 200, NULL, NULL, 'view', 93, 94);
+INSERT INTO acos VALUES(205, 200, NULL, NULL, 'add', 95, 96);
+INSERT INTO acos VALUES(206, 200, NULL, NULL, 'edit', 97, 98);
+INSERT INTO acos VALUES(207, 200, NULL, NULL, 'delete', 99, 100);
+INSERT INTO acos VALUES(208, 200, NULL, NULL, 'initDB', 101, 102);
+INSERT INTO acos VALUES(209, 200, NULL, NULL, 'mm_json_response', 103, 104);
+INSERT INTO acos VALUES(210, 158, NULL, NULL, 'AclExtras', 106, 107);
+INSERT INTO acos VALUES(211, 179, NULL, NULL, 'edit', 77, 78);
 
 SELECT pg_catalog.setval(pg_get_serial_sequence('acos', 'id'), (SELECT MAX(id) FROM acos)+1);
 
@@ -114,6 +121,9 @@ INSERT INTO aros_acos VALUES(162, 4, 158, '-1', '-1', '-1', '-1');
 INSERT INTO aros_acos VALUES(163, 4, 194, '1', '1', '1', '1');
 INSERT INTO aros_acos VALUES(164, 4, 202, '1', '1', '1', '1');
 INSERT INTO aros_acos VALUES(165, 4, 177, '1', '1', '1', '1');
+INSERT INTO aros_acos VALUES(166, 2, 175, '1', '1', '1', '1');
+INSERT INTO aros_acos VALUES(167, 3, 197, '1', '1', '1', '1');
+
 
 SELECT pg_catalog.setval(pg_get_serial_sequence('aros_acos', 'id'), (SELECT MAX(id) FROM aros_acos)+1);
 

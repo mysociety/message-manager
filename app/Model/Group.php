@@ -12,6 +12,11 @@ class Group extends AppModel {
 	    return null;
 	}
 
+	public static $ADMIN_GROUP_ID       = 1;
+	public static $MANAGER_GROUP_ID     = 2;
+	public static $API_USER_GROUP_ID    = 3;
+	public static $SOURCE_USER_GROUP_ID = 4;
+
 /**
  * Validation rules
  *

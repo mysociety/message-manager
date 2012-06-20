@@ -2,7 +2,15 @@
 
 class Status extends AppModel {
 	public $name = 'Status'; // the status of a message
-
+	public $displayField = 'name';
+	public $hasMany = array(
+		'Message' => array(
+			'className' => 'Message',
+			'foreignKey' => 'status',
+			'dependent' => false,
+		)
+	);
+	
 	public static $STATUS_UNKNOWN   = 0;
 	public static $STATUS_AVAILABLE = 1;
 	public static $STATUS_ASSIGNED  = 2;

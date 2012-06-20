@@ -42,6 +42,7 @@ class MessagesController extends AppController {
 		}
 		Controller::loadModel('ActionType'); // to access static methods on it
 		Controller::loadModel('Status'); // to access static methods on it
+		Controller::loadModel('Group'); // to access static methods on it
 	}
 	
     public function index() {
@@ -139,6 +140,37 @@ class MessagesController extends AppController {
 			$this->Session->setFlash(__($err_msg));
 		}
 		$this->redirect(array('action' => 'view', $id));
+	}
+
+	// edit lets managers change status or tag (but nothing else)
+	public function edit($id = null) {
+		$this->Message->id = $id;
+		if (!$this->Message->exists()) {
+			throw new NotFoundException(__('Invalid message'));
+		}
+		$is_admin_group = ($this->Auth->user('group_id') == Group::$ADMIN_GROUP_ID)? 1 : 0;
+		if ($this->request->is('post') || $this->request->is('put')) {
+			$saved_ok = false;
+			if (! $is_admin_group) {
+				// currently only the tag is editable by managers
+				$this->Message->tag = $this->request->data['Message']['tag'];
+				$save_ok = $this->Message->save();
+			} else { // admins can edit anything (if the view exists)
+				$saved_ok = $this->Message->save($this->request->data);
+			}
+			if ($saved_ok) {
+				$this->Session->setFlash(__('The message has been updated'));
+				$this->redirect(array('action' => 'view', $id));
+			} else {
+				$this->Session->setFlash(__('The message  could not be saved. Please, try again.'));
+			}
+		} else {
+			$this->request->data = $this->Message->read(null, $id);
+		}
+		// actually, don't allow status edit: there are buttons for that which are better (i.e., reverting when unhiding)
+		// $this->set('statuses', $this->Message->Status->find('list', array('conditions' => array('name !=' => 'unknown')))); // populate the drop-down
+		$this->set('message', $this->Message->data);
+		$this->set('is_admin_group', $is_admin_group);
 	}
 
 	//-----------------------------------------------------------------
