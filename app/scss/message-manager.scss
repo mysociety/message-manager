@@ -17,9 +17,19 @@ $color_status_locked:    #ffdddd;
 $color_status_assigned:  #f8c75e;
 $color_status_hidden:    #ade0ed;
 
+// installation-specific colors:
+$color_bg_local:           #325;
+
 body {
   background-color: $back_color;
+  border-top:3px solid $back_color;
   line-height: 1.4em;
+
+  &.site-local {
+    background-color: $color_bg_local;
+    border-top:3px solid yellow;
+  }
+
 }
 
 #container {

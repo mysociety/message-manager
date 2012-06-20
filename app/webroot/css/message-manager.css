@@ -4,7 +4,11 @@
  */
 body {
   background-color: #663333;
+  border-top: 3px solid #663333;
   line-height: 1.4em; }
+  body.site-local {
+    background-color: #332255;
+    border-top: 3px solid yellow; }
 
 #container h2, #container h3, #container h4 {
   color: #663333; }
