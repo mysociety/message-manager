@@ -14,6 +14,13 @@ var want_unique_locks = true;
 var username = "";
 var msg_prefix = "msg-";
 
+function make_base_auth(user, password) {
+    var tok = user + ':' + password;
+    var hash = btoa(tok);
+    return "Basic " + hash;
+}
+
+
 function show_available_messages(data) {
     var messages = data['messages'];
     username = data['username'];
@@ -87,8 +94,12 @@ $(document).ready(function () {
             dataType: "json", 
             type:     "post", 
             url:      message_manager_url_root +"messages/available.json",
-            username: $('#mm-htauth-username').val(),
-            password: $('#mm-htauth-password').val(),
+            beforeSend: function (xhr){
+                xhr.setRequestHeader('Authorization', make_base_auth(
+                    $('#mm-htauth-username').val(),
+                    $('#mm-htauth-password').val()
+                ));
+            },
             success:  function(data, textStatus) {show_available_messages(data)}, 
             error:    function(jqXHR, textStatus, errorThrown) {
                         var st = jqXHR.status; 
