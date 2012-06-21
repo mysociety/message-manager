@@ -56,4 +56,10 @@ $config = array(
 	 * 1 = look for it, and use it if it's there! 
 	 *-----------------------------------------------*/
 	'might_use_general_yml' => 1,
+
+	/*-----------------------------------------------
+	 * Comma seperated list of sites that can access the
+	 * JSON API
+	 *-----------------------------------------------*/
+	'cors_allowed' => 'http://www.fixmystreet.com',
 );
