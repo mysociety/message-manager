@@ -99,6 +99,7 @@ $(document).ready(function () {
                     $('#mm-htauth-username').val(),
                     $('#mm-htauth-password').val()
                 ));
+		xhr.withCredentials = true;
             },
             success:  function(data, textStatus) {show_available_messages(data)}, 
             error:    function(jqXHR, textStatus, errorThrown) {
