@@ -40,46 +40,77 @@ class User extends AppModel {
 /**
  * Validation rules
  *
+ * note: no passing of "password" here -- it must be done through new_password
+ * since the views/controllers are enforcing that.
+ *
  * @var array
  */
 	public $validate = array(
 		'username' => array(
 			'notempty' => array(
 				'rule' => array('notempty'),
-				//'message' => 'Your custom message here',
-				//'allowEmpty' => false,
-				//'required' => false,
-				//'last' => false, // Stop validation after this rule
-				//'on' => 'create', // Limit validation to 'create' or 'update' operations
+				'message' => 'Username must not be empty',
+			),
+			'isunique' => array(
+				'rule' => array('isUnique'),
+				'message' => 'Username must be unique: someone else already has that username',
 			),
 		),
-		'password' => array(
+		'new_password' => array(
+			'minLength' => array(
+				'rule' => array('minLength', 6),
+				'message' => "New password must be at least 6 characters long",
+			),
+		),
+		'confirm_password' => array(
 			'notempty' => array(
 				'rule' => array('notempty'),
-				//'message' => 'Your custom message here',
-				//'allowEmpty' => false,
-				//'required' => false,
-				//'last' => false, // Stop validation after this rule
-				//'on' => 'create', // Limit validation to 'create' or 'update' operations
+				'message' => "Password confirmation mustn't be empty",
+			),
+			'password_match' => array(
+				'rule' => array('password_match'),
+				'message' => "Password confirmation doesn't match the password",
 			),
 		),
 		'group_id' => array(
 			'numeric' => array(
 				'rule' => array('numeric'),
-				//'message' => 'Your custom message here',
-				//'allowEmpty' => false,
-				//'required' => false,
-				//'last' => false, // Stop validation after this rule
-				//'on' => 'create', // Limit validation to 'create' or 'update' operations
 			),
+			'group_exists' => array(
+				'rule' => array('group_exists'),
+				'message' => 'User must belong to a valid group',
+			)
+			
 		),
 	);
+	
+	//---------------------------------------------------
+	// custom validation routines
+	// including checking password against confirmation
+	//---------------------------------------------------
+	public function password_match($check) {
+		return $check['confirm_password'] == $this->data['User']['new_password'];
+	}
 
-	public function beforeSave() {
-	    $this->data['User']['password'] = AuthComponent::password($this->data['User']['password']);
-	    return true;
+	public function group_exists($check) {
+		$source = $this->Group->findById($check['group_id']);
+		return !empty($source['Group']['id']);
 	}
 	
+
+    // importantly hashes the new_password, which ultimately fails if new_password doesn't validate
+	function beforeSave() {
+	    parent::beforeSave();
+	    if (isset($this->data['User']['new_password']) && !empty($this->data['User']['new_password'])) {
+	        $this->data['User']['password'] = AuthComponent::password($this->data['User']['new_password']);
+		}
+		$tags = trim($this->data['User']['allowed_tags']);
+		if (empty($tags)) {
+			$this->data['User']['allowed_tags'] = null; // tidy up tags
+		}
+	    return true;
+	}
+		
 	// for ACL stuff
 	public function bindNode($user) {
 	    return array('model' => 'Group', 'foreign_key' => $user['User']['group_id']);
@@ -152,11 +183,8 @@ class User extends AppModel {
 
 	  return $value[0];
 	}
-
-
 	
 	//The Associations below have been created with all possible keys, those that are not needed can be removed
-
 
 /**
  * hasMany associations

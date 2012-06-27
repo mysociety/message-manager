@@ -73,9 +73,8 @@ class UsersController extends AppController {
 			} else {
 				$this->Session->setFlash(__('The user could not be saved. Please, try again.'));
 			}
-		} else {
-			$this->set('groups', $this->User->Group->find('list')); // populate the drop-down
-		}
+		} 
+		$this->set('groups', $this->User->Group->find('list')); // populate the drop-down
 	}
 
 /**
@@ -89,7 +88,16 @@ class UsersController extends AppController {
 		if (!$this->User->exists()) {
 			throw new NotFoundException(__('Invalid user'));
 		}
+		//$this->User->read(null, $id);
 		if ($this->request->is('post') || $this->request->is('put')) {
+
+			// if there's no attempt to change the password, remove the variables to bypass validation
+			if (empty($this->request->data['User']['new_password']) && 
+					empty($this->request->data['User']['confirm_password'])) {
+				unset($this->request->data['User']['new_password']);
+				unset($this->request->data['User']['confirm_password']);
+				$this->User->read(null, $id);
+			}
 			if ($this->User->save($this->request->data)) {
 				$this->Session->setFlash(__('The user has been saved'));
 				$this->redirect(array('action' => 'index'));
@@ -97,10 +105,10 @@ class UsersController extends AppController {
 				$this->Session->setFlash(__('The user could not be saved. Please, try again.'));
 			}
 		} else {
-	 		$this->User->id = $id;
-			$this->set('groups', $this->User->Group->find('list')); // populate the drop-down
 			$this->request->data = $this->User->read(null, $id);
 		}
+		$this->set('errors', $this->User->validationErrors);
+		$this->set('groups', $this->User->Group->find('list')); // populate the drop-down
 	}
 
 /**

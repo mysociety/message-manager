@@ -5,6 +5,7 @@
 			<th><?php echo $this->Paginator->sort('id');?></th>
 			<th><?php echo $this->Paginator->sort('username');?></th>
 			<th><?php echo $this->Paginator->sort('group_id');?></th>
+			<th><?php echo $this->Paginator->sort('allowed_tags');?></th>
 			<th><?php echo $this->Paginator->sort('created');?></th>
 			<th><?php echo $this->Paginator->sort('modified');?></th>
 			<th class="actions"> </th>
@@ -15,6 +16,7 @@
 		<td><?php echo h($user['User']['id']); ?>&nbsp;</td>
 		<td><?php echo h($user['User']['username']); ?>&nbsp;</td>
 		<td><?php echo h($user['Group']['name']); ?>&nbsp;</td>
+		<td><?php echo h(strtoupper($user['User']['allowed_tags'])); ?>&nbsp;</td>
 		<td><?php echo h($user['User']['created']); ?>&nbsp;</td>
 		<td><?php echo h($user['User']['modified']); ?>&nbsp;</td>
 		<td class="actions">

@@ -4,7 +4,9 @@
 		<legend><?php echo __('Add User'); ?></legend>
 	<?php
 		echo $this->Form->input('username');
-		echo $this->Form->input('password');
+		echo $this->Form->input('new_password', array('type'=>'password','label'=>'Password'));
+		echo $this->Form->input('confirm_password', array('type'=>'password','label'=>'Repeat password to confirm'));
+		echo $this->Form->input('allowed_tags');
 		echo $this->Form->input('group_id');
 	?>
 	</fieldset>
