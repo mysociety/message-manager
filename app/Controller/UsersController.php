@@ -107,7 +107,6 @@ class UsersController extends AppController {
 		} else {
 			$this->request->data = $this->User->read(null, $id);
 		}
-		$this->set('errors', $this->User->validationErrors);
 		$this->set('groups', $this->User->Group->find('list')); // populate the drop-down
 	}
 
