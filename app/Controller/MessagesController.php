@@ -135,9 +135,8 @@ class MessagesController extends AppController {
 			if ($this->RequestHandler->accepts('json')) {
 				$this->Message->recursive = 0;
 				$message = $this->Message->read(self::_json_fields());
-				return new CakeResponse(array(
-					'body' => json_encode(self::mm_json_response(true, $message))
-				));
+        $this->response->body( json_encode(self::mm_json_response(true, $message) ) );
+        return $this->response;
 			} else {
 				$this->Session->setFlash(__('Message locked (expires in %s seconds)%s', 
 					Configure::read('lock_expiry_seconds'), $msg_unlocked));
@@ -145,9 +144,8 @@ class MessagesController extends AppController {
 		} else {
 			$err_msg = __("Lock not granted: " . $lock_err );
 			if ($this->RequestHandler->accepts('json')) {
-				return new CakeResponse(array(
-					'body' => json_encode(self::mm_json_response(false, null, $err_msg))
-				));
+        $this->response->body( json_encode(self::mm_json_response(false, null, $err_msg)) );
+        return $this->response;
 			}
 			$this->Session->setFlash(__($err_msg));
 		}
@@ -206,9 +204,8 @@ class MessagesController extends AppController {
 				// fake success TODO
 				self::_logAction(ActionType::$ACTION_REPLY, "Reply: " . $reply_text);
 				if ($this->RequestHandler->accepts('json')) {
-					return new CakeResponse(array(
-						'body' => json_encode(self::mm_json_response(true, null))
-					));
+				    $this->response->body( json_encode(self::mm_json_response(true, null)) );
+            return $this->response;
 				} else {
 					$err_msg = "Reply sent OK.";
 				}
@@ -217,9 +214,8 @@ class MessagesController extends AppController {
 			}
 		}
 		if ($this->RequestHandler->accepts('json')) {
-			return new CakeResponse(array(
-				'body' => json_encode(self::mm_json_response(false, null, $err_msg))
-			));
+			$this->response->body( json_encode(self::mm_json_response(false, null, $err_msg)) );
+      return $this->response;
 		}
 		$this->Session->setFlash($err_msg);
 		$this->redirect(array('action' => 'view', $id));
@@ -245,9 +241,8 @@ class MessagesController extends AppController {
 			$unlocked_msg__('Failed to release lock on message');
 		}
 		if ($this->RequestHandler->accepts('json')) {
-			return new CakeResponse(array(
-				'body' => json_encode(self::mm_json_response(false, null, $unlocked_msg))
-			));
+				$this->response->body( json_encode(self::mm_json_response(false, null, $unlocked_msg)) );
+        return $this->response;
 		}
 		$this->Session->setFlash($unlocked_msg);
 		$this->redirect(array('action' => 'view', $id));
@@ -277,9 +272,8 @@ class MessagesController extends AppController {
 			$unlocked_msg = __('no locks to release');
 		}
 		if ($this->RequestHandler->accepts('json')) {
-			return new CakeResponse(array(
-				'body' => json_encode(self::mm_json_response(false, null, $unlocked_msg))
-			));
+				$this->response->body( json_encode(self::mm_json_response(false, null, $unlocked_msg)) );
+        return $this->response;
 		}
 		$this->Session->setFlash($unlocked_msg);
 		$this->redirect(array('action' => 'index'));
@@ -293,9 +287,8 @@ class MessagesController extends AppController {
 		if (empty($fms_id)) {
 			$err_msg = __("Not assigned: missing FMS ID");
 			if ($this->RequestHandler->accepts('json')) {
-				return new CakeResponse(array(
-					'body' => json_encode(self::mm_json_response(false, null, $err_msg))
-				));
+					$this->response->body( json_encode(self::mm_json_response(false, null, $err_msg)) );
+          return $this->response;
 			}
 			$this->Session->setFlash($err_msg);
 		} else {
@@ -304,9 +297,8 @@ class MessagesController extends AppController {
 			if ($lock_err) {
 				$err_msg = __("Not assigned: " + $lock_err);
 				if ($this->RequestHandler->accepts('json')) {
-					return new CakeResponse(array(
-						'body' => json_encode(self::mm_json_response(false, null, $err_msg))
-					));
+						$this->response->body( json_encode(self::mm_json_response(false, null, $err_msg)) );
+            return $this->response;
 				}
 				$this->Session->setFlash($err_msg);
 			} else {
@@ -314,17 +306,15 @@ class MessagesController extends AppController {
 				if ($this->Message->save()) {
 					self::_logAction(ActionType::$ACTION_ASSIGN, $fms_id);
 					if ($this->RequestHandler->accepts('json')) {
-						return new CakeResponse(array(
-							'body' => json_encode(self::mm_json_response(true, null))
-						));
+							$this->response->body( json_encode(self::mm_json_response(true, null)) );
+              return $this->response;
 					}
 					$this->Session->setFlash(__('Message assigned to FMS report %s', $fms_id));
 				} else {
 					$err_msg = __('Failed to assign FMS report %s to message', $fms_id);
 					if ($this->RequestHandler->accepts('json')) {
-						return new CakeResponse(array(
-							'body' => json_encode(self::mm_json_response(false, null, $err_msg))
-						));
+							$this->response->body( json_encode(self::mm_json_response(false, null, $err_msg)) );
+              return $this->response;
 					}
 					$this->Session->setFlash($err_msg);
 				}

@@ -137,6 +137,13 @@ $(document).ready(function () {
             url: message_manager_url_root +"messages/" +
                 (want_unique_lock? "lock_unique" : "lock") + 
                 "/" + msg_id + ".json",
+            beforeSend: function (xhr){
+                xhr.setRequestHeader('Authorization', make_base_auth(
+                    $('#mm-htauth-username').val(),
+                    $('#mm-htauth-password').val()
+                ));
+		xhr.withCredentials = true;
+            },
             success:function(data, textStatus) {
                 // returned data['data'] is 'Message', 'Source', 'Lockkeeper'
                 if (data['success']) {
@@ -175,6 +182,13 @@ $(document).ready(function () {
             type:"post", 
             data:$("#assign-fms-submit").closest("form").serialize(),
             url: message_manager_url_root +"messages/assign_fms_id/" + msg_id + ".json",
+            beforeSend: function (xhr){
+                xhr.setRequestHeader('Authorization', make_base_auth(
+                    $('#mm-htauth-username').val(),
+                    $('#mm-htauth-password').val()
+                ));
+		xhr.withCredentials = true;
+            },
             success:function(data, textStatus) {
                 if (data['success']) {
                     console.log("success! FMS ID assigned OK");
