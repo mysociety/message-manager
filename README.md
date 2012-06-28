@@ -30,7 +30,7 @@ gotchas you experience to this document. Contact details are at the bottom of
 this file.
 
 * install the files
-* point your webserver at `webroot`
+* point your webserver at `app/webroot`
 * create a database
 * add database settings to `app/Config/Database.php`
 * configure system-wide settings in Message Manager
@@ -41,26 +41,24 @@ this file.
 
 The rest of this document goes into more detail about this process.
 
-## Install files and point webserver at `webroot`
+## Install files and point webserver at `app/webroot`
 
 Specifically, if you don't change the structure of the delivered Message
 Manager files at all, you should be able to set your webserver document root
-to app/webroot and things will work. If you do change the structure, you'll
+to `app/webroot` and things will work. If you do change the structure, you'll
 need to update `app/webroot/index.php` to find the Cake system installation.
 
 You should be able see a Cake diagnostics page at
-http://your_domain/pages/diagnostics
+`http://your_domain/pages/diagnostics`
 
 
 ## Setting up your database
 
-Database config is in app/Config/database.php.
+Database config is in `app/Config/database.php`.
 
 You can edit this file directly if you want, or you can drop your config in to
 `app/Config/general.yml` as a YAML file. (This particular mechanism is in
 place because mySociety's own environment favours YAML configuration files).
-See
-
 
 
 ### Populate it with initial data (not optional!)
@@ -136,6 +134,9 @@ to the MSISDNs (phone numbers) of incoming messages.
 There are some basic settings that you need to edit in
 `/app/Config/MessageManager.php`
 
+Currently these values will not be read from `general.yml`, so be careful
+if you are developing the code not to commit these config changes.
+
 ### `tags`
 
 The tags are words that are used to identify and filter incoming messages.
@@ -158,7 +159,7 @@ Tag recognition is case-insensitive.
 
 ### `remove_tags_when_matched`
 
-Set to a true value if you want matched tags to be removed from incoming
+Set to a true value (`1`) if you want matched tags to be removed from incoming
 messages (recommended).
 
 ### FMS URLs
@@ -181,25 +182,6 @@ left at the default value of 360 seconds.
 
 You should be able to log into the Message Manager with the default admin
 user.
-
-### Dummy client & Incoming Message
-
-The Message Manager has a dummy client (that is, a page for testing/playing
-without needing to really integrate with an external service, that effectively
-behaves as a page on FixMyStreet would). You can find it by logging into the
-Message Manager and going to `/MessageSources/client`. Click "available
-messages" (at any time) to load the list of messages: clicking on them locks
-them, and clicking on "Assign FMS ID" will assign it -- if this operation
-succeeds, the message is removed from the list because it is no longer
-available for assignment. This demo implements the JSON API with `client.js`,
-which may be useful if you're attempting an implementation of your own.
-
-If you're logged in as an administrator (or a message-source) you'll also see
-a form for submitting incoming messages "as if" they were coming in from an
-SMS gateway.
-
-By default this page is enabled but you _must_ disable it before going live:
-see `/app/Config/MessageManager.php`.
 
 ## Add message sources
 
@@ -225,6 +207,28 @@ If you're using tags, you can specify which tags the user is associated with.
 API users cannot retreive messages that don't have a tag which matches the
 user's tag.
 
+## Dummy client & Incoming Message
+
+The Message Manager has a dummy client (that is, a page for testing/playing
+without needing to really integrate with an external service, that effectively
+behaves as a page on FixMyStreet would). You can find it by logging into the
+Message Manager and going to `/dummy`. Click "available messages" (at any
+time) to load the list of messages: clicking on them locks them, and clicking
+on "Assign FMS ID" will assign it -- if this operation succeeds, the message
+is removed from the list because it is no longer available for assignment.
+This demo implements the JSON API with `message_manager_client.js`, which is
+intended to serve as a working example if you're attempting an implementation
+of your own. See the code in `app/View/MessageSources/client.ctp` to see how
+this is used (in particular the javascript at the bottom of that file which is
+applying the methods from `message_manager_client.js`). You should be able to
+drop the `.js` file into your own client without needing to modify it.
+
+If you're logged in as an administrator (or a message-source) you'll also see
+a form for submitting incoming messages "as if" they were coming in from an
+SMS gateway.
+
+By default this page is enabled but you _must_ disable it before going live:
+see `/app/Config/MessageManager.php`.
 
 ## Setting up FixMyStreet
 
