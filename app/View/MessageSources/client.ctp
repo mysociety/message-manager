@@ -1,6 +1,6 @@
 <?php 
 echo $this->Html->script('jquery-1.7.2.min', false); 
-echo $this->Html->script('client', false); 
+echo $this->Html->script('message_manager_client', false); 
 ?>
 
 <h2>
