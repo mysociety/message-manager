@@ -214,13 +214,13 @@ body {
         font-weight: bold;
       }
     }
-    #message-list {
+    #mm-message-list {
       ul {
         list-style-type: none;
         padding: 0;
         margin: 0;
         li {
-          margin: 8px 0 0 0;
+          margin: 4px 0 0 0;
           padding: 0;
           background-color: white;
           cursor: pointer;
@@ -268,7 +268,7 @@ body {
         margin-top:1em;
       }
     }
-    .status-message-container {
+    #mm-status-message-container {
       min-height: 1.4em;
       margin: 0 0 8px 0;
       padding: 8px 4px;

@@ -38,10 +38,10 @@ echo $this->Html->script('client', false);
 			username:&nbsp;<span id="mm-received-username"><?php echo (empty($username)? "<i>none</li>":$username); ?></span> 
 		</p>
 		<h3>Mock FMS Client</h3>
-		<div class="status-message-container">
-			<div id="status-message"></div>
+		<div id="mm-status-message-container">
+			<div id="mm-status-message"></div>
 		</div>
-		<div id="message-list" style="min-height:1em;"></div>
+		<div id="mm-message-list" style="min-height:1em;"></div>
 		<?php echo $this->Form->create(array('default' => false)); ?>
 			<div id="mm-login-container">
 				<?php
@@ -66,7 +66,48 @@ echo $this->Html->script('client', false);
 			</p>
 		</div>
 	</div>
-	<!--<div class="dummy-client"><h3>AJAX: release all locks</h3></div>-->
 <?php } ?>
 
 <div style="clear:both;"></div>
+
+
+<script type="text/javascript">
+	$(document).ready(function() {
+
+		var dummy_populate_assign_boxes = function(data) {
+			if ('Message' in data) {
+				var msg_id = data['Message'].id;
+				$('#message_id').val(msg_id); 
+				if ($('#random-fms-id').prop("checked")) {
+					$('#fms_id').val(100+Math.floor(Math.random()*899));
+				}
+			}
+		}
+
+		var dummy_populate_username = function(data) {
+			$('#mm-username span').text(data['username']);
+		}
+		
+		var dummy_clear_assign_boxes = function() {
+	        $('#fms_id,#message_id').val(''); // for dummy demo only
+		}
+		
+
+
+		//------------------------------------------------------------
+		// message_manager has been declared in clients.js
+
+		message_manager.config({url_root: "/"});
+
+		message_manager.setup_click_listener({callback: dummy_populate_assign_boxes});
+
+		$('#available-submit').click(function(){
+			message_manager.get_available_messages(dummy_populate_username);
+		});
+
+		$('#assign-fms-submit').click(function() {
+			message_manager.assign_fms_id($('#message_id').val(), $('#fms_id').val(), {callback:dummy_clear_assign_boxes});
+		});    
+
+	});
+</script>
