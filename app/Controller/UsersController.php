@@ -20,9 +20,17 @@ class UsersController extends AppController {
 			if ($this->Auth->login()) {
 				// 'source' user has no useful access to anything (!) except maybe the dummy client
 				if ($this->Auth->user('group_id')==Group::$SOURCE_USER_GROUP_ID) { // hard-coded!
-					$this->redirect(array('controller' => 'MessageSources', 'action' => 'client'));
-				} else {
-					$this->redirect($this->Auth->redirect());
+					if (Configure::read('enable_dummy_client')==1) {
+						$this->redirect(array('controller' => 'MessageSources', 'action' => 'client'));
+					} else { // home page?
+						$this->redirect(array('controller' => 'Pages', 'action' => 'display'));
+					}
+				} else { // redirecting to login seems confusing (e.g., after login failure)
+					if ($this->Auth->redirect() == '/Users/login') {
+						$this->redirect(array('controller' => 'Pages', 'action' => 'display'));
+					} else {
+						$this->redirect($this->Auth->redirect());
+					}
 				}
 			} else {
 				$this->Session->setFlash('Your username or password was incorrect.');
