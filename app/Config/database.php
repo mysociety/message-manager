@@ -81,39 +81,28 @@ class DATABASE_CONFIG {
 		//'encoding' => 'utf8',
 	);
 	
-	// this quirky bit o' code lets Cake pull the database config from the general.yml file (if it
-	// exists): this is useful for mySociety because it fits in with our automatic deployment 
-	// mechanism, but is safe for others to skip.
-	// In fact, you can spare Cake the trouble of trying to read the file if you know it won't be
-	// there by setting  might_use_general_yml to 0 (see app/Config/MessageManager.php). 
 	function __construct () {
+		// following uses any MESSAGE_MANAGER_DB_* settings that were
+		// in general.yml (useful for mySociety's own deployments)
 		if (Configure::read('might_use_general_yml')==1) {
-			
-			// ** This is much nicer...
-			//     App::uses('Spyc', 'Lib');
-			// ** but on (fastcgi?) deployment, it won't play nicely, so instead do: 
-			$got_spyc = include(APP . 'Lib' . DS . 'spyc.php' );
-			$config = Spyc::YAMLLoad(APP . 'Config/general.yml'); 
-			if ( is_array($config) ) { 
-				foreach ( $config as $full_name=>$data ) {
-					if (! is_array($data)) { // safety check
-						$name = strtolower(str_replace('MESSAGE_MANAGER_DB_', '', $full_name));
-						switch ($name) {
-							case 'name':
-								$this->default['database'] = $data;
-								break;
-							case 'pass':
-								$this->default['password'] = $data;
-								break;
-							case 'user':
-								$this->default['login'] = $data;
-								break;							
-							default:
-								$this->default[$name] = $data;
-						}
+			foreach (Configure::read() as $key=>$value) {
+				if (preg_match('/^db_/', $key)) {
+					$name = strtolower(str_replace('db_', '', $key));
+					switch ($name) {
+						case 'name':
+							$this->default['database'] = $value;
+							break;
+						case 'pass':
+							$this->default['password'] = $value;
+							break;
+						case 'user':
+							$this->default['login'] = $value;
+							break;
+						default:
+							$this->default[$name] = $value;
 					}
 				}
-			}
+			}	
 		} 
 	}
 }

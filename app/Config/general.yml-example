@@ -6,7 +6,8 @@
 # If you'd prefer to use general.yml as a plain database config file (and
 # thereby avoid contaminating app/Config/database.php with changes) you
 # can put them into app/Config/general.yml and the Message Manager will 
-# use them to overwrite anything database.php.
+# use them to overwrite anything in app/Config/MessageManager.php and
+# app/Config/database.php.
 #
 #    datasource: 'Database/Mysql'
 #    persistent: false
@@ -29,7 +30,9 @@
 # settings once the names here have have had their prefixes stripped and lowercased.
 # 
 # Configuration parameters in YAML syntax for mySociety internal deployment only:
-#
+# Note "MESSAGE_MANAGER_DB_*" is magic, and becomes the appropriate *database* config.
+# All other config is placed in the default application config, having stripped
+# the optional "MESSAGE_MANAGER_" prefix.
 
 MESSAGE_MANAGER_DB_USER: user
 MESSAGE_MANAGER_DB_PASS: user
@@ -37,4 +40,27 @@ MESSAGE_MANAGER_DB_NAME: messages
 MESSAGE_MANAGER_DB_HOST: localhost
 MESSAGE_MANAGER_DB_PORT: 5432
 
+# MESSAGEMANAGER_DB_DATASOURCE: 'datasource: Database/Mysql'
 MESSAGE_MANAGER_DB_DATASOURCE: 'Database/Postgres'
+
+MESSAGE_MANAGER_CORS_ALLOWED: 'http://www.fixmystreet.com'
+
+MESSAGE_MANAGER_DB_USER: root
+MESSAGE_MANAGER_DB_PASS: root
+MESSAGE_MANAGER_DB_NAME: 'messages'
+MESSAGE_MANAGER_DB_HOST: localhost
+# MESSAGEMANAGER_DB_PORT: '5432'
+
+MESSAGE_MANAGER_DB_DATASOURCE: 'Database/mySql'
+
+MESSAGE_MANAGER_LOCK_EXPIRY_SECONDS: '360'
+
+MESSAGE_MANAGER_TAGS:
+  - LUZ: "Barangay Luz"
+  - BSN: "Barangay Basak San Nicolas"
+
+MESSAGE_MANAGER_REMOVE_TAGS_WHEN_MATCHED: '1'
+MESSAGE_MANAGER_FMS_SITE_URL: 'http://fms-local'
+MESSAGE_MANAGER_FMS_REPORT_PATH: '/report/%s'
+MESSAGE_MANAGER_CORS_ALLOWED: 'http://www.fixmystreet.com'
+MESSAGE_MANAGER_ENABLE_DUMMY_CLIENT: '1'
