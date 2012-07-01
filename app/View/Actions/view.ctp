@@ -16,7 +16,7 @@
 			<td>
 				<?php if ($action['Action']['message_id']) {
 					echo $this->Html->link($action['Message']['msisdn'],
-						array('controller' => 'users', 'action' => 'view', $action['Action']['message_id']));
+						array('controller' => 'messages', 'action' => 'view', $action['Action']['message_id']));
 				} else { ?>
 					&mdash;
 				<?php } ?>
