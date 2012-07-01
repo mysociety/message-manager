@@ -29,7 +29,13 @@
 				echo 'none';
 			} ?>
 			&nbsp;
-		</dd>	  
+		</dd>
+		<?php foreach($message['Action'] as $action) { 
+			if ($action['ActionType']['name']=='note') {
+				echo('<dt><a href="#action_' . $action['id'] . '">Note</a></dt>');
+				echo('<dd><p class="note-text">' . h($action['note']) . '</p></dd>');
+			}
+		} ?>
 		<dt>
 			FMS ID
 		</dt>
@@ -95,6 +101,7 @@
 		</dd>
 	</dl>
 
+	
 	<!-- add note -->
 	<?php echo $this->Form->create('Action', array('controller'=>'Actions', 'action'=>'add'));?>
 	<?php echo $this->Form->hidden('message_id', array('value'=>$message['Message']['id']));?>
@@ -119,7 +126,7 @@
 			<td>&nbsp;</td>
 	<?php foreach($message['Action'] as $action){ ?>
 		<tr>
-			<td><?php echo $action['created']; ?></td>
+			<td><a name="action_<?php echo $action['id'];?>"></a><?php echo $action['created']; ?></td>
 			<td>
 				<?php if ($action['user_id']) {
 					echo $this->Html->link($action['User']['username'],

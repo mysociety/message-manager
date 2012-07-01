@@ -51,12 +51,14 @@ body {
   margin-top: 0em; }
 #container .mm-page ul {
   margin-bottom: 1.2em; }
-#container .message-text {
+#container .message-text, #container .note-text {
   border: 1px solid black;
   padding: 1em;
   background-color: #fff4f4;
   font-weight: bold;
   min-height: 2em; }
+#container .note-text {
+  background-color: #ffcccc; }
 #container p.footnote {
   font-size: 80%;
   margin-top: 2em;

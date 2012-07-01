@@ -9,6 +9,7 @@ $message_border_color: #000;
 $message_bg_color:     #fff4f4;
 $weak_text_color:      #666;
 $dummy_back_color:     #eee;
+$note_bg_color:        #ffcccc;
 
 // status colours
 $color_status_unknown:   #dddddd; 
@@ -92,12 +93,15 @@ body {
       margin-bottom: 1.2em;
     }
   }
-  .message-text {
+  .message-text, .note-text {
     border:1px solid $message_border_color;
     padding: 1em;
     background-color: $message_bg_color;
     font-weight: bold;
     min-height: 2em;
+  }
+  .note-text {
+    background-color: $note_bg_color;
   }
   p.footnote  {
     font-size: 80%;
