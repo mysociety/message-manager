@@ -10,7 +10,7 @@ class UsersController extends AppController {
 	public function beforeFilter() {
 		parent::beforeFilter();
 		Controller::loadModel('Group'); // to access static methods on it
-		// $this->Auth->allow('initDB'); // uncomment to enable re-build of the aros_acos table
+		//$this->Auth->allow('initDB'); // uncomment to enable re-build of the aros_acos table
 	}
 	
 	public $helpers = array('Js' =>  array('Jquery'));
@@ -144,7 +144,7 @@ class UsersController extends AppController {
 		//------------------------------ 
 		// safety! only run this once, if you need to!
 		 $this->Session->setFlash(__('initDB is disabled!'));
-		 $this->redirect(array('action' => 'index'));
+		 $this->redirect(array('controller' => 'Pages', 'action' => 'display'));
 		 return;
 		//------------------------------ 
 
@@ -156,6 +156,7 @@ class UsersController extends AppController {
 		// allow managers to deal with most things except users and groups
 		$group->id = Group::$MANAGER_GROUP_ID;
 		$this->Acl->deny($group, 'controllers');
+		$this->Acl->allow($group, 'controllers/Actions/add');  // for adding notes to messages
 		$this->Acl->allow($group, 'controllers/Actions/index');
 		$this->Acl->allow($group, 'controllers/Actions/view');
 		$this->Acl->allow($group, 'controllers/Groups/index');
