@@ -47,7 +47,11 @@
 		</dl>
 	</div>
 	<p>
-		To change tags and settings, edit <code>app/Config/MessageManager.php</code>
+		To change tags and settings, edit 
+		<?php if (Configure::read('might_use_general_yml')=='1') { ?>
+			<code>app/Config/general.yml</code> or 
+		<? } ?>
+		<code>app/Config/MessageManager.php</code>.
 	</p>
 </div>
 <?php echo $this->element('sidebar/pages'); ?>
