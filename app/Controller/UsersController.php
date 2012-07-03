@@ -10,6 +10,8 @@ class UsersController extends AppController {
 	public function beforeFilter() {
 		parent::beforeFilter();
 		Controller::loadModel('Group'); // to access static methods on it
+		$this->Auth->allow('login');
+
 		//$this->Auth->allow('initDB'); // uncomment to enable re-build of the aros_acos table
 	}
 	
