@@ -58,7 +58,9 @@ Database config is in `app/Config/database.php`.
 
 You can edit this file directly if you want, or you can drop your config in to
 `app/Config/general.yml` as a YAML file. (This particular mechanism is in
-place because mySociety's own environment favours YAML configuration files).
+place because mySociety's own environment favours YAML configuration files
+-- see the notes below about `general.yml`, which you may prefer because it
+means all your config is in a single file, outside of the git repository).
 
 
 ### Populate it with initial data (not optional!)
@@ -82,18 +84,26 @@ Remember you'll need to change the `datasource` setting (see above) to
 
 ### Warning about user groups
 
-Don't delete any of the existing user groups, or make any new ones.
+Don't delete any of the existing user groups, or make any new ones. Make as
+many new users as you like, but not new user groups!
 
-If you do, you will almost certainly run into problems until you rebuild the
-aros_acos table. See `UsersController/initdb` (in the code: it's
-disabled/commented) for details for rebuilding it but, really, don't change
-the groups :-)
+The rest of this little section only affects you if you're a developer
+modifying the code, so skip it if that's not you.
 
-Similarly, if you do add any actions to existing controllers, you'll need to
-rebuild the `aros_acos` table to have them included in Message Manager's
-authorisation policy. This only affects you if you are a developer adding new
-code. See the comments at the top of `db/initial_auth.sql` for instructions
-how to rebuild the authorisation tables.
+If you do delete or create user groups, you will almost certainly run into
+problems until you rebuild the aros_acos table. See `UsersController/initdb`
+(in the code: it's disabled/commented) for details for rebuilding it but,
+really, don't change the groups :-)
+
+Similarly, if you add any new actions to existing controllers, you'll need to
+add them to the `acos` table, and then rebuild the `aros_acos` table to have
+them included in Message Manager's authorisation policy. Remember, this only
+affects you if you are a developer adding new code. The thing to bear in mind
+is that AROS (requestor objects) are user groups, which you'll probably not
+need to ever change, and ACOS (the actions being requested) are your new
+actions, which will need to be both added and mapped to the AROS who are
+allowed to use them. See the comments at the top of `db/initial_auth.sql` for
+instructions how to rebuild the authorisation tables.
 
 The authorisation within Message Manager is handled on the group level (which
 is why although you shouldn't delete the groups, deleting/adding users won't
@@ -131,11 +141,47 @@ to the MSISDNs (phone numbers) of incoming messages.
 
 ## Configuring the Message Manager's system-wide settings
 
-There are some basic settings that you need to edit in
-`/app/Config/MessageManager.php`
+There are some basic settings that you need to edit. If you're running a local
+installation and are happy to edit `/app/Config/MessageManager.php` then you
+can add config directly there (and, as mentioned above,
+`/app/Config/Database.php`).
 
-Currently these values will not be read from `general.yml`, so be careful
-if you are developing the code not to commit these config changes.
+However, Message Manager will also look inside `app/Config/general.yml` for
+overriding configuration settings. This mechanism is in place because
+mySociety's internal deployment mechanism uses YAML config files. If you don't
+want to use this mechanism, set
+
+    might_use_general_yml = 0
+
+to prevent Message Manager from attempting to read the file at all.
+
+*Note that (if `might_use_general_yml` is set to `1`), any settings in
+`general.yml` will override the values in `/MessageManager.php` and
+`Database.php`. That is: if you're using the `general.yml` file, its values
+really are used!*
+
+### Note about prefixes in general.yml
+
+If you put config settings into `general.yml`, they'll be read as you'd
+expect. However there's also a little bit of magic going on that mySociety's
+internal mechanism uses: the prefix `MESSAGE_MANAGER_` will be stripped from
+any config names, and furthermore those with `MESSAGE_MANAGER_DB_` or `db_`
+prefixes are mapped explicitly to Cake's database config settings. There's a
+even more magic mapping between mySociety's internal defaults and Cake's, but
+if you use the values Cake expects, you'll be fine. For example, to set your
+database settings from within `general.yml` use this:
+
+    db_datasource: 'Database/Mysql'
+    db_persistent: false
+    db_host: 'localhost'
+    db_login: 'user'
+    db_password: 'password'
+    db_database: 'your_database_name'
+
+Remember that these are just overriding the values in Cake's default and
+database php files anyway, so if you want to be terse you only need to declare
+values that are different.
+
 
 ### `tags`
 
@@ -162,7 +208,7 @@ Tag recognition is case-insensitive.
 Set to a true value (`1`) if you want matched tags to be removed from incoming
 messages (recommended).
 
-### FMS URLs
+### `fms_site_url` and `fms_report_path`
 
 Provide the base URL of your FMS-like site and the path to reports. 
 
@@ -172,16 +218,32 @@ Provide the base URL of your FMS-like site and the path to reports.
 It's probably best to not have a trailing slash on the site URL, and start the
 path with one. The `%s` will be replaced with the problem report's ID.
 
-### Other settings
+### `enable_dummy_client`
 
-Other config settings are `enable_dummy_client` which you should set to a
-false value before going live, and `lock_expiry_seconds` which can normally be
-left at the default value of 360 seconds.
+Set this to `0` to disable the dummy client before going live. You can see the
+dummy client at `/dummy` and you can use it to fake incoming messages and
+client interaction with the database... but you *must* disable it before
+running a production system.
+
+### `lock_expiry_seconds`
+
+The lock expiry controls how long a message "belongs" to the user who last
+claimed it (locking is the mechanism used to stop two FMS users creating a
+report from the same message at the same time). You can normally leave this at
+the default value of 360 seconds.
+
+### `cors_allowed`
+
+The CORS allowed is a comma-separated list of URLs that are used to indicate
+to the (browser) clients which domains the Message Manager regards as
+trustworthy when receiving incoming AJAX requests from domains other than its
+own. This is part of the mechanism used if you're making Message Manager calls
+from within another website's pages (such as FixMyStreet).
 
 ## Smoke-test: log in as `admin`
 
-You should be able to log into the Message Manager with the default admin
-user.
+Once you've set up your config, you should be able to log into the Message
+Manager with the default admin user.
 
 ## Add message sources
 
@@ -228,7 +290,7 @@ a form for submitting incoming messages "as if" they were coming in from an
 SMS gateway.
 
 By default this page is enabled but you _must_ disable it before going live:
-see `/app/Config/MessageManager.php`.
+see the section on configuration above (`enable_dummy_client`).
 
 ## Setting up FixMyStreet
 
@@ -237,8 +299,9 @@ to enable the Message Manager functionality for specified accounts in that
 application (note: June-2012 *not yet implemented*).
 
 If you are implementing your own code, see the API documentation (log into
-Message Manager and go to `/api`) and also have a look at `client.js`, which
-implements the concept by way of a demonstration -- see "Dummy client" above.
+Message Manager and go to `/api`) and also have a look at
+`message_manager_client.js`, which implements the concept by way of a
+demonstration -- see "Dummy client" above.
 
 # Running Message Manager
 
@@ -273,9 +336,9 @@ includes some of the configuration described above.
 
 # About the project
 
-mySociety's Message Manager was created as an addition to the FixMyStreet platform as part of a
-project funded by the World Bank. See code.fixmystreet.com for more information about the 
-platform. 
+mySociety's Message Manager was created as an addition to the FixMyStreet
+platform as part of a project funded by the World Bank. See
+code.fixmystreet.com for more information about the platform.
 
 
 ## Timeline
@@ -291,7 +354,7 @@ mySociety's Message Manager is released under the GNU Affero General Public
 License. See the accompanying LICENSE file.
 
 
-##About Cake
+## About Cake
 
 [CakePHP][4] is a rapid development framework for PHP which uses commonly
 known design patterns like Active Record, Association Data Mapping, Front
