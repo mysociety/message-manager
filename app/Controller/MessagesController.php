@@ -95,7 +95,7 @@ class MessagesController extends AppController {
 		} else {
 			$this->helpers[] = 'MessageUtils';
 			$this->Message->recursive=2; // to get the user and type values
-			$this->set('message', $this->Message->read());
+			$this->set('message', $this->Message->read(), $id);
 			$this->set('is_locked', $this->Message->is_locked()? 1 : 0);
 			$this->set('seconds_until_lock_expiry', $this->Message->seconds_until_lock_expiry());
 		}
@@ -134,7 +134,7 @@ class MessagesController extends AppController {
 			}
 			if ($this->RequestHandler->accepts('json')) {
 				$this->Message->recursive = 0;
-				$message = $this->Message->read(self::_json_fields());
+				$message = $this->Message->read(self::_json_fields(), $id);
         $this->response->body( json_encode(self::mm_json_response(true, $message) ) );
         return $this->response;
 			} else {
