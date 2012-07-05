@@ -53,7 +53,7 @@ you're *not* running under under CGI/fastCGI, you may want to comment out the
 Authorization rewrite rule.
 
 You should be able see a Cake diagnostics page at
-`http://your_domain/pages/diagnostics`
+`http://your_domain/pages/cake_diagnostics`
 
 
 ## Setting up your database
