@@ -1,8 +1,7 @@
 <IfModule mod_rewrite.c>
     RewriteEngine On
-    # uncomment the line below if you are running under CGI/fastCGI to make 
-    # Basic auth work
-    # RewriteRule .*     -         [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+    # uncomment the line below if you are running under CGI/fastCGI to make Basic auth work
+    RewriteRule .*     -         [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^(.*)$ index.php [QSA,L]

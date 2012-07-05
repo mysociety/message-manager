@@ -48,6 +48,10 @@ Manager files at all, you should be able to set your webserver document root
 to `app/webroot` and things will work. If you do change the structure, you'll
 need to update `app/webroot/index.php` to find the Cake system installation.
 
+There's an `.htaccess` file in `app/webroot` which is ready-to-use, but if
+you're *not* running under under CGI/fastCGI, you may want to comment out the
+Authorization rewrite rule.
+
 You should be able see a Cake diagnostics page at
 `http://your_domain/pages/diagnostics`
 
