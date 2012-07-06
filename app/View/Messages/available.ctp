@@ -14,8 +14,8 @@
 
 	    <?php $c_locks = 0; foreach ($messages as $message): ?>
 	    <tr>
-	        <td><?php echo $message['Message']['created']; ?></td>
-	        <td class="status-<?php echo $message['Status']['name']; ?>"><?php echo $message['Status']['name']; ?>
+	        <td><?php echo h($message['Message']['created']); ?></td>
+	        <td class="status-<?php echo ($message['Status']['name']); ?>"><?php echo h($message['Status']['name']); ?>
 				<?php if (! empty($message['Message']['lock_expires'])) {
 					echo('*');
 					$c_locks++;

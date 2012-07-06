@@ -15,15 +15,15 @@
 			<p class="message-text"><?php echo h($message['Message']['message'])?></p>
 		</dd>
 		<dt>Status</dt>
-		<dd class="status-<?php echo $message['Status']['name'] ?>">
-			<strong><?php echo $message['Status']['name'] ?></strong>
+		<dd class="status-<?php echo h($message['Status']['name']) ?>">
+			<strong><?php echo h($message['Status']['name']) ?></strong>
 			&nbsp;
 		</dd>
 		<dt>Lock</dt>
 		<dd class="status-<?php echo($is_locked?'locked':'unlocked'); ?>">
 			<?php if ($message['Message']['lock_expires']) {
 				echo $this->MessageUtils->pretty_lock_duration($seconds_until_lock_expiry);
-				echo " (" . $message['Message']['lock_expires'] . ")<br/>";
+				echo " (" . h($message['Message']['lock_expires']) . ")<br/>";
 				echo 'owner: ' . h($message['Lockkeeper']['username']);
 			} else {
 				echo 'none';
@@ -32,7 +32,7 @@
 		</dd>
 		<?php foreach($message['Action'] as $action) { 
 			if ($action['ActionType']['name']=='note') {
-				echo('<dt><a href="#action_' . $action['id'] . '">Note</a></dt>');
+				echo('<dt><a href="#action_' . h($action['id']) . '">Note</a></dt>');
 				echo('<dd><p class="note-text">' . h($action['note']) . '</p></dd>');
 			}
 		} ?>
@@ -45,31 +45,31 @@
 				echo $this->Html->link($fms_url, $fms_url, array('class'=>'no-decoration'));
 			} ?>
 			<?php if (!empty($message['Message']['assigned'])) {
-				echo "<br/>assigned: " . $message['Message']['assigned'];
+				echo "<br/>assigned: " . h($message['Message']['assigned']);
  			} ?>
 			&nbsp;
 		</dd>
 		<dt>Received</dt>
 		<dd>
-			 <?php echo $message['Message']['received']?>
+			 <?php echo h($message['Message']['received']) ?>
 			&nbsp;
 		</dd>
 		<dt>Created</dt>
 		<dd>
-			 <?php echo $message['Message']['created']?>
+			 <?php echo h($message['Message']['created']) ?>
 			&nbsp;
 		</dd>
 		<dt>Modified</dt>
 		<dd>
 			 <?php
 			 	if ($message['Message']['modified'] != $message['Message']['created']) {
-					echo $message['Message']['modified'];
+					echo h($message['Message']['modified']);
 				} ?>
 			&nbsp;
 		</dd>
 		<dt>Replied</dt>
 		<dd>
-			 <?php echo $message['Message']['replied']?>
+			 <?php echo h($message['Message']['replied'])?>
 			&nbsp;
 		</dd>
 		<dt>
@@ -89,7 +89,7 @@
 		</dd>
 		<dt>Sender token</dt>
 		<dd>
-			<?php echo $message['Message']['sender_token']?>
+			<?php echo h($message['Message']['sender_token'])?>
 			&nbsp;
 		</dd>
 		<dt>
@@ -120,13 +120,13 @@
 			<th> </th>
 		</tr>
 		<tr>
-			<td><?php echo $message['Message']['created']?></td>
+			<td><?php echo h($message['Message']['created']) ?></td>
 			<td>&nbsp;</td>
 			<td>added to MessageManager</td>
 			<td>&nbsp;</td>
 	<?php foreach($message['Action'] as $action){ ?>
 		<tr>
-			<td><a name="action_<?php echo $action['id'];?>"></a><?php echo $action['created']; ?></td>
+			<td><a name="action_<?php echo h($action['id']);?>"></a><?php echo h($action['created']); ?></td>
 			<td>
 				<?php if ($action['user_id']) {
 					echo $this->Html->link($action['User']['username'],

@@ -170,8 +170,8 @@
 			<dl>
 				<?php $tags = Configure::read('tags'); 
 				foreach ($tags as $tag => $full) { ?>
-					<dt><?php echo $tag; ?></dt>
-					<dd><?php echo $full; ?></dd>
+					<dt><?php echo h($tag); ?></dt>
+					<dd><?php echo h($full); ?></dd>
 				<?php } ?>
 			</dl>
 			<p>

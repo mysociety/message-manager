@@ -45,9 +45,9 @@
 		</tr>
 	<?php foreach($user['Action'] as $action){ ?>
 		<tr>
-			<td><?php echo $action['created']; ?></td>
-			<!--echo $action['ActionType']['name']; -->
-			<td><?php echo $action['ActionType']['description']; ?></td>
+			<td><?php echo h($action['created']); ?></td>
+			<!--echo h($action['ActionType']['name']); -->
+			<td><?php echo h($action['ActionType']['description']); ?></td>
 			<td>
 				<?php if ($action['message_id']) {
 					echo $this->Html->link($action['Message']['msisdn'],
@@ -57,7 +57,7 @@
 				<?php } ?>
 			</td>
 			<!-- TODO item_id links to whatever item type is relevant to this action -->
-			<td><?php echo $action['note']; ?></td>
+			<td><?php echo h($action['note']); ?></td>
 		</tr>
 	<?php } ?>
 	</table>

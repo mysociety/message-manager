@@ -12,7 +12,7 @@
 		</tr>
 
 		<tr>
-			<td><?php echo $action['Action']['created']; ?></td>
+			<td><?php echo h($action['Action']['created']); ?></td>
 			<td>
 				<?php if ($action['Action']['message_id']) {
 					echo $this->Html->link($action['Message']['msisdn'],
@@ -29,9 +29,9 @@
 					&mdash;
 				<?php } ?>
 			</td>
-			<td><?php echo $action['ActionType']['description']; ?></td>
-			<td><?php echo $action['Action']['item_id']; ?></td>
-			<td><?php echo $action['Action']['note']; ?></td>
+			<td><?php echo h($action['ActionType']['description']); ?></td>
+			<td><?php echo h($action['Action']['item_id']); ?></td>
+			<td><?php echo h($action['Action']['note']); ?></td>
 		</tr>
 	</table>
 </div>

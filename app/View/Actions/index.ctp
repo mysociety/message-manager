@@ -35,8 +35,8 @@
                 <?php }
             ?>
         </td>
-        <td><?php echo $action['Action']['item_id']; ?></td>
-        <td><?php echo $action['Action']['note']; ?></td>
+        <td><?php echo h($action['Action']['item_id']); ?></td>
+        <td><?php echo h($action['Action']['note']); ?></td>
         <td class="actions">
             <?php echo $this->Html->link(__('View'), array('action' => 'view', $action['Action']['id']), null); ?>
             <?php echo $this->Form->postLink(__('Delete'), array('action' => 'delete', $action['Action']['id']), null, __('Are you sure you want to delete # %s?', $action['Action']['id'])); ?>

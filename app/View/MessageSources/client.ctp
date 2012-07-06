@@ -35,7 +35,7 @@ echo $this->Html->script('message_manager_client', false);
 	<div class="dummy-client">
 		<p id="mm-username">
 			tag:&nbsp;<?php echo (empty($allowed_tags)? "<i>any</i>":strtoupper($allowed_tags)); ?>,
-			username:&nbsp;<span id="mm-received-username"><?php echo (empty($username)? "<i>none</i>":$username); ?></span> 
+			username:&nbsp;<span id="mm-received-username"><?php echo (empty($username)? "<i>none</i>":h($username)); ?></span> 
 		</p>
 		<h3>Mock FMS Client</h3>
 		<div id="mm-status-message-container">
