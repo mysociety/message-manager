@@ -13,8 +13,8 @@
 
     <?php foreach ($actions as $action): ?>
     <tr>
-        <td><?php echo $action['Action']['created']; ?></td>
-        <td><?php echo $action['ActionType']['name']; ?></td>
+        <td><?php echo h($action['Action']['created']); ?></td>
+        <td><?php echo h($action['ActionType']['name']); ?></td>
         <td>
             <?php
                 if ($action['Action']['user_id']) {
