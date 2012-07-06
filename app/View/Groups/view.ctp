@@ -46,9 +46,9 @@
 		$i = 0;
 		foreach ($group['User'] as $user): ?>
 		<tr>
-			<td><?php echo $user['id'];?></td>
-			<td><?php echo $user['username'];?></td>
-			<td><?php echo $user['created'];?></td>
+			<td><?php echo h($user['id']);?></td>
+			<td><?php echo h($user['username']);?></td>
+			<td><?php echo h($user['created']);?></td>
 			<td class="actions">
 				<?php echo $this->Html->link(__('View'), array('controller' => 'users', 'action' => 'view', $user['id'])); ?>
 				<?php echo $this->Html->link(__('Edit'), array('controller' => 'users', 'action' => 'edit', $user['id'])); ?>

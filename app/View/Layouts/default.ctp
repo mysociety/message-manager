@@ -45,7 +45,7 @@ $cakeDescription = __d('cake_dev', 'CakePHP: the rapid development php framework
 				<?php
 					if (AuthComponent::user('id')) { ?>
 						<li>
-							user: <?php echo AuthComponent::user('username'); ?>
+							user: <?php echo h(AuthComponent::user('username')); ?>
 						</li>
 						<li>
 							<?php echo $this->Html->link(__('logout'), array('controller' => 'Users', 'action' => 'logout')); ?>

@@ -15,18 +15,18 @@
 
 	    <?php $c_locks = 0; foreach ($messages as $message): ?>
 	    <tr>
-	        <td><?php echo $message['Message']['created']; ?></td>
-	        <td class="status-<?php echo $message['Status']['name']; ?>">
+	        <td><?php echo h($message['Message']['created']); ?></td>
+	        <td class="status-<?php echo h($message['Status']['name']); ?>">
 				<?php if (! empty($message['Message']['lock_expires'])) {
-					echo('<abbr title="locked by: ' . $message['Lockkeeper']['username'] . '">' . $message['Status']['name'] . ' *</abbr>');
+					echo('<abbr title="locked by: ' . h($message['Lockkeeper']['username']) . '">' . h($message['Status']['name']) . ' *</abbr>');
 					$c_locks++;
 				} else { 
-					echo $message['Status']['name']; 
+					echo h($message['Status']['name']);
 				} ?>
 				</td>
 	        <td><?php echo h($message['Source']['name']); ?></td>
 	        <td>
-	            <?php echo $message['Message']['msisdn']; ?>
+	            <?php echo h($message['Message']['msisdn']); ?>
 	        </td>
 	        <td><?php echo h($message['Message']['tag']); ?></td>
 	        <td><?php echo h($message['Message']['message']); ?></td>
