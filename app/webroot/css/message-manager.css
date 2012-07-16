@@ -20,16 +20,33 @@ body {
   #container #header h1 {
     background-color: inherit;
     background-image: none;
-    padding: 4px;
+    padding: 4px 0;
     float: left;
     font-size: 1.2em;
     font-weight: bold; }
+    #container #header h1 a {
+      background-color: inherit;
+      font-weight: inherit; }
   #container #header ul {
     list-style-type: none; }
     #container #header ul li {
       display: inline;
       margin: 0;
       padding: 4px 1em 4px 0; }
+  #container #header #header-nav {
+    clear: both;
+    text-align: left;
+    margin-left: 0; }
+    #container #header #header-nav ul {
+      margin-left: 0; }
+      #container #header #header-nav ul li {
+        width: auto;
+        padding-right: 0px; }
+        #container #header #header-nav ul li a {
+          background-color: #550000;
+          margin-right: 0; }
+          #container #header #header-nav ul li a:hover {
+            background-color: #aa9999; }
   #container #header a {
     color: #fff;
     margin-right: 0.5em;
@@ -49,8 +66,10 @@ body {
   margin-top: 1.25em; }
 #container .home-block h3, #container .home-block h4 {
   margin-top: 0em; }
-#container .mm-page ul {
-  margin-bottom: 1.2em; }
+#container .mm-page {
+  margin: 2em; }
+  #container .mm-page ul {
+    margin-bottom: 1.2em; }
 #container .message-text, #container .note-text {
   border: 1px solid black;
   padding: 1em;

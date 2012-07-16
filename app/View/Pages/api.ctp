@@ -1,4 +1,4 @@
-<div class="mm-page view">
+<div class="mm-page">
 	<h2>APIs</h2>
 	<p>
 		There are two ways to interact with the Message Manager from outside: submit incoming messages,
@@ -513,5 +513,4 @@ error: A message from this source with this external ID already exists
 
 
 </div>
-<?php echo $this->element('sidebar/pages'); ?>
 

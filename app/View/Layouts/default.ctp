@@ -40,7 +40,7 @@ $cakeDescription = __d('cake_dev', 'CakePHP: the rapid development php framework
 <body class="<?php echo($site_css_class); ?>">
 	<div id="container" >
 		<div id="header">
-			<a href="/"><h1>Message Manager</h1></a>
+			<h1><a href="/">Message Manager</a></h1>
 			<ul class="user-details">
 				<?php
 					if (AuthComponent::user('id')) { ?>
@@ -59,6 +59,14 @@ $cakeDescription = __d('cake_dev', 'CakePHP: the rapid development php framework
 						</li>
 				<?php  } ?>
 			</ul>
+			<?php
+				if (AuthComponent::user('id')) { ?>
+					<div id="header-nav">
+						<?php echo $this->element('navmenu'); ?>
+					</div>
+				<?php  } ?>
+			</ul>
+				    
 		</div>
 		<div id="content">
 			<?php echo $this->Session->flash(); ?>

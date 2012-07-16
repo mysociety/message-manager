@@ -1,4 +1,4 @@
-<div class="mm-page view">
+<div class="mm-page">
 	<h2>Message Manager Help</h2>
 	<p>
 		See also: 
@@ -286,4 +286,3 @@
 		URL to submit incoming messages. Users in this group have no other access to Message Manager.
 	</p>
 </div>
-<?php echo $this->element('sidebar/pages'); ?>

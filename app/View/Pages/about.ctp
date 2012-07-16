@@ -1,4 +1,4 @@
-<div class="mm-page view">
+<div class="mm-page">
 	<h2>About the Message Manager</h2>
 	<p><strong>
 		Messages for FixMyStreet and similar systems.
@@ -29,4 +29,3 @@
 	</p>	
 		
 </div>
-<?php echo $this->element('sidebar/pages'); ?>
