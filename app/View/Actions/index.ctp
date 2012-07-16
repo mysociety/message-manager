@@ -1,5 +1,5 @@
 <!-- unusual admin view: normal users only see actions in context of messages -->
-<h1>Activity</h1>
+<h2>Activity</h2>
 <table>
 	<tr>
 		<th><?php echo $this->Paginator->sort('created');?></th>
