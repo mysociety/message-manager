@@ -4,16 +4,31 @@
 		There are two ways to interact with the Message Manager from outside: submit incoming messages,
 		or manipulate messages with the JSON API.
 	</p>
-	<h2 style="margin-top:2em;">Incoming Messages</h2>
+	<ul>
+		<li><a href="#incoming">Incoming Messages</a></li>
+		<li><a href="#json_api">JSON API</a></li>
+	</ul>
+	<a name="incoming"></a>
+	<h2 style="margin-top: 2.5em;">Incoming Messages</h2>
 	<p>
-		Message sources can deliver incoming messages by POSTing to <code>/messages/incoming</code>.
-		Note that it is anticipated that each message source may send different params, so this is
-		currently the most "lazy" format.
+		Example of an <b>incoming message</b>: a text message received by an SMS gateway. 
 	</p>
 	<p>
-		The incoming request must be authorised &mdash; the user <em>must</em> be the one explicitly
-		associated with the message source. Usually this also implies that the user is in the
-		<code>message-sources</code> user group.
+		The Message Manager won't accept an incoming message without authentication, which is enforced
+		by login (username and password). So in order to allow a message source (for example,
+		an SMS gateway) to be able to submit new messages, you must create both a new 
+		<?php echo $this->Html->link(__('user'), array('controller'=>"Users", 'action'=>'index'));?> and a new
+		<?php echo $this->Html->link(__('message source'), array('controller'=>"MessageSources", 'action'=>'index'));?>
+		 for it. The user, which should be in the <code>message-sources</code> user group,
+		 provides authentication when messages are submitted. The message source identifies the source (in case 
+		 your Message Manager is receiving messages from more than one source, for example) and is uniquely 
+		 associated with its single user.
+	</p>
+	<p>
+		Message sources can deliver incoming messages by POSTing to <code>/messages/incoming</code>.
+		Note that it is anticipated that each message source may send different parameters, so this is
+		currently the most "lazy" format, and it's likely that custom URLs will be needed on a case-by-case
+		basis.
 	</p>
 	<dl>
 		<dt>address</dt>
@@ -28,12 +43,15 @@
 			</p>
 			<p>
 				<strong>data[Message][external_id]</strong> <br/>
-				If the message source has a unique ID for this message, it can provide it here.
-				These can be used to prevent duplicate submissions to the Message Manager. (Not yet implemented).
+				If the message source has a unique ID for this message, it should provide it here.
+				If an external ID is provided, and a message already exists from this source with 
+				this ID, then the Message Manager will reject the incoming message. That is, if you
+				provide an external ID, then it <strong>must</strong> be unique. It is recommended that
+				you do provide external IDs because this mechanism prevents duplicate submissions.
 			</p>
 			<p>
 				<strong>data[Message][msisdn]</strong><br/>
-				The phone number or other address of the sender.
+				The phone number (or other address) of the sender.
 			</p>
 			<p>
 				<strong>data[Message][message]</strong><br/>
@@ -45,15 +63,20 @@
 		<dt>operation</dt>
 		<dd>
 			<p>
-				The incoming message is accepted. Depending on configuration, if the message starts with
-				a recognised tag (keyword), it may be removed.
+				The incoming message is accepted and stored in the Message Manager &mdash; and consequently
+				given a status of <code>available</code>.
+			</p>
+			<p>
+				If the message starts with a recognised tag (keyword), it may be removed and stored separately 
+				(this behaviour depends on the system-wide configuration setting <code>remove_tags_when_matched</code>,
+				which is currently set to <code><?php echo Configure::read('remove_tags_when_matched'); ?></code>).
 			</p>
 		</dd>
 		<dt>returns</dt>
 		<dd>
 			<p> 
-				The default response is <code>text/plain</code> message. The HTTP status code of 200 does not imply the 
-				message was accepted: check for <code>OK</code> on the first line of the response.
+				The default response is a <code>text/plain</code> message. The HTTP status code of 200 does <strong>not</strong>
+				imply the message was accepted: check for <code>OK</code> on the first line of the response.
 			</p>
 			<p>
 				If the message is rejected because of validation errors, these are returned as text.
@@ -66,15 +89,16 @@
 		<dt>example</dt>
 		<dd>
 			<p>
-				A message that is successfully saved:
+				A message that is successfully saved will generate a response like this:
 			</p>
 <pre>
 OK
 Saved message id=1382
 </pre>
 			<p>
-				A message that is rejected because a message with the same external ID has already been submitted
-				(note that this check is only performed if an external ID has been explicitly provided):
+				A message that is rejected causes a response like the following &mdash; the response does <strong>not</strong>
+				have <code>OK</code> on the first line (but note that it is nonetheless sent with an HTTP 
+				status code of 200):
 			</p>
 <pre>
 Failed
@@ -85,8 +109,8 @@ error: A message from this source with this external ID already exists
 		</dd>
 	</dl>
 
-
-	<h2 style="margin-top: 2em;">Message Manager JSON API</h2>
+	<a name="json_api"></a>
+	<h2 style="margin-top: 4em;">Message Manager JSON API</h2>
 	<p>
 		FixMyStreet communicates with the Message Manager with AJAX calls sending JSON.
 	</p>
@@ -96,7 +120,7 @@ error: A message from this source with this external ID already exists
 		are not sent. If your users do need to access that kind of detail, then grant them 
 		login access to the Message Manager admin (probably as a 
 		<?php echo $this->Html->link(__('user'), array('controller'=>"Users", 'action'=>'index'));?> 
-		in the <em>managers</em> group).
+		in the <code>managers</code> group).
 	</p>
 	<h3>API Summary</h3>
 	<ul>
@@ -110,7 +134,7 @@ error: A message from this source with this external ID already exists
 	</ul>
 	<h3>Authorisation credentials</h3>
 	<p>
-		Access to the API is by login (user session) or TODO by supplying credentials on a per-call basis.
+		Access to the API is either by login (user session) or HTTP Basic Auth by supplying credentials on a per-call basis.
 	</p>
 	<h3>404 errors for message not found</h3>
 	<p>
@@ -235,48 +259,7 @@ error: A message from this source with this external ID already exists
 			</p>
 		</dd>
 		<dt>returns</dt>
-		<dd>
-			<p> The available call returns an array of three objects:
-			</p>
-			<ul>
-				<li><strong>success</strong>: 
-					which is <code>true</code> or <code>false</code>
-				</li>
-				<li><strong>data</strong>: 
-					currently, successful locks also return the message data, which is a <code>message</code> object with the same fields
-					as an entry from the <code>available</code> JSON call, above.
-				</li>
-				<li><strong>error</strong> (only on failure): 
-					a message describing the fault
-				</li>
-			</ul>
-		</dd>
-		<dt>example</dt>
-		<dd>
-			<p>If the lock is granted, <code>success==true</code></p>
-	<pre>
-{
-  "success":     true,
-  "data":{
-    "Message":   {...},
-    "Source":    {...},
-    "Status":    {...},
-    "Lockkeeper":{...}
-  }
-}
-</pre>
-			<p>
-				If the lock was not granted, <code>success==false</code> and the response will provide an <code>error</code> message.
-				Currently, the message's data is <em>not</em> returned on failure.
-			</p>
-<pre>
-{
-  "success":  false,
-  "data":     null,
-  "error":    "Lock not granted (locked by another user)"
-}
-</pre>
-		</dd>
+		<dd>Identical to <code>/message/lock_unique/</code> below, which is the preferred way to acquire a lock.</dd>
 	</dl>
 
 	<h4>Lock message and relinquish all other locks</h4>
@@ -301,6 +284,49 @@ error: A message from this source with this external ID already exists
 			<p>
 				This is the recommended way to acquire locks.
 			</p>
+		</dd>
+		<dt>returns</dt>
+		<dd>
+			<p> The available call returns an array of three objects:
+			</p>
+			<ul>
+				<li><strong>success</strong>: 
+					which is <code>true</code> or <code>false</code>
+				</li>
+				<li><strong>data</strong>: 
+					currently, successful locks also return the message data, which is a <code>message</code> object with the same fields
+					as an entry from the <code>available</code> JSON call, above.
+				</li>
+				<li><strong>error</strong> (only on failure): 
+					a message describing the fault
+				</li>
+			</ul>
+		</dd>
+		<dt>example</dt>
+		<dd>
+			<p>If the lock is granted, <code>success==true</code>, and the data is also returned:</p>
+	<pre>
+{
+  "success":     true,
+  "data":{
+    "Message":   {...},
+    "Source":    {...},
+    "Status":    {...},
+    "Lockkeeper":{...}
+  }
+}
+</pre>
+			<p>
+				If the lock was not granted, <code>success==false</code> and the response will provide an <code>error</code> message.
+				Currently, the message's data is <em>not</em> returned on failure, as shown here:
+			</p>
+<pre>
+{
+  "success":  false,
+  "data":     null,
+  "error":    "Lock not granted (locked by another user)"
+}
+</pre>
 		</dd>
 	</dl>
 	
@@ -351,7 +377,7 @@ error: A message from this source with this external ID already exists
 			<p>
 				Because attempting to unlock a message that was not locked, or that is locked by another
 				user, is not reported as failure, a <code>false</code> response does not occur. However, 
-				other failures (such as 404 for message not found) return an explicit HTTP response code.
+				other failures return an explicit HTTP response code (such as 404 for message not found) .
 			</p>
 			<p>
 				You cannot use the result of <code>unlock</code> to determine whether or not a message is now unlocked.
@@ -372,7 +398,7 @@ error: A message from this source with this external ID already exists
 		<dd>
 			<p>
 				This is the same as <code>messages/unlock</code> except that it applies to all messages with a
-				lock owned by this user. Like <code>unlock</code>, this won't report a fails silently for
+				lock owned by this user. Like <code>unlock</code> described above, this fails silently for
 				unchanged locks. Specifically, if there are no locks, the call still succeeeds.
 			</p>
 			<p>
@@ -490,7 +516,7 @@ error: A message from this source with this external ID already exists
 		</dd>
 		<dt>example</dt>
 		<dd>
-			<p>If the FMS ID is assigned, <code>success==true</code></p>
+			<p>If the FMS ID is assigned, <code>success==true</code>:</p>
 <pre>
 {
   "success":     true,
@@ -499,7 +525,7 @@ error: A message from this source with this external ID already exists
 </pre>
 		<p>
 			If the assignment failed <code>success==false</code> and will provide an <code>error</code> message.
-			Currently, the message's data is not returned on failure.
+			Currently, the message's data is not returned on failure:
 		</p>
 <pre>
 {
@@ -510,7 +536,5 @@ error: A message from this source with this external ID already exists
 </pre>
 		</dd>
 	</dl>
-
-
 </div>
 

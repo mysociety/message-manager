@@ -119,6 +119,13 @@ body {
     ul {
       margin-bottom: 1.2em;
     }
+    pre {
+      line-height: 1.4em;
+      margin-bottom: 1.2em;
+    }
+    td {
+      line-height: 1.4em;
+    }
   }
   .message-text, .note-text {
     border:1px solid $message_border_color;

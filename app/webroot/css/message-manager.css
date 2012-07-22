@@ -70,6 +70,11 @@ body {
   margin: 2em; }
   #container .mm-page ul {
     margin-bottom: 1.2em; }
+  #container .mm-page pre {
+    line-height: 1.4em;
+    margin-bottom: 1.2em; }
+  #container .mm-page td {
+    line-height: 1.4em; }
 #container .message-text, #container .note-text {
   border: 1px solid black;
   padding: 1em;

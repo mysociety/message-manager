@@ -43,7 +43,8 @@
 		<dd>
 			<p>
 				The message text itself. This may have had the <em>tag</em> stripped off it, depending on the 
-				settings.
+				system-wide configuration setting <code>remove_tags_when_matched</code>
+				(which is currently set to <code><?php echo Configure::read('remove_tags_when_matched'); ?></code>).
 			</p>
 		</dd>
 		<dt>
@@ -58,7 +59,7 @@
 					<td class="status-available">available</td>
 					<td>
 						Messages that have not yet been assigned to an FMS problem report are available. 
-						These are the only messages that are listed on the JSON API and the only
+						These are the only messages that are provided over the JSON API and the only
 						messages that an FMS user can lock. A lock is required before an FMS ID can be
 						assigned.
 					</td>
@@ -85,14 +86,23 @@
 		<dd>
 			<p>
 				A message is locked by an FMS user when they select it before using it to create or
-				update to an FMS problem report. The Message Manager shows the owner (in the API, this
+				update an FMS problem report. The Message Manager shows the owner (in the API, this
 				user is called the Lockkeeper) and the expiry time.
 			</p>
 			<p>
 				When a lock is granted, it remains in place for 
 				<?php echo Configure::read('lock_expiry_seconds'); ?> seconds
-				(this is a system-wide setting), unless a manager or administrator unlocks 
-				the message explicitly.
+				(this is the system-wide setting <code>lock_expiry_seconds</code>), 
+				unless a manager or administrator unlocks the message explicitly.
+		</dd>
+		<dt>
+		    Note
+		</dt>
+		<dd>
+		    <p>
+		        You can add a note to any message when you are viewing it (there's an <em>Add note</em>
+		        button above its history/activity data). Notes can be seen by anyone who has access to
+		        the message's view page. Notes also appear as items in the message's history.
 		</dd>
 		<dt>
 			FMS ID
@@ -152,7 +162,7 @@
 		<dd>
 			<p>
 				Some message sources allocate a unique ID for each message. This is the external ID, if
-				any, that the source provided when it offered the message the Message Manager.
+				any, that the source provided when it offered the message to the Message Manager.
 			</p>
 		</dd>
 		<dt>
@@ -175,7 +185,9 @@
 				<?php } ?>
 			</dl>
 			<p>
-				The Message Manager can be configured to strip tags out of the message text automatically if required.
+				The Message Manager may strip tags out of the message text automatically,
+				depending on the system-wide configuration setting <code>remove_tags_when_matched</code>
+				(which is currently set to <code><?php echo Configure::read('remove_tags_when_matched'); ?></code>).
 			</p>
 		</dd>
 		<dt>
@@ -211,7 +223,7 @@
 	</p>
 	<p>
 		The JSON API provides and <code>unlock</code> and <code>unlock_all</code> methods too.
-		Given that expire automatically, and the recommended use of <code>unlock_unique</code> to
+		Given that locks expire automatically, and the recommended use of <code>unlock_unique</code> to
 		acquire locks, you probably don't need to use <code>unlock</code>. A well-behaved
 		implementation should call <code>unlock_all</code> when a user explicitly logs out.
 	</p>
@@ -259,13 +271,14 @@
 	</p>
 	<p>
 		You'll need to associate each message source with a user who is in the <code>message-sources</code> group.
-		This user's username and password will be needed by the source in order to submit incoming messages.
+		This user's username and password will be needed by the source in order to authenticate the submission of
+		incoming messages.
 	</p>
 	<h3> Users and Groups </h3>
 	<p>
 		Users belong to one of four groups. Most FixMyStreet users will be api-users, that is, they won't need
-		login access to the Message Manager website &mdash; FixMyStreet will provide the login for them.
-		TODO [not fully implemented yet]
+		login access to the Message Manager website &mdash; they will only be logging in via FixMyStreet in order
+		to use the JSON API.
 	</p>
 	<h4>administrators</h4>
 	<p>
@@ -274,8 +287,8 @@
 	<h4>managers</h4>
 	<p>
 		Managers have access to the Message Manager in order to view and manipulate message data 
-		(for example, hiding messages) but they cannot create or delete users. They also have access to the JSON API,
-		so can use their login from within FMS too.
+		(for example, hiding messages, or adding/changing incorrect tags) but they cannot create or delete users. 
+		They also have access to the JSON API, so can use their login from within FMS too.
 	</p>
 	<h4>api-users</h4>
 		API users have limited access to the Message Manager but can use the JSON API.
