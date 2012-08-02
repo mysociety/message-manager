@@ -45,6 +45,25 @@ class AppController extends Controller {
 
     public function beforeFilter() {
         //Configure AuthComponent
+
+		if (isset($this->data['User']['login'])) {
+			// allow email rather than username on login
+		    if (Validation::email($this->data['User']['login'])) {
+				// find the user with this email, and change the username
+		        // Note, also considered changing Auth's behaviour with:
+		  		//    $this->Auth->fields = array('username' => 'email');
+	 			// but had more success with the explicit lookup below
+				$users = $this->User->findAllByEmail($this->data['User']['login']);
+				if (count($users)==1) { 
+					// critically important that it's an unambiguous email match because we
+					// are not yet policing unique email adresseses: for now, fail silently
+					$this->request->data['User']['username'] = $users[0]['User']['username'];
+				}
+			} else {
+				$this->request->data['User']['username'] = $this->data['User']['login'];
+			}
+		}
+
 		$this->Auth->authorize = 'Actions';
 		$this->Auth->actionPath = 'Controllers/';
         $this->Auth->loginAction = array('controller' => 'users', 'action' => 'login');

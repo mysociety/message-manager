@@ -7,6 +7,7 @@
 		echo $this->Form->input('User.username', array('errors'=>true));
 		echo $this->Form->input('new_password', array('type'=>'password','label'=>'New password'));
 		echo $this->Form->input('confirm_password', array('type'=>'password','label'=>'Repeat password to confirm'));
+		echo $this->Form->input('User.email', array('errors'=>true));
 		echo $this->Form->input('group_id');
 		echo $this->Form->input('allowed_tags');
 	?>
