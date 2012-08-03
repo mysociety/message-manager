@@ -56,6 +56,17 @@ class User extends AppModel {
 				'message' => 'Username must be unique: someone else already has that username',
 			),
 		),
+		'email' => array(
+			'email' => array(
+				'rule' => array('email'),
+				'message' => 'Not a valid email address',
+				'allowEmpty' => true,
+			),
+			'isUnique' => array(
+				'rule' => array('isUnique'),
+				'message' => 'This email address is already associated with another username',
+			),
+		),
 		'new_password' => array(
 			'minLength' => array(
 				'rule' => array('minLength', 6),
