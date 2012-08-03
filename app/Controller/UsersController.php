@@ -11,6 +11,23 @@ class UsersController extends AppController {
 		parent::beforeFilter();
 		Controller::loadModel('Group'); // to access static methods on it
 		$this->Auth->allow('login');
+		if (isset($this->data['User']['login'])) {
+			// allow email as an alternative to username on login
+		    if (Validation::email($this->data['User']['login'])) {
+				// find the user with this email, and change the username
+		        // Note, also considered changing Auth's behaviour with:
+		  		//    $this->Auth->fields = array('username' => 'email');
+	 			// but had more success with the explicit lookup below
+				$users = $this->User->findAllByEmail($this->data['User']['login']);
+				if (count($users)==1) { 
+					// critically important that it's an unambiguous email match because we
+					// are not yet policing unique email adresseses: for now, fail silently
+					$this->request->data['User']['username'] = $users[0]['User']['username'];
+				}
+			} else {
+				$this->request->data['User']['username'] = $this->data['User']['login'];
+			}
+		}
 
 		//$this->Auth->allow('initDB'); // uncomment to enable re-build of the aros_acos table
 	}
@@ -145,9 +162,9 @@ class UsersController extends AppController {
 	public function initDB() {
 		//------------------------------ 
 		// safety! only run this once, if you need to!
-		 $this->Session->setFlash(__('initDB is disabled!'));
-		 $this->redirect(array('controller' => 'Pages', 'action' => 'display'));
-		 return;
+		$this->Session->setFlash(__('initDB is disabled!'));
+		$this->redirect(array('controller' => 'Pages', 'action' => 'display'));
+		return;
 		//------------------------------ 
 
 		$group = $this->User->Group;
