@@ -1,6 +1,11 @@
 <?php
 class ActionsController extends AppController {
     public $helpers = array('Html', 'Form');
+    var $paginate = array(
+        'order' => array(
+             'created' => 'desc'
+        )
+    );
 
 	public function beforeFilter() {
 	    parent::beforeFilter();

@@ -45,6 +45,11 @@ class AppController extends Controller {
 
     public function beforeFilter() {
         //Configure AuthComponent
+		
+		// username is the default...
+		// but see UsersController's beforeFilter: email address is also acceptable on login
+		$this->Auth->fields = array('username' => 'username'); 
+		
 		$this->Auth->authorize = 'Actions';
 		$this->Auth->actionPath = 'Controllers/';
         $this->Auth->loginAction = array('controller' => 'users', 'action' => 'login');
