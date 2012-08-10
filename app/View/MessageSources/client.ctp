@@ -1,6 +1,7 @@
 <?php 
 echo $this->Html->script('jquery-1.7.2.min', false); 
-echo $this->Html->script('message_manager_client', false); 
+echo $this->Html->script('modernizr.custom', false);
+echo $this->Html->script('message_manager_client', false);
 ?>
 
 <h2>
@@ -75,13 +76,15 @@ echo $this->Html->script('message_manager_client', false);
 	$(document).ready(function() {
 
 		var dummy_populate_assign_boxes = function(data) {
-			if ('Message' in data) {
-				var msg_id = data['Message'].id;
-				$('#message_id').val(msg_id); 
-				if ($('#random-fms-id').prop("checked")) {
-					$('#fms_id').val(100+Math.floor(Math.random()*899));
-				}
-			}
+			if (('success' in data) && data.success) {
+    			if ('Message' in data['data']) {
+    				var msg_id = data.data['Message'].id;
+    				$('#message_id').val(msg_id); 
+    				if ($('#random-fms-id').prop("checked")) {
+    					$('#fms_id').val(100+Math.floor(Math.random()*899));
+    				}
+    			}
+    		}
 		}
 
 		var dummy_populate_username = function(data) {
@@ -106,7 +109,10 @@ echo $this->Html->script('message_manager_client', false);
 		});
 
 		$('#assign-fms-submit').click(function() {
-			message_manager.assign_fms_id($('#message_id').val(), $('#fms_id').val(), {callback:dummy_clear_assign_boxes});
+			message_manager.assign_fms_id(
+			    $('#message_id').val(), 
+			    $('#fms_id').val(), 
+			    {callback:dummy_clear_assign_boxes});
 		});    
 
 	});
