@@ -8,7 +8,7 @@ class Action extends AppModel {
 			'className' => 'Message',
 			'foreignKey' => 'message_id',
 			'conditions' => '',
-			'fields' => 'Message.msisdn'
+			'fields' => 'Message.from_address, Message.to_address'
 			// 'order' => array('Group.name' => 'ASC')
 		),
 		'User' => array(

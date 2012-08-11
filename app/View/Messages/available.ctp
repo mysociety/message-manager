@@ -32,7 +32,7 @@
 
 	</table>
 	<p class="pagination-legend">
-		Note: MSISDN (and some other fields) are not included in "available" responses.
+		Note: from_address (and some other fields) are not included in "available" responses.
 	</p>
 	<p class="pagination-legend">
 	<?php

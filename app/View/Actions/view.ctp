@@ -15,7 +15,7 @@
 			<td><?php echo h($action['Action']['created']); ?></td>
 			<td>
 				<?php if ($action['Action']['message_id']) {
-					echo $this->Html->link($action['Message']['msisdn'],
+					echo $this->Html->link($action['Message']['from_address'],
 						array('controller' => 'messages', 'action' => 'view', $action['Action']['message_id']));
 				} else { ?>
 					&mdash;

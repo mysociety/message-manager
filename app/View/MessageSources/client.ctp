@@ -22,7 +22,7 @@ echo $this->Html->script('message_manager_client', false);
 			// echo $this->Form->input('password');
 			echo $this->Form->input('messageSource_id', array('name' => 'data[Message][source_id]'));
 			echo $this->Form->input('external_id', array('label' => 'External ID (optional: a message ID)', 'type' => 'text'));
-			echo $this->Form->input('msisdn', array('label' => 'MSISDN'));
+			echo $this->Form->input('from_address', array('label' => 'Sender phone number'));
 			echo $this->Form->input('message', array('label' => 'Message'));
 			echo $this->Form->submit();
 			echo $this->Form->end();

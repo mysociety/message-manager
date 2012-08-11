@@ -32,7 +32,7 @@
 				These can be used to prevent duplicate submissions to the Message Manager. (Not yet implemented).
 			</p>
 			<p>
-				<strong>data[Message][msisdn]</strong><br/>
+				<strong>data[Message][from_address]</strong><br/>
 				The phone number or other address of the sender.
 			</p>
 			<p>
@@ -92,7 +92,7 @@ error: A message from this source with this external ID already exists
 	</p>
 	<p>
 		The Message Manager doesn't make all its data available over the API. For example,
-		FMS users don't normally need MSISDN (phone numbers) and activity details, so those
+		FMS users don't normally need phone numbers and activity details, so those
 		are not sent. If your users do need to access that kind of detail, then grant them 
 		login access to the Message Manager admin (probably as a 
 		<?php echo $this->Html->link(__('user'), array('controller'=>"Users", 'action'=>'index'));?> 

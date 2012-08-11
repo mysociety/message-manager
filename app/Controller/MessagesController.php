@@ -64,7 +64,7 @@ class MessagesController extends AppController {
 
 	// get available messages: 
 	// provided as the main AJAX call for FMS to populate its messages
-	// NB strips unwanted message details, e.g., no MSISDN etc, because this is
+	// NB strips unwanted message details, e.g., no from_address etc, because this is
 	// used to serve requests "outside" the Message Manager itself
 	// only serve messages with matching tag
     public function available() {
@@ -185,6 +185,7 @@ class MessagesController extends AppController {
 
 	//-----------------------------------------------------------------
 	// TODO: reply not implemented yet
+	// reply creates a new message object, and queues it to be sent
 	//-----------------------------------------------------------------
 	public function reply($id = null) {
 		if (!$this->request->is('post')) {
@@ -202,10 +203,16 @@ class MessagesController extends AppController {
 			$lock_err = $this->Message->lock($this->Auth->user('id'));
 			if (empty($lock_err)) {
 				// fake success TODO
+				// create new message
+				// $reply->data['Message']['parent_id'] = $id;
+				// $repy->data['Message']['is_outbound'] = 1;
+				// $reply->data['Message']['to_address] = $this->Message->data['Message']['from_address']
+				// 
+				
 				self::_logAction(ActionType::$ACTION_REPLY, "Reply: " . $reply_text);
 				if ($this->RequestHandler->accepts('json')) {
-				    $this->response->body( json_encode(self::mm_json_response(true, null)) );
-            return $this->response;
+					$this->response->body( json_encode(self::mm_json_response(true, null)) );
+					return $this->response;
 				} else {
 					$err_msg = "Reply sent OK.";
 				}
@@ -215,7 +222,7 @@ class MessagesController extends AppController {
 		}
 		if ($this->RequestHandler->accepts('json')) {
 			$this->response->body( json_encode(self::mm_json_response(false, null, $err_msg)) );
-      return $this->response;
+			return $this->response;
 		}
 		$this->Session->setFlash($err_msg);
 		$this->redirect(array('action' => 'view', $id));

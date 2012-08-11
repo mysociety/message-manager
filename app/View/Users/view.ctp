@@ -50,7 +50,7 @@
 			<td><?php echo h($action['ActionType']['description']); ?></td>
 			<td>
 				<?php if ($action['message_id']) {
-					echo $this->Html->link($action['Message']['msisdn'],
+					echo $this->Html->link($action['Message']['from_address'],
 						array('controller' => 'messages', 'action' => 'view', $action['message_id']));
 				} else { ?>
 					&mdash;

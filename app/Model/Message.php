@@ -23,14 +23,20 @@ class Message extends AppModel {
 			'className' 	=> 'MessageSource',
 			'foreignKey'	=> 'source_id',
 			'fields'		=> array('name', 'url')
-		)
-		
+		),
+		'Parent' => array(
+			'className' 	=> 'Message',
+			'foreignKey'	=> 'parent_id',
+			'fields'		=> array('from_address', 'message', 'is_outbound')
+		),
 	);
 	
 	public $validate = array(
-		'msisdn' => array(
-			'rule'    => '/^[0-9]{8,17}$/i',
-			'message' => 'MSISDN must be comprised of 8-17 digits only',
+		// note MSISD is now also used for outgoing messages, e.g. username
+		// In future may also be used for, e.g, twitter status: later, refactor by changing name?
+		'from_address' => array(
+			'rule'    => 'notEmpty',
+			'message' => 'Address of sender may not be empty',
 			'on'      => 'create'
 		),
 		'message' => array(
@@ -52,9 +58,9 @@ class Message extends AppModel {
 	
 	// beforeSave:
 	// * generate sender_token:
-	//   Save a unique-per-msisdn token (sender_token) so FMS users can tell when two messages
-	//   are from the same sender without knowing their MSISDNs.
-	//   In anticipation of MSISDNs being non-numeric (twitter handles, etc) this is done case-insensitively.
+	//   Save a unique-per-from_address token (sender_token) so FMS users can tell when two messages
+	//   are from the same sender without knowing their phone numbers, etc.
+	//   In anticipation of from_address being non-numeric (twitter handles, etc) this is done case-insensitively.
 	//
 	// * extract tag
 	//   Scans the (presumably) incoming message for tags, possibly stripping them
@@ -63,8 +69,8 @@ class Message extends AppModel {
 	//   tag: LUZ, message: "Hole in the road..."
 	
 	public function beforeSave() {
-		if (!empty($this->data['Message']['msisdn'])) {
-			$this->data['Message']['sender_token'] = hash('md5', strtolower(trim($this->data['Message']['msisdn'])));
+		if (!empty($this->data['Message']['from_address'])) {
+			$this->data['Message']['sender_token'] = hash('md5', strtolower(trim($this->data['Message']['from_address'])));
 		}
 		if (!empty($this->data['Message']['message'])) {
 			$message_text = $this->data['Message']['message'];
