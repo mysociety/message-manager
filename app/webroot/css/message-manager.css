@@ -200,6 +200,12 @@ body {
     border: 1px solid #666666;
     padding: 1em;
     margin: 1em; }
+  #container .dummy-client #reply-form-container {
+    display: none; }
+    #container .dummy-client #reply-form-container #reply-form {
+      margin-top: 2em;
+      border: 1px solid #666666;
+      background-color: #ffdddd; }
   #container .dummy-client #assign-fms-container {
     margin-top: 2em;
     padding-top: 1em;

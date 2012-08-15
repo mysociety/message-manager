@@ -203,13 +203,20 @@ class MessagesController extends AppController {
 			$lock_err = $this->Message->lock($this->Auth->user('id'));
 			if (empty($lock_err)) {
 				// fake success TODO
-				// create new message
-				// $reply->data['Message']['parent_id'] = $id;
-				// $repy->data['Message']['is_outbound'] = 1;
-				// $reply->data['Message']['to_address] = $this->Message->data['Message']['from_address']
-				// 
-				
+				$reply = new Message;
+				$reply->create();
+				$reply->save(array(
+						'parent_id' =>  $id,
+						'is_outbound' => 1,
+						'message' => $reply_text,
+						'status' => Status::$STATUS_PENDING
+				));
+				// consider sending reply->id back with the success response
 				self::_logAction(ActionType::$ACTION_REPLY, "Reply: " . $reply_text);
+				if (! $this->Message->replied) {
+					$this->Message->replied=1; // set the flag (hmm, not using this)
+					$this->Message->save();
+				}
 				if ($this->RequestHandler->accepts('json')) {
 					$this->response->body( json_encode(self::mm_json_response(true, null)) );
 					return $this->response;

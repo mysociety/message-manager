@@ -54,12 +54,21 @@ echo $this->Html->script('message_manager_client', false);
 			echo $this->Form->submit('Get available messages', array('id' => 'available-submit'));
 			echo $this->Form->end();
 		?>
+    	<div id="reply-form-container">
+    	    	<?php 
+    				echo $this->Form->create(array('id' => 'reply-form','default'=>false));
+    				echo $this->Form->input('reply_text', array('label'=>'Reply text', 'type'=>'text', 'name'=>'reply_text', 'id'=>'reply_text'));
+    				echo $this->Form->submit(__('Send Reply'), array('id' => 'reply-submit'));
+    				echo $this->Form->end();
+    			?>
+    	</div>
 		<div id="assign-fms-container">
 			<?php 
 				echo $this->Form->create(array('id' => 'assign-fms-form','default'=>false));
 				echo $this->Form->input('message_id', array('label'=>'Message ID', 'type'=>'text', 'name'=>'message_id', 'id'=>'message_id'));
 				echo $this->Form->input('fms_id', array('label'=>'FMS ID', 'type'=>'text', 'name'=>'fms_id', 'id'=>'fms_id'));
 				echo $this->Form->submit(__('Assign FMS ID'), array('id' => 'assign-fms-submit'));
+				echo $this->Form->submit(__('Reply'), array('id' => 'reveal-reply-form'));
 				echo $this->Form->end();
 			?>
 			<p style="clear:both;padding-top:1em;">
@@ -74,6 +83,8 @@ echo $this->Html->script('message_manager_client', false);
 
 <script type="text/javascript">
 	$(document).ready(function() {
+		
+		var dummy_reply_busy = false;
 
 		var dummy_populate_assign_boxes = function(data) {
 			if (('success' in data) && data.success) {
@@ -95,7 +106,11 @@ echo $this->Html->script('message_manager_client', false);
 	        $('#fms_id,#message_id').val(''); // for dummy demo only
 		}
 		
-
+		var dummy_reply_cleanup = function(data) {
+			$('#reply_tet').val('');
+			$('#reply-form-container').stop().hide(500);
+			dummy_reply_busy = true;
+		}
 
 		//------------------------------------------------------------
 		// message_manager has been declared in clients.js
@@ -115,5 +130,28 @@ echo $this->Html->script('message_manager_client', false);
 			    {callback:dummy_clear_assign_boxes});
 		});    
 
+		$('#reveal-reply-form').click(function(e) {
+			e.preventDefault();
+			if (!$('#message_id').val()) {
+				$('#reply-form-container').stop().hide(500);
+			} else {
+				$('#reply-form-container').stop().toggle(1000);
+			}
+		});
+
+		$('#reply-submit').click(function(e) {
+			e.preventDefault();
+			if (! dummy_reply_busy) {
+				if (! $('#message_id').val()) {
+					alert("No: won't send without a message ID");
+				} else {
+					message_manager.reply(
+					    $('#message_id').val(), 
+					    $('#reply_text').val(), 
+					    {callback:dummy_reply_cleanup});
+				}
+			}
+		});
+        
 	});
 </script>

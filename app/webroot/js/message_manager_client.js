@@ -328,6 +328,57 @@ var message_manager = (function() {
         });
     };
 
+    var reply = function(msg_id, reply_text, options) {
+        var check_li_exists = false;
+        if (options) {
+            if (typeof(options.callback) === 'function') {
+                callback = options.callback;
+            }
+            if (typeof(options.check_li_exists) !== undefined && options.check_li_exists !== undefined) {
+                check_li_exists = true; // MM dummy
+            }
+        }
+        var $li = $('#' + _msg_prefix + msg_id);
+        if (check_li_exists) {
+            if ($li.size() === 0) {
+                say_status("Couldn't find message with ID " + msg_id);
+                return;
+            }
+        }
+        reply_text = $.trim(reply_text);
+        if (reply_text === '') {
+            say_status("won't send empty reply");
+            return;            
+        } 
+        $li.addClass('msg-is-busy');
+        $.ajax({
+            dataType:"json", 
+            type:"post", 
+            data: {reply_text: reply_text},
+            url: _url_root +"messages/reply/" + msg_id + ".json",
+            beforeSend: function (xhr){
+                xhr.setRequestHeader('Authorization', get_current_auth_credentials());
+                xhr.withCredentials = true;
+            },
+            success:function(data, textStatus) {
+                if (data.success) {
+                    $li.removeClass('msg-is-busy msg-is-locked').addClass('msg-is-owned'); // no longer available
+                    say_status("Reply sent OK");
+                    if (typeof(callback) === "function") {
+                        callback.call($(this), data.data); // returned data['data'] is null but may change in future
+                    }
+                } else {
+                    $li.removeClass('msg-is-busy').addClass('msg-is-locked');
+                    say_status("failed: " + data.error);
+                }
+            }, 
+            error: function(jqXHR, textStatus, errorThrown) {
+                say_status("error: " + textStatus + ": " + errorThrown);
+                $li.removeClass('msg-is-busy');
+            }
+        });
+    };
+
     // revealed public methods:
     return {
        config: config,
@@ -335,6 +386,7 @@ var message_manager = (function() {
        get_available_messages: get_available_messages,
        request_lock: request_lock,
        assign_fms_id: assign_fms_id,
+       reply: reply,
        sign_out: sign_out
      };
 })();

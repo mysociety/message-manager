@@ -278,6 +278,14 @@ body {
       padding: 1em;
       margin: 1em;
     }
+    #reply-form-container {
+      display:none;    
+      #reply-form{
+        margin-top: 2em;
+        border: 1px solid $weak_text_color;
+        background-color: #ffdddd;
+      }
+    }
     #assign-fms-container {
       margin-top: 2em;
       padding-top: 1em;
