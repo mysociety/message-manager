@@ -209,12 +209,14 @@ class MessagesController extends AppController {
 						'parent_id' =>  $id,
 						'is_outbound' => 1,
 						'message' => $reply_text,
-						'status' => Status::$STATUS_PENDING
+						'status' => Status::$STATUS_PENDING,
+						'from_address' => $this->Auth->user('username'),
+						'to_address' => $this->Message->data['Message']['from_address']
 				));
 				// consider sending reply->id back with the success response
-				self::_logAction(ActionType::$ACTION_REPLY, "Reply: " . $reply_text);
-				if (! $this->Message->replied) {
-					$this->Message->replied=1; // set the flag (hmm, not using this)
+				self::_logAction(ActionType::$ACTION_REPLY, "Reply: " . $reply_text, $reply->id);
+				if (! $this->Message->data['Message']['replied']) {
+					$this->Message->data['Message']['replied']=1; // set the flag (hmm, not using this)
 					$this->Message->save();
 				}
 				if ($this->RequestHandler->accepts('json')) {
@@ -339,7 +341,7 @@ class MessagesController extends AppController {
 
 	public function unassign_fms_id($id = null) {
 		self::_load_record($id);
-		$fms_id = $this->Message->fms_id;
+		$fms_id = $this->data['Message']['fms_id'];
 		$this->Message->unassign_fms_id();
 		if ($this->Message->save()) {
 			self::_logAction(ActionType::$ACTION_UNASSIGN);
@@ -430,7 +432,7 @@ class MessagesController extends AppController {
 		$source_user_id = $this->Auth->user('id');
 		$source_by_user = $this->MessageSource->findByUserId($source_user_id, array('fields'=>'id'));
 		// infer source_id from user unless it's been explicitly sent
-		$source_id = empty($this->Message->souce_id)? $source_by_user : $this->Message->souce_id;
+		$source_id = empty($this->data['Message']['source_id'])? $source_by_user : $this->data['Message']['source_id'];
 		if (empty($source_by_user)) {
 			$return_code = 403;
 			$response_text = __("Forbidden\nUser %s is not currently allocated to any message source: cannot submit incoming messages.",  $this->Auth->user('username'));
@@ -492,17 +494,20 @@ class MessagesController extends AppController {
 		);
 	}
 	
-	private function _logAction($action_type, $custom_param=null) {
+	private function _logAction($action_type, $custom_param_1=null, $custom_param_2=null) {
 		$action = new Action;
 		$params = array(
 			'type_id' =>  $action_type,
 			'user_id' => $this->Auth->user('id'),
 			'message_id' => $this->Message->id,
 		);
-		if ($action_type==ActionType::$ACTION_NOTE || $action_type==ActionType::$ACTION_REPLY) {
-			$params['note'] = $custom_param;
+		if ($action_type==ActionType::$ACTION_NOTE) {
+			$params['note'] = $custom_param_1;			
+		} elseif ($action_type==ActionType::$ACTION_REPLY) {
+			$params['note'] = $custom_param_1;
+			$params['item_id'] = $custom_param_2;
 		} elseif ($action_type==ActionType::$ACTION_ASSIGN) {
-			$params['item_id'] = intval($custom_param);
+			$params['item_id'] = intval($custom_param_1);
 		}
 		$action->create($params);
 		$action->save();
