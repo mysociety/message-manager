@@ -28,7 +28,11 @@
 	Router::connect('/', array('controller' => 'pages', 'action' => 'display', 'home'));
 	Router::connect('/about', array('controller' => 'pages', 'action' => 'display', 'about'));
 	Router::connect('/help', array('controller' => 'pages', 'action' => 'display', 'help'));
+	
 	Router::connect('/dummy', array('controller' => 'MessageSources', 'action' => 'client'));
+	
+	Router::connect('/messages/sent', array('controller' => 'messages', 'action' => 'index', 'sent'));
+	Router::connect('/messages/received', array('controller' => 'messages', 'action' => 'index', 'received'));
 	
 /**
  * ...and connect the rest of 'Pages' controller's urls.

@@ -58,16 +58,14 @@ class MessagesController extends AppController {
 	}
 	
 	// index shows all messages... maybe filtered on is_outbound;
-	public function index() {
+	public function index($direction = null) {
 		$title = "";
-		if (isset($this->request->query['is_outbound'])) {
-			if ($this->request->query['is_outbound'] == 1) {
-				$title = __("Messages sent");
-				$conditions = array('Message.is_outbound' => 1);
-			} else {
-				$title = __("Messages received");
-				$conditions = array('Message.is_outbound' => 0);
-			}
+		if ($direction == 'sent') {
+			$title = __("Messages sent");
+			$conditions = array('Message.is_outbound' => 1);
+		} elseif ($direction == 'received') {
+			$title = __("Messages received");
+			$conditions = array('Message.is_outbound' => 0);
 		} else {
 			$title = __("All messages (received and sent)");
 			$conditions = array();
