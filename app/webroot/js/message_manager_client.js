@@ -379,6 +379,51 @@ var message_manager = (function() {
         });
     };
 
+    var hide = function(msg_id, options) {
+        var check_li_exists = false;
+        if (options) {
+            if (typeof(options.callback) === 'function') {
+                callback = options.callback;
+            }
+            if (typeof(options.check_li_exists) !== undefined && options.check_li_exists !== undefined) {
+                check_li_exists = true; // MM dummy
+            }
+        }
+        var $li = $('#' + _msg_prefix + msg_id);
+        if (check_li_exists) {
+            if ($li.size() === 0) {
+                say_status("Couldn't find message with ID " + msg_id);
+                return;
+            }
+        }
+        $li.addClass('msg-is-busy');
+        $.ajax({
+            dataType:"json", 
+            type:"post", 
+            url: _url_root +"messages/hide/" + msg_id + ".json",
+            beforeSend: function (xhr){
+                xhr.setRequestHeader('Authorization', get_current_auth_credentials());
+                xhr.withCredentials = true;
+            },
+            success:function(data, textStatus) {
+                if (data.success) {
+                    $li.removeClass('msg-is-busy msg-is-locked').addClass('msg-is-owned').fadeOut('slow'); // no longer available
+                    say_status("Message hidden");
+                    if (typeof(callback) === "function") {
+                        callback.call($(this), data.data); 
+                    }
+                } else {
+                    $li.removeClass('msg-is-busy').addClass('msg-is-locked');
+                    say_status("failed: " + data.error);
+                }
+            }, 
+            error: function(jqXHR, textStatus, errorThrown) {
+                say_status("error: " + textStatus + ": " + errorThrown);
+                $li.removeClass('msg-is-busy');
+            }
+        });
+    };
+
     // revealed public methods:
     return {
        config: config,
@@ -387,6 +432,7 @@ var message_manager = (function() {
        request_lock: request_lock,
        assign_fms_id: assign_fms_id,
        reply: reply,
+       hide: hide,
        sign_out: sign_out
      };
 })();

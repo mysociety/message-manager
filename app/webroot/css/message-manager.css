@@ -108,6 +108,8 @@ body {
     margin: 1em 0; }
   #container .home-block dl {
     width: 100%; }
+#container .inline-buttons a {
+  margin-right: 0.5em; }
 #container #footer a {
   color: #fff;
   margin-right: 0.5em;

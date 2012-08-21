@@ -69,6 +69,7 @@ echo $this->Html->script('message_manager_client', false);
 				echo $this->Form->input('fms_id', array('label'=>'FMS ID', 'type'=>'text', 'name'=>'fms_id', 'id'=>'fms_id'));
 				echo $this->Form->submit(__('Assign FMS ID'), array('id' => 'assign-fms-submit'));
 				echo $this->Form->submit(__('Reply'), array('id' => 'reveal-reply-form'));
+				echo $this->Form->submit(__('Hide'), array('id' => 'hide-button'));
 				echo $this->Form->end();
 			?>
 			<p style="clear:both;padding-top:1em;">
@@ -84,7 +85,7 @@ echo $this->Html->script('message_manager_client', false);
 <script type="text/javascript">
 	$(document).ready(function() {
 		
-		var dummy_reply_busy = false;
+		var dummy_busy = false;
 
 		var dummy_populate_assign_boxes = function(data) {
 			if (('success' in data) && data.success) {
@@ -109,7 +110,11 @@ echo $this->Html->script('message_manager_client', false);
 		var dummy_reply_cleanup = function(data) {
 			$('#reply_tet').val('');
 			$('#reply-form-container').stop().hide(500);
-			dummy_reply_busy = true;
+			dummy_busy = false;
+		}
+
+		var dummy_hide_cleanup = function(data) {
+			dummy_busy = false;
 		}
 
 		//------------------------------------------------------------
@@ -139,12 +144,21 @@ echo $this->Html->script('message_manager_client', false);
 			}
 		});
 
+		$('#hide-button').click(function() {
+			if ($('#message_id').val()) {
+				message_manager.hide(
+				    $('#message_id').val(), 
+				    {callback:dummy_hide_cleanup});
+			}
+		});
+		
 		$('#reply-submit').click(function(e) {
 			e.preventDefault();
-			if (! dummy_reply_busy) {
+			if (! dummy_busy) {
 				if (! $('#message_id').val()) {
 					alert("No: won't send without a message ID");
 				} else {
+					dummy_busy = true;
 					message_manager.reply(
 					    $('#message_id').val(), 
 					    $('#reply_text').val(), 

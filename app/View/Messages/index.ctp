@@ -1,5 +1,12 @@
 <div class="mm-messages">
-	<h2>Messages</h2>
+	<h2><?php echo $title ?></h2>
+	<div class="actions inline-buttons">
+	<?php 	
+		echo $this->Html->link(__('Received'), array('controller' => 'Messages', 'action' => 'index', '?' => array('is_outbound' => 0)));
+		echo $this->Html->link(__('Sent'), array('controller' => 'Messages', 'action' => 'index', '?' => array('is_outbound' => 1)));
+		echo $this->Html->link(__('All'), array('controller' => 'Messages', 'action' => 'index'));
+	?>
+	</div>
 	<table>
 	    <tr>
 	        <th><?php echo $this->Paginator->sort('created');?></th>

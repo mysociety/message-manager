@@ -57,9 +57,27 @@ class MessagesController extends AppController {
 		Controller::loadModel('Group'); // to access static methods on it
 	}
 	
-    public function index() {
-		$this->Message->recursive = 0;
-		$this->set('messages', $this->paginate());	
+	// index shows all messages... maybe filtered on is_outbound;
+	public function index() {
+		$title = "";
+		if (isset($this->request->query['is_outbound'])) {
+			if ($this->request->query['is_outbound'] == 1) {
+				$title = __("Messages sent");
+				$conditions = array('Message.is_outbound' => 1);
+			} else {
+				$title = __("Messages received");
+				$conditions = array('Message.is_outbound' => 0);
+			}
+		} else {
+			$title = __("All messages");
+			$conditions = array();
+		}
+		$this->paginate = array(
+			'recursive' => 0,
+			'conditions' => $conditions,
+		);
+		$this->set('title', $title);
+		$this->set('messages', $this->paginate('Message'));
     }
 
 	// get available messages: 
@@ -303,8 +321,7 @@ class MessagesController extends AppController {
 		if (empty($fms_id)) {
 			$err_msg = __("Not assigned: missing FMS ID");
 			if ($this->RequestHandler->accepts('json')) {
-					$this->response->body( json_encode(self::mm_json_response(false, null, $err_msg)) );
-          return $this->response;
+				$this->response->body( json_encode(self::mm_json_response(false, null, $err_msg)) );
 			}
 			$this->Session->setFlash($err_msg);
 		} else {
@@ -313,8 +330,8 @@ class MessagesController extends AppController {
 			if ($lock_err) {
 				$err_msg = __("Not assigned: " + $lock_err);
 				if ($this->RequestHandler->accepts('json')) {
-						$this->response->body( json_encode(self::mm_json_response(false, null, $err_msg)) );
-            return $this->response;
+					$this->response->body( json_encode(self::mm_json_response(false, null, $err_msg)) );
+					return $this->response;
 				}
 				$this->Session->setFlash($err_msg);
 			} else {
@@ -341,7 +358,7 @@ class MessagesController extends AppController {
 
 	public function unassign_fms_id($id = null) {
 		self::_load_record($id);
-		$fms_id = $this->data['Message']['fms_id'];
+		$fms_id = $this->Message->data['Message']['fms_id'];
 		$this->Message->unassign_fms_id();
 		if ($this->Message->save()) {
 			self::_logAction(ActionType::$ACTION_UNASSIGN);
@@ -357,10 +374,19 @@ class MessagesController extends AppController {
 		$this->Message->hide(); 
 		if ($this->Message->save()) {
 			self::_logAction(ActionType::$ACTION_HIDE);
-			$this->Session->setFlash(__('Message hidden'));
+			$msg = __('Message hidden');
+			if ($this->RequestHandler->accepts('json')) {
+				$this->response->body( json_encode(self::mm_json_response(true, null)) );
+				return $this->response;
+			}
 		} else {
-			$this->Session->setFlash(__('Failed to hide message'));
+			$msg = __('Failed to hide message');
+			if ($this->RequestHandler->accepts('json')) {
+				$this->response->body( json_encode(self::mm_json_response(false, null, $msg)) );
+				return $this->response;
+			}
 		}
+		$this->Session->setFlash($msg);
 		$this->redirect(array('action' => 'view', $id));
 	}
 
@@ -432,7 +458,7 @@ class MessagesController extends AppController {
 		$source_user_id = $this->Auth->user('id');
 		$source_by_user = $this->MessageSource->findByUserId($source_user_id, array('fields'=>'id'));
 		// infer source_id from user unless it's been explicitly sent
-		$source_id = empty($this->data['Message']['source_id'])? $source_by_user : $this->data['Message']['source_id'];
+		$source_id = empty($this->Message->data['Message']['source_id'])? $source_by_user : $this->Message->data['Message']['source_id'];
 		if (empty($source_by_user)) {
 			$return_code = 403;
 			$response_text = __("Forbidden\nUser %s is not currently allocated to any message source: cannot submit incoming messages.",  $this->Auth->user('username'));
