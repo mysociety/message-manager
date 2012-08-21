@@ -69,7 +69,7 @@ class MessagesController extends AppController {
 				$conditions = array('Message.is_outbound' => 0);
 			}
 		} else {
-			$title = __("All messages");
+			$title = __("All messages (received and sent)");
 			$conditions = array();
 		}
 		$this->paginate = array(

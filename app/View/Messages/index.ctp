@@ -2,9 +2,7 @@
 	<h2><?php echo $title ?></h2>
 	<div class="actions inline-buttons">
 	<?php 	
-		echo $this->Html->link(__('Received'), array('controller' => 'Messages', 'action' => 'index', '?' => array('is_outbound' => 0)));
-		echo $this->Html->link(__('Sent'), array('controller' => 'Messages', 'action' => 'index', '?' => array('is_outbound' => 1)));
-		echo $this->Html->link(__('All'), array('controller' => 'Messages', 'action' => 'index'));
+		echo $this->Html->link(__('All messages'), array('controller' => 'Messages', 'action' => 'index'));
 	?>
 	</div>
 	<table>
