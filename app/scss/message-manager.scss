@@ -20,6 +20,7 @@ $color_status_available: #ddffdd;
 $color_status_locked:    #ffdddd;
 $color_status_assigned:  #f8c75e;
 $color_status_hidden:    #ade0ed;
+$color_status_pending:   #f0f066;
 
 // installation-specific colors:
 $color_bg_local:           #325;
@@ -147,6 +148,7 @@ body {
     .status-unlocked  {background-color: inherit }
     .status-assigned  {background-color: $color_status_assigned }
     .status-hidden    {background-color: $color_status_hidden }
+    .status-pending   {background-color: $color_status_pending }
     dd {
       padding-left: 4px;
     }
