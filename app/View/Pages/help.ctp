@@ -19,7 +19,7 @@
 	</p>
 	<dl>
 		<dt>
-			MSISDN
+			From address
 		</dd>
 		<dd>
 			<p>
@@ -31,10 +31,10 @@
 		</dd>
 		<dd>
 			<p>
-				A token that is unique for the MSISDN (actually it's an MD5 hash of the MSISDN).
-				You can use the token to determine when two messages have come from the same
-				sender without knowing the MSISDN (this is useful because the JSON API doesn't 
-				share MSISDNs).
+				A token that is unique for the sender address (e.g., phone number) (actually 
+				it's an MD5 hash of the address). You can use the token to determine when two 
+				messages have come from the same sender without knowing their number (this is 
+				useful because the JSON API doesn't share phone numbers).
 			</p>
 		</dd>
 		<dt>

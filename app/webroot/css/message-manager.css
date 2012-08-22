@@ -103,6 +103,8 @@ body {
   background-color: #f8c75e; }
 #container .mm-messages .status-hidden {
   background-color: #ade0ed; }
+#container .mm-messages .status-pending {
+  background-color: #f0f066; }
 #container .mm-messages dd {
   padding-left: 4px; }
 #container .home-block {
@@ -205,6 +207,12 @@ body {
     border: 1px solid #666666;
     padding: 1em;
     margin: 1em; }
+  #container .dummy-client #reply-form-container {
+    display: none; }
+    #container .dummy-client #reply-form-container #reply-form {
+      margin-top: 2em;
+      border: 1px solid #666666;
+      background-color: #ffdddd; }
   #container .dummy-client #assign-fms-container {
     margin-top: 2em;
     padding-top: 1em;

@@ -154,7 +154,8 @@ CREATE TABLE users (
     allowed_tags VARCHAR(255),
     can_reply INT(1) NOT NULL DEFAULT '0',
     created DATETIME,
-    modified DATETIME
+    modified DATETIME,
+	email varchar(132) DEFAULT NULL
 );
 
 INSERT INTO `users` VALUES(1, 'admin', '78ff58c353c9b6d1c60ac48b3e37536e7e8b07e1', 1, NULL, 0, '2012-05-25 00:00:00', '2012-05-25 00:00:00');

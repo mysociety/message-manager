@@ -189,7 +189,7 @@ class UsersController extends AppController {
 		$this->Acl->allow($group, 'controllers/Users/logout');
 
 		// allow api-users to only use the JSON API
-		// note nothing here gives access to MSISDNs
+		// note nothing here gives access to from_address, etc.
 		$group->id = Group::$API_USER_GROUP_ID;
 		$this->Acl->deny($group, 'controllers');
 		$this->Acl->allow($group, 'controllers/Messages/assign_fms_id');

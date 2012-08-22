@@ -1,11 +1,16 @@
 <div class="mm-messages">
-	<h2>Messages</h2>
+	<h2><?php echo $title ?></h2>
+	<div class="actions inline-buttons">
+	<?php 	
+		echo $this->Html->link(__('All messages'), array('controller' => 'Messages', 'action' => 'index'));
+	?>
+	</div>
 	<table>
 	    <tr>
 	        <th><?php echo $this->Paginator->sort('created');?></th>
 	        <th><?php echo $this->Paginator->sort('status');?></th>
 	        <th><?php echo $this->Paginator->sort('source');?></th>
-	        <th><?php echo $this->Paginator->sort('MSISDN');?></th>
+	        <th><?php echo $this->Paginator->sort('from_address');?></th>
 	        <th><?php echo $this->Paginator->sort('tag');?></th>
 	        <th><?php echo $this->Paginator->sort('message');?></th>
 	        <th> </th>
@@ -26,7 +31,7 @@
 				</td>
 	        <td><?php echo h($message['Source']['name']); ?></td>
 	        <td>
-	            <?php echo h($message['Message']['msisdn']); ?>
+	            <?php echo h($message['Message']['from_address']); ?>
 	        </td>
 	        <td><?php echo h($message['Message']['tag']); ?></td>
 	        <td><?php echo h($message['Message']['message']); ?></td>

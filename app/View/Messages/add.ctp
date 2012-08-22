@@ -5,7 +5,7 @@
 	<?php
 	 	// note: cake expects this be to a true foreign key; change name? $this->Form->input('external_id');
 		echo $this->Form->input('source_id');
-		echo $this->Form->input('msisdn');
+		echo $this->Form->input('from_address');
 		echo $this->Form->input('message');
 		echo $this->Form->input('tag');
 	?>

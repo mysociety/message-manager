@@ -20,6 +20,9 @@ $color_status_available: #ddffdd;
 $color_status_locked:    #ffdddd;
 $color_status_assigned:  #f8c75e;
 $color_status_hidden:    #ade0ed;
+$color_status_pending:   #f0f066;
+$color_status_sent:      #66cc33;
+$color_status_error:     #ee6666;
 
 // installation-specific colors:
 $color_bg_local:           #325;
@@ -154,6 +157,7 @@ body {
     .status-unlocked  {background-color: inherit }
     .status-assigned  {background-color: $color_status_assigned }
     .status-hidden    {background-color: $color_status_hidden }
+    .status-pending   {background-color: $color_status_pending }
     dd {
       padding-left: 4px;
     }
@@ -284,6 +288,14 @@ body {
       border: 1px solid $weak_text_color;
       padding: 1em;
       margin: 1em;
+    }
+    #reply-form-container {
+      display:none;    
+      #reply-form{
+        margin-top: 2em;
+        border: 1px solid $weak_text_color;
+        background-color: #ffdddd;
+      }
     }
     #assign-fms-container {
       margin-top: 2em;

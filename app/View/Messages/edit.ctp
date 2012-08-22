@@ -12,10 +12,10 @@
 		</p>
 		<dl style="margin:2em 0">
 			<dt>
-				MSISDN
+				Sender
 			</dt>
 			<dd>
-				<?php echo h($message['Message']['msisdn'])?>
+				<?php echo h($message['Message']['from_address'])?>
 				&nbsp;
 			</dd>
 			<dt>

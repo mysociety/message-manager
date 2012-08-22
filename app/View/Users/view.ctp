@@ -6,6 +6,11 @@
 			<?php echo h($user['User']['username']); ?>
 			&nbsp;
 		</dd>
+		<dt><?php echo __('Email'); ?></dt>
+		<dd>
+			<?php echo h($user['User']['email']); ?>
+			&nbsp;
+		</dd>
 		<dt><?php echo __('Group'); ?></dt>
 		<dd>
 			<?php echo h($user['Group']['name']); ?>
@@ -20,6 +25,11 @@
 			 		echo h(strtoupper($user['User']['allowed_tags'])); 
 				}
 			?>
+			&nbsp;
+		</dd>
+		<dt><?php echo __('Can send replies?'); ?></dt>
+		<dd>
+			<?php echo($user['User']['can_reply']? "yes":"no"); ?>
 			&nbsp;
 		</dd>
 		<dt><?php echo __('Created'); ?></dt>
@@ -50,7 +60,7 @@
 			<td><?php echo h($action['ActionType']['description']); ?></td>
 			<td>
 				<?php if ($action['message_id']) {
-					echo $this->Html->link($action['Message']['msisdn'],
+					echo $this->Html->link($action['Message']['from_address'],
 						array('controller' => 'messages', 'action' => 'view', $action['message_id']));
 				} else { ?>
 					&mdash;

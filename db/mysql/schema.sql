@@ -111,6 +111,7 @@ CREATE TABLE users (
   can_reply int(1) DEFAULT NULL,
   created datetime DEFAULT NULL,
   modified datetime DEFAULT NULL,
+  email varchar(132) DEFAULT NULL,
   PRIMARY KEY (id),
   UNIQUE KEY username (username)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=6 ;

@@ -1,11 +1,39 @@
 <div class="mm-messages view">
-	<h2>Message</h1>
+	<h2>
+	    <?php
+	        if ($message['Message']['is_outbound']) {
+	            echo('Outbound');
+	        }
+	    ?>
+	    Message
+	</h2>
 	<dl style="margin-bottom:3em">
+	    <?php if ($message['Message']['parent_id']) { ?>
+    		<dt>
+    			In reply to
+    		</dt>
+    		<dd>
+    		    <?php echo $this->Html->link(h($message['Message']['parent_id']), array('action' => 'view', $message['Message']['parent_id']), null); ?>
+    			&nbsp;
+    			<?php echo $message['Parent']['message'] ?>
+    		</dd>
+	    <?php 
+	        } 
+	        if ($message['Message']['to_address']) { ?>
+	            
+		    <dt>
+			    To
+		    </dt>
+		    <dd>
+			    <?php echo h($message['Message']['to_address'])?>
+			    &nbsp;
+		    </dd>
+		<?php } ?>
 		<dt>
-			MSISDN
+			From
 		</dt>
 		<dd>
-			<?php echo h($message['Message']['msisdn'])?>
+			<?php echo h($message['Message']['from_address'])?>
 			&nbsp;
 		</dd>
 		<dt>
@@ -209,6 +237,12 @@
 		<li>
 			<?php echo $this->Html->link(__('Edit'), array('action' => 'edit', $message['Message']['id']));?>
 		</li>
+		<?php if (! $message['Message']['is_outbound']) { ?>
+			<li>
+				<?php echo $this->Html->link(__('Reply'),
+			 		array('action' => 'reply', $message['Message']['id'])); ?>
+			</li>
+		<?php } ?>
 		<li>
 			<?php echo $this->Form->postLink(__('Delete'),
 		 		array('action' => 'delete', $message['Message']['id']), null, 

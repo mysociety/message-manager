@@ -53,18 +53,34 @@ class MessagesController extends AppController {
 			$this->Auth->authenticate = array('Form');
 		}
 		Controller::loadModel('ActionType'); // to access static methods on it
-		Controller::loadModel('Status'); // to access static methods on it
 		Controller::loadModel('Group'); // to access static methods on it
+		Controller::loadModel('Status'); // to access static methods on it
 	}
 	
-    public function index() {
-		$this->Message->recursive = 0;
-		$this->set('messages', $this->paginate());	
+	// index shows all messages... maybe filtered on is_outbound;
+	public function index($direction = null) {
+		$title = "";
+		if ($direction == 'sent') {
+			$title = __("Messages sent");
+			$conditions = array('Message.is_outbound' => 1);
+		} elseif ($direction == 'received') {
+			$title = __("Messages received");
+			$conditions = array('Message.is_outbound' => 0);
+		} else {
+			$title = __("All messages (received and sent)");
+			$conditions = array();
+		}
+		$this->paginate = array(
+			'recursive' => 0,
+			'conditions' => $conditions,
+		);
+		$this->set('title', $title);
+		$this->set('messages', $this->paginate('Message'));
     }
 
 	// get available messages: 
 	// provided as the main AJAX call for FMS to populate its messages
-	// NB strips unwanted message details, e.g., no MSISDN etc, because this is
+	// NB strips unwanted message details, e.g., no from_address etc, because this is
 	// used to serve requests "outside" the Message Manager itself
 	// only serve messages with matching tag
     public function available() {
@@ -182,43 +198,76 @@ class MessagesController extends AppController {
 		$this->set('message', $this->Message->data);
 		$this->set('is_admin_group', $is_admin_group);
 	}
-
+	
 	//-----------------------------------------------------------------
 	// TODO: reply not implemented yet
+	// reply creates a new message object, and queues it to be sent
 	//-----------------------------------------------------------------
 	public function reply($id = null) {
-		if (!$this->request->is('post')) {
-			throw new MethodNotAllowedException();
-		}
-		self::_load_record($id);
-		$reply_text = $this->request->data('reply_text');
-		$err_msg = "Reply to message (via source) not implemented yet: TODO";
-		if (empty($reply_text)) {
-			$err_msg = "Empty reply text: won't send reply";
-		} elseif (! $this->Auth->user('can_reply')==1) {
-			$err_msg = "User " . $this->Auth->user('username') . " lacks reply privilege";
+		if (! $this->Auth->user('can_reply')==1) {
+			$deny_msg = "Cannot reply: user " . $this->Auth->user('username') . " lacks reply privilege";
 			self::_logAction(ActionType::$ACTION_NOTE, "attempt to reply to message " . $id . " denied");
-		} else {
-			$lock_err = $this->Message->lock($this->Auth->user('id'));
-			if (empty($lock_err)) {
-				// fake success TODO
-				self::_logAction(ActionType::$ACTION_REPLY, "Reply: " . $reply_text);
-				if ($this->RequestHandler->accepts('json')) {
-				    $this->response->body( json_encode(self::mm_json_response(true, null)) );
-            return $this->response;
-				} else {
-					$err_msg = "Reply sent OK.";
-				}
+			if ($this->RequestHandler->accepts('json')) {
+				$this->response->body( json_encode(self::mm_json_response(false, null, $deny_msg)) );
+				return $this->response;
 			} else {
-				$err_msg = "reply failed: " . $lock_err;
+				$this->Session->setFlash($deny_msg);
+				$this->redirect(array('action' => 'view', $id));
+			}
+		} else {
+			self::_load_record($id);
+			if ($this->request->is('post')) {
+				$reply_text = $this->request->data('reply_text');
+				if (empty($reply_text)) {
+						$err_msg = "Empty reply text: won't send reply";
+				} else {
+					$lock_err = $this->Message->lock($this->Auth->user('id'));
+					if (empty($lock_err)) {
+						// fake success TODO
+						$reply = new Message;
+						$reply->create();
+						$reply->save(array(
+								'parent_id' =>  $id,
+								'is_outbound' => 1,
+								'message' => $reply_text,
+								'status' => Status::$STATUS_PENDING,
+								'from_address' => $this->Auth->user('username'),
+								'to_address' => $this->Message->data['Message']['from_address']
+						));
+						// consider sending reply->id back with the success response
+						self::_logAction(ActionType::$ACTION_REPLY, "Reply: " . $reply_text, $reply->id);
+						if (! $this->Message->data['Message']['replied']) {
+							$this->Message->data['Message']['replied']=1; // set the flag (hmm, not using this)
+							$this->Message->save();
+						}
+						if ($this->RequestHandler->accepts('json')) {
+							$this->response->body( json_encode(self::mm_json_response(true, null)) );
+							return $this->response;
+						} else {
+							$err_msg = "Reply sent OK.";
+						}
+					} else {
+						$err_msg = "reply failed: " . $lock_err;
+					}
+				}
+				if ($this->RequestHandler->accepts('json')) {
+					$this->response->body( json_encode(self::mm_json_response(false, null, $err_msg)) );
+					return $this->response;
+				}
+				$this->Session->setFlash($err_msg);
+				$this->redirect(array('action' => 'view', $id));
+			} else { // not a POST request
+				if ($this->RequestHandler->accepts('json')) {
+					throw new MethodNotAllowedException();
+				}
+				if (! $this->Auth->user('can_reply')==1) {
+					$this->Session->setFlash($deny_msg);
+					$this->redirect(array('action' => 'view', $id));
+				} else {
+					$this->set('message', $this->Message->data);
+				}
 			}
 		}
-		if ($this->RequestHandler->accepts('json')) {
-			$this->response->body( json_encode(self::mm_json_response(false, null, $err_msg)) );
-      return $this->response;
-		}
-		$this->Session->setFlash($err_msg);
-		$this->redirect(array('action' => 'view', $id));
 	}
 	
 	// same as lock except also relinquishes all other locks held by this user
@@ -287,8 +336,7 @@ class MessagesController extends AppController {
 		if (empty($fms_id)) {
 			$err_msg = __("Not assigned: missing FMS ID");
 			if ($this->RequestHandler->accepts('json')) {
-					$this->response->body( json_encode(self::mm_json_response(false, null, $err_msg)) );
-          return $this->response;
+				$this->response->body( json_encode(self::mm_json_response(false, null, $err_msg)) );
 			}
 			$this->Session->setFlash($err_msg);
 		} else {
@@ -297,8 +345,8 @@ class MessagesController extends AppController {
 			if ($lock_err) {
 				$err_msg = __("Not assigned: " + $lock_err);
 				if ($this->RequestHandler->accepts('json')) {
-						$this->response->body( json_encode(self::mm_json_response(false, null, $err_msg)) );
-            return $this->response;
+					$this->response->body( json_encode(self::mm_json_response(false, null, $err_msg)) );
+					return $this->response;
 				}
 				$this->Session->setFlash($err_msg);
 			} else {
@@ -325,7 +373,7 @@ class MessagesController extends AppController {
 
 	public function unassign_fms_id($id = null) {
 		self::_load_record($id);
-		$fms_id = $this->Message->fms_id;
+		$fms_id = $this->Message->data['Message']['fms_id'];
 		$this->Message->unassign_fms_id();
 		if ($this->Message->save()) {
 			self::_logAction(ActionType::$ACTION_UNASSIGN);
@@ -341,10 +389,19 @@ class MessagesController extends AppController {
 		$this->Message->hide(); 
 		if ($this->Message->save()) {
 			self::_logAction(ActionType::$ACTION_HIDE);
-			$this->Session->setFlash(__('Message hidden'));
+			$msg = __('Message hidden');
+			if ($this->RequestHandler->accepts('json')) {
+				$this->response->body( json_encode(self::mm_json_response(true, null)) );
+				return $this->response;
+			}
 		} else {
-			$this->Session->setFlash(__('Failed to hide message'));
+			$msg = __('Failed to hide message');
+			if ($this->RequestHandler->accepts('json')) {
+				$this->response->body( json_encode(self::mm_json_response(false, null, $msg)) );
+				return $this->response;
+			}
 		}
+		$this->Session->setFlash($msg);
 		$this->redirect(array('action' => 'view', $id));
 	}
 
@@ -416,7 +473,7 @@ class MessagesController extends AppController {
 		$source_user_id = $this->Auth->user('id');
 		$source_by_user = $this->MessageSource->findByUserId($source_user_id, array('fields'=>'id'));
 		// infer source_id from user unless it's been explicitly sent
-		$source_id = empty($this->Message->souce_id)? $source_by_user : $this->Message->souce_id;
+		$source_id = empty($this->Message->data['Message']['source_id'])? $source_by_user : $this->Message->data['Message']['source_id'];
 		if (empty($source_by_user)) {
 			$return_code = 403;
 			$response_text = __("Forbidden\nUser %s is not currently allocated to any message source: cannot submit incoming messages.",  $this->Auth->user('username'));
@@ -478,17 +535,21 @@ class MessagesController extends AppController {
 		);
 	}
 	
-	private function _logAction($action_type, $custom_param=null) {
+	private function _logAction($action_type, $custom_param_1=null, $custom_param_2=null) {
+		Controller::loadModel('Action');
 		$action = new Action;
 		$params = array(
 			'type_id' =>  $action_type,
 			'user_id' => $this->Auth->user('id'),
 			'message_id' => $this->Message->id,
 		);
-		if ($action_type==ActionType::$ACTION_NOTE || $action_type==ActionType::$ACTION_REPLY) {
-			$params['note'] = $custom_param;
+		if ($action_type==ActionType::$ACTION_NOTE) {
+			$params['note'] = $custom_param_1;			
+		} elseif ($action_type==ActionType::$ACTION_REPLY) {
+			$params['note'] = $custom_param_1;
+			$params['item_id'] = $custom_param_2;
 		} elseif ($action_type==ActionType::$ACTION_ASSIGN) {
-			$params['item_id'] = intval($custom_param);
+			$params['item_id'] = intval($custom_param_1);
 		}
 		$action->create($params);
 		$action->save();

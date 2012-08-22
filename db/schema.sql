@@ -103,6 +103,7 @@ CREATE TABLE users (
   allowed_tags varchar(255) default null,
   can_reply smallint default null,
   created timestamp default null,
-  modified timestamp default null
+  modified timestamp default null,
+  email varchar(132) DEFAULT null
 );
 create unique index users_username_idx on users(username);

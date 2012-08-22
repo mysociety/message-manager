@@ -9,6 +9,7 @@
 		echo $this->Form->input('User.email', array('errors'=>true, 'label'=>'Email (optional)'));
 		echo $this->Form->input('allowed_tags');
 		echo $this->Form->input('group_id');
+		echo $this->Form->input('can_reply', array('label'=>'Can send replies?'));
 	?>
 	</fieldset>
 <?php echo $this->Form->end(__('Submit'));?>

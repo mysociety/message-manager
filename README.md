@@ -140,7 +140,7 @@ If you do delete users, remember to keep at least one admin user in the
 database, otherwise you won't be able to log in and create more users.
 
 Note that users in the `administrators` and `managers` groups *do* have access
-to the MSISDNs (phone numbers) of incoming messages.
+to the phone numbers of incoming messages.
 
 
 ## Configuring the Message Manager's system-wide settings
@@ -322,7 +322,7 @@ includes some of the configuration described above.
    * create users
 
       * managers for the team members who can have access to the message data
-        (including MSISDNs)
+        (including users' phone numbers)
 
       * api-users for FMS users who simply want to be able to allocate
         messages to the FMS reports they are creating. Remember to add the

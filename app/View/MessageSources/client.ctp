@@ -1,6 +1,7 @@
 <?php 
 echo $this->Html->script('jquery-1.7.2.min', false); 
-echo $this->Html->script('message_manager_client', false); 
+echo $this->Html->script('modernizr.custom', false);
+echo $this->Html->script('message_manager_client', false);
 ?>
 
 <h2>
@@ -21,7 +22,7 @@ echo $this->Html->script('message_manager_client', false);
 			// echo $this->Form->input('password');
 			echo $this->Form->input('messageSource_id', array('name' => 'data[Message][source_id]'));
 			echo $this->Form->input('external_id', array('label' => 'External ID (optional: a message ID)', 'type' => 'text'));
-			echo $this->Form->input('msisdn', array('label' => 'MSISDN'));
+			echo $this->Form->input('from_address', array('label' => 'Sender phone number'));
 			echo $this->Form->input('message', array('label' => 'Message'));
 			echo $this->Form->submit();
 			echo $this->Form->end();
@@ -53,12 +54,22 @@ echo $this->Html->script('message_manager_client', false);
 			echo $this->Form->submit('Get available messages', array('id' => 'available-submit'));
 			echo $this->Form->end();
 		?>
+    	<div id="reply-form-container">
+    	    	<?php 
+    				echo $this->Form->create(array('id' => 'reply-form','default'=>false));
+    				echo $this->Form->input('reply_text', array('label'=>'Reply text', 'type'=>'text', 'name'=>'reply_text', 'id'=>'reply_text'));
+    				echo $this->Form->submit(__('Send Reply'), array('id' => 'reply-submit'));
+    				echo $this->Form->end();
+    			?>
+    	</div>
 		<div id="assign-fms-container">
 			<?php 
 				echo $this->Form->create(array('id' => 'assign-fms-form','default'=>false));
 				echo $this->Form->input('message_id', array('label'=>'Message ID', 'type'=>'text', 'name'=>'message_id', 'id'=>'message_id'));
 				echo $this->Form->input('fms_id', array('label'=>'FMS ID', 'type'=>'text', 'name'=>'fms_id', 'id'=>'fms_id'));
 				echo $this->Form->submit(__('Assign FMS ID'), array('id' => 'assign-fms-submit'));
+				echo $this->Form->submit(__('Reply'), array('id' => 'reveal-reply-form'));
+				echo $this->Form->submit(__('Hide'), array('id' => 'hide-button'));
 				echo $this->Form->end();
 			?>
 			<p style="clear:both;padding-top:1em;">
@@ -73,15 +84,19 @@ echo $this->Html->script('message_manager_client', false);
 
 <script type="text/javascript">
 	$(document).ready(function() {
+		
+		var dummy_busy = false;
 
 		var dummy_populate_assign_boxes = function(data) {
-			if ('Message' in data) {
-				var msg_id = data['Message'].id;
-				$('#message_id').val(msg_id); 
-				if ($('#random-fms-id').prop("checked")) {
-					$('#fms_id').val(100+Math.floor(Math.random()*899));
-				}
-			}
+			if (('success' in data) && data.success) {
+    			if ('Message' in data['data']) {
+    				var msg_id = data.data['Message'].id;
+    				$('#message_id').val(msg_id); 
+    				if ($('#random-fms-id').prop("checked")) {
+    					$('#fms_id').val(100+Math.floor(Math.random()*899));
+    				}
+    			}
+    		}
 		}
 
 		var dummy_populate_username = function(data) {
@@ -92,7 +107,15 @@ echo $this->Html->script('message_manager_client', false);
 	        $('#fms_id,#message_id').val(''); // for dummy demo only
 		}
 		
+		var dummy_reply_cleanup = function(data) {
+			$('#reply_tet').val('');
+			$('#reply-form-container').stop().hide(500);
+			dummy_busy = false;
+		}
 
+		var dummy_hide_cleanup = function(data) {
+			dummy_busy = false;
+		}
 
 		//------------------------------------------------------------
 		// message_manager has been declared in clients.js
@@ -106,8 +129,43 @@ echo $this->Html->script('message_manager_client', false);
 		});
 
 		$('#assign-fms-submit').click(function() {
-			message_manager.assign_fms_id($('#message_id').val(), $('#fms_id').val(), {callback:dummy_clear_assign_boxes});
+			message_manager.assign_fms_id(
+			    $('#message_id').val(), 
+			    $('#fms_id').val(), 
+			    {callback:dummy_clear_assign_boxes});
 		});    
 
+		$('#reveal-reply-form').click(function(e) {
+			e.preventDefault();
+			if (!$('#message_id').val()) {
+				$('#reply-form-container').stop().hide(500);
+			} else {
+				$('#reply-form-container').stop().toggle(1000);
+			}
+		});
+
+		$('#hide-button').click(function() {
+			if ($('#message_id').val()) {
+				message_manager.hide(
+				    $('#message_id').val(), 
+				    {callback:dummy_hide_cleanup});
+			}
+		});
+		
+		$('#reply-submit').click(function(e) {
+			e.preventDefault();
+			if (! dummy_busy) {
+				if (! $('#message_id').val()) {
+					alert("No: won't send without a message ID");
+				} else {
+					dummy_busy = true;
+					message_manager.reply(
+					    $('#message_id').val(), 
+					    $('#reply_text').val(), 
+					    {callback:dummy_reply_cleanup});
+				}
+			}
+		});
+        
 	});
 </script>
