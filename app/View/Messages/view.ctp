@@ -237,6 +237,12 @@
 		<li>
 			<?php echo $this->Html->link(__('Edit'), array('action' => 'edit', $message['Message']['id']));?>
 		</li>
+		<?php if (! $message['Message']['is_outbound']) { ?>
+			<li>
+				<?php echo $this->Html->link(__('Reply'),
+			 		array('action' => 'reply', $message['Message']['id'])); ?>
+			</li>
+		<?php } ?>
 		<li>
 			<?php echo $this->Form->postLink(__('Delete'),
 		 		array('action' => 'delete', $message['Message']['id']), null, 

@@ -21,6 +21,8 @@ $color_status_locked:    #ffdddd;
 $color_status_assigned:  #f8c75e;
 $color_status_hidden:    #ade0ed;
 $color_status_pending:   #f0f066;
+$color_status_sent:      #66cc33;
+$color_status_error:     #ee6666;
 
 // installation-specific colors:
 $color_bg_local:           #325;
@@ -162,11 +164,6 @@ body {
     }
     dl {
       width: 100%;
-    }
-  }
-  .inline-buttons {
-    a {
-      margin-right: 0.5em;
     }
   }
   

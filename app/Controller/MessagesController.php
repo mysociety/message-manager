@@ -53,8 +53,8 @@ class MessagesController extends AppController {
 			$this->Auth->authenticate = array('Form');
 		}
 		Controller::loadModel('ActionType'); // to access static methods on it
-		Controller::loadModel('Status'); // to access static methods on it
 		Controller::loadModel('Group'); // to access static methods on it
+		Controller::loadModel('Status'); // to access static methods on it
 	}
 	
 	// index shows all messages... maybe filtered on is_outbound;
@@ -198,59 +198,76 @@ class MessagesController extends AppController {
 		$this->set('message', $this->Message->data);
 		$this->set('is_admin_group', $is_admin_group);
 	}
-
+	
 	//-----------------------------------------------------------------
 	// TODO: reply not implemented yet
 	// reply creates a new message object, and queues it to be sent
 	//-----------------------------------------------------------------
 	public function reply($id = null) {
-		if (!$this->request->is('post')) {
-			throw new MethodNotAllowedException();
-		}
-		self::_load_record($id);
-		$reply_text = $this->request->data('reply_text');
-		$err_msg = "Reply to message (via source) not implemented yet: TODO";
-		if (empty($reply_text)) {
-			$err_msg = "Empty reply text: won't send reply";
-		} elseif (! $this->Auth->user('can_reply')==1) {
-			$err_msg = "User " . $this->Auth->user('username') . " lacks reply privilege";
+		if (! $this->Auth->user('can_reply')==1) {
+			$deny_msg = "Cannot reply: user " . $this->Auth->user('username') . " lacks reply privilege";
 			self::_logAction(ActionType::$ACTION_NOTE, "attempt to reply to message " . $id . " denied");
+			if ($this->RequestHandler->accepts('json')) {
+				$this->response->body( json_encode(self::mm_json_response(false, null, $deny_msg)) );
+				return $this->response;
+			} else {
+				$this->Session->setFlash($deny_msg);
+				$this->redirect(array('action' => 'view', $id));
+			}
 		} else {
-			$lock_err = $this->Message->lock($this->Auth->user('id'));
-			if (empty($lock_err)) {
-				// fake success TODO
-				$reply = new Message;
-				$reply->create();
-				$reply->save(array(
-						'parent_id' =>  $id,
-						'is_outbound' => 1,
-						'message' => $reply_text,
-						'status' => Status::$STATUS_PENDING,
-						'from_address' => $this->Auth->user('username'),
-						'to_address' => $this->Message->data['Message']['from_address']
-				));
-				// consider sending reply->id back with the success response
-				self::_logAction(ActionType::$ACTION_REPLY, "Reply: " . $reply_text, $reply->id);
-				if (! $this->Message->data['Message']['replied']) {
-					$this->Message->data['Message']['replied']=1; // set the flag (hmm, not using this)
-					$this->Message->save();
+			self::_load_record($id);
+			if ($this->request->is('post')) {
+				$reply_text = $this->request->data('reply_text');
+				if (empty($reply_text)) {
+						$err_msg = "Empty reply text: won't send reply";
+				} else {
+					$lock_err = $this->Message->lock($this->Auth->user('id'));
+					if (empty($lock_err)) {
+						// fake success TODO
+						$reply = new Message;
+						$reply->create();
+						$reply->save(array(
+								'parent_id' =>  $id,
+								'is_outbound' => 1,
+								'message' => $reply_text,
+								'status' => Status::$STATUS_PENDING,
+								'from_address' => $this->Auth->user('username'),
+								'to_address' => $this->Message->data['Message']['from_address']
+						));
+						// consider sending reply->id back with the success response
+						self::_logAction(ActionType::$ACTION_REPLY, "Reply: " . $reply_text, $reply->id);
+						if (! $this->Message->data['Message']['replied']) {
+							$this->Message->data['Message']['replied']=1; // set the flag (hmm, not using this)
+							$this->Message->save();
+						}
+						if ($this->RequestHandler->accepts('json')) {
+							$this->response->body( json_encode(self::mm_json_response(true, null)) );
+							return $this->response;
+						} else {
+							$err_msg = "Reply sent OK.";
+						}
+					} else {
+						$err_msg = "reply failed: " . $lock_err;
+					}
 				}
 				if ($this->RequestHandler->accepts('json')) {
-					$this->response->body( json_encode(self::mm_json_response(true, null)) );
+					$this->response->body( json_encode(self::mm_json_response(false, null, $err_msg)) );
 					return $this->response;
-				} else {
-					$err_msg = "Reply sent OK.";
 				}
-			} else {
-				$err_msg = "reply failed: " . $lock_err;
+				$this->Session->setFlash($err_msg);
+				$this->redirect(array('action' => 'view', $id));
+			} else { // not a POST request
+				if ($this->RequestHandler->accepts('json')) {
+					throw new MethodNotAllowedException();
+				}
+				if (! $this->Auth->user('can_reply')==1) {
+					$this->Session->setFlash($deny_msg);
+					$this->redirect(array('action' => 'view', $id));
+				} else {
+					$this->set('message', $this->Message->data);
+				}
 			}
 		}
-		if ($this->RequestHandler->accepts('json')) {
-			$this->response->body( json_encode(self::mm_json_response(false, null, $err_msg)) );
-			return $this->response;
-		}
-		$this->Session->setFlash($err_msg);
-		$this->redirect(array('action' => 'view', $id));
 	}
 	
 	// same as lock except also relinquishes all other locks held by this user
@@ -519,6 +536,7 @@ class MessagesController extends AppController {
 	}
 	
 	private function _logAction($action_type, $custom_param_1=null, $custom_param_2=null) {
+		Controller::loadModel('Action');
 		$action = new Action;
 		$params = array(
 			'type_id' =>  $action_type,
