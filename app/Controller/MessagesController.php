@@ -471,17 +471,24 @@ class MessagesController extends AppController {
 		//---------------
 		Controller::loadModel('MessageSource'); // really?  This needs tidying!
 		$source_user_id = $this->Auth->user('id');
-		$source_by_user = $this->MessageSource->findByUserId($source_user_id, array('fields'=>'id'));
-		// infer source_id from user unless it's been explicitly sent
+		$source_by_user = $this->MessageSource->findByUserId($source_user_id);
+		// for now, infer source_id from user unless it's been explicitly sent
 		$source_id = empty($this->Message->data['Message']['source_id'])? $source_by_user : $this->Message->data['Message']['source_id'];
-		if (empty($source_by_user)) {
+		if (empty($source_id)) {
+			$return_code = 404;
+			$response_text = __("No such source\nCould not determine which message source is submitting the message (log in as an allocated user perhaps?).");
+		} elseif (empty($source_by_user)) {
 			$return_code = 403;
-			$response_text = __("Forbidden\nUser %s is not currently allocated to any message source: cannot submit incoming messages.",  $this->Auth->user('username'));
-		} elseif ($source_by_user != $source_id) {
+			$response_text = __("Forbidden\nUser \"%s\" is not currently allocated to any message source: cannot submit incoming messages.",  $this->Auth->user('username'));
+		} elseif ($source_by_user['MessageSource']['id'] != $source_id) {
 			$return_code = 403;
-			$response_text = __("Forbidden\nUser %s is not this source's allocated user.",  $this->Auth->user('username'));
+			$response_text = __("Forbidden\nUser \"%s\" is not this source's allocated user (user's allocated gateway is %s)",
+				$this->Auth->user('username'), 
+				(empty($source_by_user['MessageSource']['name'])? $source_by_user['MessageSource']['id'] : $source_by_user['MessageSource']['name'])
+			);
 		} else {
 			$this->Message->set('status', Status::$STATUS_AVAILABLE);
+			$this->Message->set('is_outbound', false);
 			if (! $this->Message->validates()) {
 				$response_text = __("Failed\nthe incoming message had validation errors:\n\n");
 				foreach ($this->Message->validationErrors as $field => $error) { 
