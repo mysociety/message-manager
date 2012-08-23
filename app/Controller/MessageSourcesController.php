@@ -70,6 +70,14 @@ class MessageSourcesController extends AppController {
 				$this->Session->setFlash(__('The message source could not be saved. Please, try again.'));
 			}
 		}
+		$this->set('users', $this->MessageSource->User->find('list', array(
+			'fields' => array('username'),
+				'conditions' => array('group_id' => Group::$SOURCE_USER_GROUP_ID),
+				'order' => array('username' => 'ASC')
+			 )
+		)); // populate the drop-down
+		$source_group = $this->Group->findById(Group::$SOURCE_USER_GROUP_ID);
+		$this->set('source_group_name', empty($source_group)? "message-sources" : $source_group['Group']['name']); 
 	}
 
 	public function client() {
