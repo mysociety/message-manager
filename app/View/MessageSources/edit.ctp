@@ -6,7 +6,7 @@
 		echo $this->Form->input('name');
 		echo $this->Form->input('description');
 		echo $this->Form->input('url');
-		echo $this->Form->input('ip_addresses');
+		echo $this->Form->input('ip_addresses', array('type' => 'text'));
 		echo $this->Form->input('user_id');
 	?>
 	</fieldset>
