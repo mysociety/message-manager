@@ -6,6 +6,7 @@ class MessageSourcesController extends AppController {
 	    parent::beforeFilter();
 		
 	    $this->Auth->allow('client'); // allow access to the dummy client for testing Basic Auth
+		Controller::loadModel('Group'); // to access static methods on it
 	}
 	
     public function index() {
@@ -48,7 +49,14 @@ class MessageSourcesController extends AppController {
 		} else {
 			$this->request->data = $this->MessageSource->read(null, $id);
 		}
-		$this->set('users', $this->MessageSource->User->find('list')); // populate the drop-down
+		$this->set('users', $this->MessageSource->User->find('list', array(
+			'fields' => array('username'),
+				'conditions' => array('group_id' => Group::$SOURCE_USER_GROUP_ID),
+				'order' => array('username' => 'ASC')
+			 )
+		)); // populate the drop-down
+		$source_group = $this->Group->findById(Group::$SOURCE_USER_GROUP_ID);
+		$this->set('source_group_name', empty($source_group)? "message-sources" : $source_group['Group']['name']); 
 	}
 	
 	

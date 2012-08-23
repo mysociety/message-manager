@@ -469,7 +469,7 @@ class MessagesController extends AppController {
 		// ...otherwise if there was no source_id, infer it from the current user.
 		// After checking this, $source_user_id will be null if there's no match.
 		//---------------
-		Controller::loadModel('MessageSource'); // really?  This needs tidying!
+		Controller::loadModel('MessageSource'); // really?  This needs tidying!... should be using user's MessageSource association
 		$source_user_id = $this->Auth->user('id');
 		$source_by_user = $this->MessageSource->findByUserId($source_user_id);
 		// for now, infer source_id from user unless it's been explicitly sent

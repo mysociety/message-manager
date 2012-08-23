@@ -215,6 +215,10 @@ class User extends AppModel {
 			'exclusive' => '',
 			'finderQuery' => '',
 			'counterQuery' => ''
+		),
+		'MessageSource' => array(
+			'className' => 'Action',
+			'foreignKey' => 'user_id'
 		)
 	);
 

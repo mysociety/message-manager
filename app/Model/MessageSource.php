@@ -6,7 +6,7 @@ class MessageSource extends AppModel {
 			'className' => 'User',
 			'foreignKey' => 'user_id',
 			'conditions' => array('User.group_id' => '4'), // FIXME 'message-sources' hardcoded!
-			'fields'		=> array('User.username'),
+			'fields' => array('username'),
 			'order' => array('User.username' => 'ASC')
 		)
 	);
