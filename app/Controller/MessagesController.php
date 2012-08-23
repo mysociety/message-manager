@@ -237,7 +237,7 @@ class MessagesController extends AppController {
 						// consider sending reply->id back with the success response
 						self::_logAction(ActionType::$ACTION_REPLY, "Reply: " . $reply_text, $reply->id);
 						if (! $this->Message->data['Message']['replied']) {
-							$this->Message->data['Message']['replied']=1; // set the flag (hmm, not using this)
+							$this->Message->data['Message']['replied']=date('Y-m-d H:i:s'); // date of *most recent* reply
 							$this->Message->save();
 						}
 						if ($this->RequestHandler->accepts('json')) {
