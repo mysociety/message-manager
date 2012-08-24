@@ -101,6 +101,7 @@ class MessagesController extends AppController {
 			)
 		);
 		$this->set('messages', $messages);	
+		$this->set('allowed_tags', $allowed_tags);	
 	}
 
 	public function view($id = null) {
