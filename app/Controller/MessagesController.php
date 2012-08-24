@@ -114,6 +114,9 @@ class MessagesController extends AppController {
 			$this->set('message', $this->Message->read(), $id);
 			$this->set('is_locked', $this->Message->is_locked()? 1 : 0);
 			$this->set('seconds_until_lock_expiry', $this->Message->seconds_until_lock_expiry());
+			
+			// not setting parent because the Parent association already has it in the model
+			$this->set('children', $this->Message->children($id));
 		}
     }
 

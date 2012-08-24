@@ -8,26 +8,54 @@
 	    Message
 	</h2>
 	<dl style="margin-bottom:3em">
+		<?php
+	        if ($message['Message']['to_address']) { ?>
+		    	<dt>
+			    	To
+		    	</dt>
+		    	<dd>
+			    	<?php echo h($message['Message']['to_address'])?>
+			    	&nbsp;
+		    	</dd>
+		<?php } ?>
+
 	    <?php if ($message['Message']['parent_id']) { ?>
     		<dt>
-    			In reply to
+    			In reply to 
     		</dt>
     		<dd>
-    		    <?php echo $this->Html->link(h($message['Message']['parent_id']), array('action' => 'view', $message['Message']['parent_id']), null); ?>
-    			&nbsp;
-    			<?php echo $message['Parent']['message'] ?>
+				<a href="<?php echo $this->Html->url(array('action' => 'view', $message['Message']['parent_id'])); ?>">
+					<span class="message-sender">
+						<?php echo h($message['Parent']['from_address']); ?>
+					</span>
+    				<?php echo h($message['Parent']['message']); ?>
+    			</a>&nbsp;
     		</dd>
-	    <?php 
-	        } 
-	        if ($message['Message']['to_address']) { ?>
-	            
-		    <dt>
-			    To
-		    </dt>
-		    <dd>
-			    <?php echo h($message['Message']['to_address'])?>
-			    &nbsp;
-		    </dd>
+	    <?php } ?> 
+		<dt>
+			Message
+		</dt>
+		<dd>
+			<p class="message-text">
+				<span class="message-sender">
+					<?php echo($message['Message']['from_address'])?>
+				</span>
+				<?php echo h($message['Message']['message'])?>
+			</p>
+		</dd>
+		<?php foreach ($children as $child) {  ?>
+			<dt>
+				Reply
+				
+			</dt>
+			<dd>
+				<a href="<?php echo $this->Html->url(array('action' => 'view', $child['Message']['id'])); ?>">
+					<span class="message-sender">
+						<?php echo h($child['Message']['from_address']); ?>
+					</span>
+					<?php echo h($child['Message']['message']); ?>
+				</a>&nbsp;
+			</dd>
 		<?php } ?>
 		<dt>
 			From
@@ -35,12 +63,6 @@
 		<dd>
 			<?php echo h($message['Message']['from_address'])?>
 			&nbsp;
-		</dd>
-		<dt>
-			Message
-		</dt>
-		<dd>
-			<p class="message-text"><?php echo h($message['Message']['message'])?></p>
 		</dd>
 		<dt>Status</dt>
 		<dd class="status-<?php echo h($message['Status']['name']) ?>">

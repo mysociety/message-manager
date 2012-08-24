@@ -30,6 +30,7 @@ class Message extends AppModel {
 			'fields'		=> array('from_address', 'message', 'is_outbound')
 		),
 	);
+	public $actsAs = array('Tree');
 	
 	public $validate = array(
 		// note MSISD is now also used for outgoing messages, e.g. username
