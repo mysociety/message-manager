@@ -500,6 +500,25 @@ class MessagesController extends AppController {
 				}
 			} elseif ($this->Message->save()) {
 				$response_text = __("OK\nSaved message id=%s", $this->Message->id);
+				// check to see if this looks like a reply: 
+				//    -- has no tag (easiest to detect *after* the save)
+				//    -- from a from_address that was the to_address of a message in the last 3 days
+				self::_load_record($this->Message->id);
+				if (empty($this->Message->data['Message']['tag'])) {
+					$response = $this->Message->find('first', array(
+						'conditions' =>  array(
+							'Message.to_address' => $this->Message->data['Message']['from_address'],
+							'Message.created >=' => date('Y-m-d', strtotime('-3 days'))
+						),
+						'order' => array('Message.created' => 'desc')
+					));
+					if ($response) {
+						$this->Message->set('parent_id', $response['Message']['id']);
+						if ($this->Message->save()) {
+							$response_text = $response_text . " saved as a response to message " . $response['Message']['id'];
+						} // fail silently: the initial message was saved
+					}
+				}
 			} else {
 				$return_code = 500;
 				$response_text = __('Failed\nunexpected error, the message could not be saved.');

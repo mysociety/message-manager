@@ -39,7 +39,7 @@
 					<td class="message-reply">
 						<?= $reply['created']?>
 					</td>
-					<td class="status-<?php echo ($reply['Status']['name']); ?>"><?php echo h($reply['Status']['name']); ?>
+					<td class="message-reply status-<?php echo ($reply['Status']['name']); ?>"><?php echo h($reply['Status']['name']); ?>
 						<?php if (! empty($reply['lock_expires'])) {
 							echo('*');
 							$c_locks++;
