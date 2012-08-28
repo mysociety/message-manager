@@ -62,6 +62,13 @@ $config = array(
 	 * JSON API
 	 *-----------------------------------------------*/
 	'cors_allowed' => 'http://www.fixmystreet.com',
+	
+	/*-----------------------------------------------
+	 * Period within which a message can be automatically
+	 * considered as a possible reply to a sent message
+	 *-----------------------------------------------*/
+	'autodetect_reply_period' => '1 week'
+	
 );
 
 // The following quirky bit o' code lets Cake pull the database config from the
