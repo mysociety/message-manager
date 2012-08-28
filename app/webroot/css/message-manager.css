@@ -83,6 +83,10 @@ body {
   min-height: 2em; }
 #container .note-text {
   background-color: #ffcccc; }
+#container tr.message-reply {
+  background-color: #cccccc; }
+  #container tr.message-reply td.message-reply {
+    padding-left: 2em; }
 #container p.footnote {
   font-size: 80%;
   margin-top: 2em;

@@ -6,6 +6,10 @@ class Message extends AppModel {
 			'foreignKey'	=> 'message_id',
 			'order'			=> 'Action.created ASC',
 			'dependent'		=> true,
+		),
+		'Reply' => array(
+			'className' 	=> 'Message',
+			'foreignKey'	=> 'parent_id',
 		)
 	);
 	public $belongsTo = array(

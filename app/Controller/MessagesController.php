@@ -86,7 +86,7 @@ class MessagesController extends AppController {
     public function available() {
 		$this->Message->recursive = 1;
 		$allowed_tags =  $this->Auth->user('allowed_tags');
-		$conditions = array('Message.status' => Status::$STATUS_AVAILABLE);
+		$conditions = array('Message.status' => Status::$STATUS_AVAILABLE, 'Message.parent_id' => null);
 		// TODO really, allowed tags should be comma-separated list; for now, consider it a single tag
 		if (! empty($allowed_tags)) {
 			$conditions['Message.tag'] = strtoupper(trim($allowed_tags));
@@ -94,7 +94,7 @@ class MessagesController extends AppController {
 		$messages = $this->Message->find('all',
 			array(
 				'conditions' => $conditions,
-				'recursive' => 0,
+				'recursive' => 2,
 				'fields'	=> self::_json_fields(),
 				'order' => array('Message.created ASC'),
 				'limit' => 20 // for now FIXME -- paginate?

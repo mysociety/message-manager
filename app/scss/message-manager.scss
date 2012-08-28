@@ -24,6 +24,8 @@ $color_status_pending:   #f0f066;
 $color_status_sent:      #66cc33;
 $color_status_error:     #ee6666;
 
+$color_reply_bg:         #cccccc;
+
 // installation-specific colors:
 $color_bg_local:           #325;
 
@@ -139,6 +141,12 @@ body {
   }
   .note-text {
     background-color: $note_bg_color;
+  }
+  tr.message-reply {
+    background-color: $color_reply_bg;
+    td.message-reply {
+      padding-left: 2em;
+    }
   }
   p.footnote  {
     font-size: 80%;

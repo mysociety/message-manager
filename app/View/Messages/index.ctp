@@ -2,7 +2,9 @@
 	<h2><?php echo $title ?></h2>
 	<div class="actions inline-buttons">
 	<?php 	
-		echo $this->Html->link(__('All messages'), array('controller' => 'Messages', 'action' => 'index'));
+echo $this->Html->link(__('All messages'), array('controller' => 'Messages', 'action' => 'index'));
+echo "&nbsp;";
+echo $this->Html->link(__('Available messages'), array('controller' => 'Messages', 'action' => 'available'));
 	?>
 	</div>
 	<table>
