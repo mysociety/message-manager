@@ -111,6 +111,39 @@ body {
   background-color: #f0f066; }
 #container .mm-messages dd {
   padding-left: 4px; }
+#container .mm-messages .reply-0 {
+  padding-left: 4px;
+  background-color: #e8e8e8; }
+#container .mm-messages .reply-1 {
+  padding-left: 1.5em;
+  background-color: #dedede; }
+#container .mm-messages .reply-2 {
+  padding-left: 3.0em;
+  background-color: #d6d6d6; }
+#container .mm-messages .reply-3 {
+  padding-left: 4.5em;
+  background-color: #d1d1d1; }
+#container .mm-messages .reply-4 {
+  padding-left: 6.0em;
+  background-color: #c9c9c9; }
+#container .mm-messages .reply-5 {
+  padding-left: 7.0em;
+  background-color: #bfbfbf; }
+#container .mm-messages .reply-6 {
+  padding-left: 8.0em;
+  background-color: #b8b8b8; }
+#container .mm-messages a.reply-link {
+  width: 100%;
+  display: block;
+  text-decoration: none;
+  color: black; }
+  #container .mm-messages a.reply-link:hover {
+    background-color: red; }
+  #container .mm-messages a.reply-link .message-sender {
+    float: right;
+    display: block;
+    padding: 0 0.5em;
+    border-left: 6px solid #fff; }
 #container .home-block {
   margin: 0 0 1.2em 0;
   padding: 0.5em;

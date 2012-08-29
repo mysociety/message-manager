@@ -53,7 +53,8 @@ class MessageUtilsHelper extends AppHelper {
 						<?php echo h($reply['Message']['from_address']); ?>
 					</span>
 					<?php echo h($reply['Message']['message']); ?>
-				</a>&nbsp;
+				&nbsp;
+				</a>
 			</dd>
 		<?php 
 			if ($reply['children']) {

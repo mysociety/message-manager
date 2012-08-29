@@ -25,6 +25,13 @@ $color_status_sent:      #66cc33;
 $color_status_error:     #ee6666;
 
 $color_reply_bg:         #cccccc;
+$color_bg_reply_0:       #E8E8E8;
+$color_bg_reply_1:       #DEDEDE;
+$color_bg_reply_2:       #D6D6D6;
+$color_bg_reply_3:       #D1D1D1;
+$color_bg_reply_4:       #C9C9C9;
+$color_bg_reply_5:       #BFBFBF;
+$color_bg_reply_6:       #B8B8B8;
 
 // installation-specific colors:
 $color_bg_local:           #325;
@@ -168,6 +175,28 @@ body {
     .status-pending   {background-color: $color_status_pending }
     dd {
       padding-left: 4px;
+    }
+    .reply-0 {padding-left:4px;   background-color: $color_bg_reply_0;}
+    .reply-1 {padding-left:1.5em; background-color: $color_bg_reply_1;}
+    .reply-2 {padding-left:3.0em; background-color: $color_bg_reply_2;}
+    .reply-3 {padding-left:4.5em; background-color: $color_bg_reply_3;}
+    .reply-4 {padding-left:6.0em; background-color: $color_bg_reply_4;}
+    .reply-5 {padding-left:7.0em; background-color: $color_bg_reply_5;}
+    .reply-6 {padding-left:8.0em; background-color: $color_bg_reply_6;}
+    a.reply-link {
+      width: 100%;
+      display: block;
+      text-decoration: none;
+      color: black;
+      &:hover {
+        background-color: red;
+      }
+      .message-sender {
+        float:right;
+        display: block;
+        padding: 0 0.5em;
+        border-left: 6px solid #fff;
+      }
     }
   }
   .home-block {
