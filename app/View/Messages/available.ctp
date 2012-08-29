@@ -3,6 +3,13 @@
 		Available Messages
 		<?php if (! empty($allowed_tags)) {echo h("(tags: $allowed_tags)");} ?>
 	</h2>
+	<div class="actions inline-buttons">
+		<?php 	
+	echo $this->Html->link(__('All messages'), array('controller' => 'Messages', 'action' => 'index'));
+	echo "&nbsp;";
+	echo $this->Html->link(__('Available messages'), array('controller' => 'Messages', 'action' => 'available'));
+		?>
+	</div>
 	<table>
 		<tr>
 			<th>Created</th>

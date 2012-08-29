@@ -45,8 +45,10 @@
 		</dd>
 		<?php foreach ($children as $child) {  ?>
 			<dt>
+				<?php if ($child['Message']['parent_id'] != $message['Message']['id']) { // indicate this is not a direct reply
+					echo("&nbsp;&nbsp;");
+				}?>
 				Reply
-				
 			</dt>
 			<dd>
 				<a href="<?php echo $this->Html->url(array('action' => 'view', $child['Message']['id'])); ?>">
