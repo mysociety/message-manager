@@ -43,7 +43,7 @@ class MessageUtilsHelper extends AppHelper {
 	
 	// recursively display replies: expects 'children' array, from a actsAs Tree query
 	function message_entry_in_thread($replies, $depth) { 
-		$css_class = "reply-" . max($depth, 6); // arbitrary limit to nesting
+		$css_class = "reply-" . min($depth, 6); // arbitrary limit to nesting
 		foreach ($replies as $reply) { ?>
 			<dt class="<?php echo($css_class);?>">Reply
 			</dt>
