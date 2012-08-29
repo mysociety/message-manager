@@ -43,22 +43,7 @@
 				<?php echo h($message['Message']['message'])?>
 			</p>
 		</dd>
-		<?php foreach ($children as $child) {  ?>
-			<dt>
-				<?php if ($child['Message']['parent_id'] != $message['Message']['id']) { // indicate this is not a direct reply
-					echo("&nbsp;&nbsp;");
-				}?>
-				Reply
-			</dt>
-			<dd>
-				<a href="<?php echo $this->Html->url(array('action' => 'view', $child['Message']['id'])); ?>">
-					<span class="message-sender">
-						<?php echo h($child['Message']['from_address']); ?>
-					</span>
-					<?php echo h($child['Message']['message']); ?>
-				</a>&nbsp;
-			</dd>
-		<?php } ?>
+		<?php $this->MessageUtils->message_entry_in_thread($children, 0); ?>
 		<dt>
 			From
 		</dt>

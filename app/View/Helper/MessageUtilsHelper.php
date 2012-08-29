@@ -40,4 +40,27 @@ class MessageUtilsHelper extends AppHelper {
 		return Configure::read('fms_site_url') .
 			preg_replace('/%s/', $fms_id, Configure::read('fms_report_path'));
 	}
+	
+	// recursively display replies: expects 'children' array, from a actsAs Tree query
+	function message_entry_in_thread($replies, $depth) { 
+		$css_class = "reply-" . max($depth, 6); // arbitrary limit to nesting
+		foreach ($replies as $reply) { ?>
+			<dt class="<?php echo($css_class);?>">Reply
+			</dt>
+			<dd class="<?php echo($css_class);?>">
+				<a href="<?php echo $this->Html->url(array('action' => 'view', $reply['Message']['id'])); ?>" class="reply-link">
+					<span class="message-sender">
+						<?php echo h($reply['Message']['from_address']); ?>
+					</span>
+					<?php echo h($reply['Message']['message']); ?>
+				</a>&nbsp;
+			</dd>
+		<?php 
+			if ($reply['children']) {
+				self::message_entry_in_thread($reply['children'], $depth+1);
+			}
+		}
+	}
 } 
+
+?>

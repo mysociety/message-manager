@@ -127,22 +127,17 @@ class MessagesController extends AppController {
 			$message = $this->Message->find('first', array(
 				'conditions' => array('Message.id' => $id),
 			));
-
 			$this->Message->Behaviors->attach('Containable');
 			$messages = $this->Message->find('threaded', array(
 			    'conditions' => array(
 			        'Message.lft >=' => $message['Message']['lft'], 
 			        'Message.rght <=' => $message['Message']['rght']
 			    ),
-				'contain' => array(
-				),
-
+				'contain' => array(), // empty, restricts to just the Message
 			));
 			
 			$this->set('message', $message);
 			$this->set('children', $messages[0]['children']);
-			debug($messages[0]['children']);
-
 			$this->set('is_locked', $this->Message->is_locked()? 1 : 0);
 			$this->set('seconds_until_lock_expiry', $this->Message->seconds_until_lock_expiry());
 
