@@ -91,15 +91,27 @@ class MessagesController extends AppController {
 		if (! empty($allowed_tags)) {
 			$conditions['Message.tag'] = strtoupper(trim($allowed_tags));
 		}
-		$messages = $this->Message->find('all',
+		/*
+		$this->Message->Behaviors->attach('Containable');
+		$messages = $this->Message->find('threaded',
 			array(
+				'contain' => array(
+					'Reply' => array(
+						'contain' => array('Reply', 'Source', 'Status', 'Lockkeeper'), 
+						'fields' => self::_json_fields()
+					), 
+					'Source', 
+					'Status', 
+					'Lockkeeper'),
 				'conditions' => $conditions,
-				'recursive' => 2,
+				'recursive' => 1,
 				'fields'	=> self::_json_fields(),
 				'order' => array('Message.created ASC'),
 				'limit' => 20 // for now FIXME -- paginate?
 			)
 		);
+		*/
+		$messages = $this->Message->children(null, false, self::_json_fields(), null, null, 1, 1);
 		$this->set('messages', $messages);	
 		$this->set('allowed_tags', $allowed_tags);	
 	}
@@ -112,12 +124,28 @@ class MessagesController extends AppController {
 		} else {
 			$this->helpers[] = 'MessageUtils';
 			$this->Message->recursive=2; // to get the user and type values
-			$this->set('message', $this->Message->read(), $id);
+			$message = $this->Message->find('first', array(
+				'conditions' => array('Message.id' => $id),
+			));
+
+			$this->Message->Behaviors->attach('Containable');
+			$messages = $this->Message->find('threaded', array(
+			    'conditions' => array(
+			        'Message.lft >=' => $message['Message']['lft'], 
+			        'Message.rght <=' => $message['Message']['rght']
+			    ),
+				'contain' => array(
+				),
+
+			));
+			
+			$this->set('message', $message);
+			$this->set('children', $messages[0]['children']);
+			debug($messages[0]['children']);
+
 			$this->set('is_locked', $this->Message->is_locked()? 1 : 0);
 			$this->set('seconds_until_lock_expiry', $this->Message->seconds_until_lock_expiry());
-			
-			// not setting parent because the Parent association already has it in the model
-			$this->set('children', $this->Message->children($id));
+
 		}
     }
 
