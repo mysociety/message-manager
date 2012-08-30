@@ -187,7 +187,7 @@ database php files anyway, so if you want to be terse you only need to declare
 values that are different.
 
 
-### `tags`
+### config setting: `tags`
 
 The tags are words that are used to identify and filter incoming messages.
 Currently the Message Manager checks for a tag at the start of incoming
@@ -207,12 +207,12 @@ and meaningful!) and associate it with the full meaning. For example:
 
 Tag recognition is case-insensitive.
 
-### `remove_tags_when_matched`
+### config setting: `remove_tags_when_matched`
 
 Set to a true value (`1`) if you want matched tags to be removed from incoming
 messages (recommended).
 
-### `fms_site_url` and `fms_report_path`
+### config settings: `fms_site_url` and `fms_report_path`
 
 Provide the base URL of your FMS-like site and the path to reports. 
 
@@ -222,27 +222,34 @@ Provide the base URL of your FMS-like site and the path to reports.
 It's probably best to not have a trailing slash on the site URL, and start the
 path with one. The `%s` will be replaced with the problem report's ID.
 
-### `enable_dummy_client`
+### config setting: `enable_dummy_client`
 
 Set this to `0` to disable the dummy client before going live. You can see the
 dummy client at `/dummy` and you can use it to fake incoming messages and
 client interaction with the database... but you *must* disable it before
 running a production system.
 
-### `lock_expiry_seconds`
+### config setting: `lock_expiry_seconds`
 
 The lock expiry controls how long a message "belongs" to the user who last
 claimed it (locking is the mechanism used to stop two FMS users creating a
 report from the same message at the same time). You can normally leave this at
 the default value of 360 seconds.
 
-### `cors_allowed`
+### config setting: `cors_allowed`
 
 The CORS allowed is a comma-separated list of URLs that are used to indicate
 to the (browser) clients which domains the Message Manager regards as
 trustworthy when receiving incoming AJAX requests from domains other than its
 own. This is part of the mechanism used if you're making Message Manager calls
 from within another website's pages (such as FixMyStreet).
+
+### config setting: `autodetect_reply_period`
+
+Message Manager tries to detect when an incoming message might actually be a reply (rather than a new report) by seeing if there were any outbound messages
+sent to this number within a certain period. By default this is `1 week` but
+if you find that's not long enough you can change it here (e.g., `2 days`, 
+`2 weeks`, `1 year`).
 
 ## Smoke-test: log in as `admin`
 
@@ -282,12 +289,16 @@ Message Manager and going to `/dummy`. Click "available messages" (at any
 time) to load the list of messages: clicking on them locks them, and clicking
 on "Assign FMS ID" will assign it -- if this operation succeeds, the message
 is removed from the list because it is no longer available for assignment.
-This demo implements the JSON API with `message_manager_client.js`, which is
-intended to serve as a working example if you're attempting an implementation
-of your own. See the code in `app/View/MessageSources/client.ctp` to see how
-this is used (in particular the javascript at the bottom of that file which is
-applying the methods from `message_manager_client.js`). You should be able to
-drop the `.js` file into your own client without needing to modify it.
+Similarly, you can reply to and hide messages (replies won't get sent unless
+you've actually enabled/configured the SMS sending, so it's probably safe to
+play). This demo implements the JSON API with `message_manager_client.js`,
+which is intended to serve as a working example if you're attempting an
+implementation of your own. See the code in
+`app/View/MessageSources/client.ctp` 
+to see how this is used (in particular the javascript at the bottom of that
+file which is applying the methods from `message_manager_client.js`). You
+should be able to drop the `.js` file into your own client without needing to
+modify it.
 
 If you're logged in as an administrator (or a message-source) you'll also see
 a form for submitting incoming messages "as if" they were coming in from an
