@@ -279,7 +279,8 @@ body {
         #container .dummy-client #mm-message-list ul li label, #container .dummy-client #mm-message-list ul li span.msg-text, #container .dummy-client #mm-message-list ul ul.mm-reply-thread li label, #container .dummy-client #mm-message-list ul ul.mm-reply-thread li span.msg-text {
           display: block;
           font-weight: normal;
-          margin: 0.1em 0 0.1em 4.5em; }
+          margin: 0.1em 0 0.1em 4.5em;
+          cursor: pointer; }
   #container .dummy-client #mm-login-container {
     display: none;
     border: 1px solid #666666;
