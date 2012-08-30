@@ -133,7 +133,7 @@ var message_manager = (function() {
 
     var extract_replies = function(replies, depth) {
         var $ul = "";
-        if (replies) {
+        if (replies && replies.length > 0) {
             var indent = new Array( depth + 1 ).join('&nbsp;');
             $ul = $('<ul class="mm-reply-thread"/>');
             for (var i=0; i<replies.length; i++) {

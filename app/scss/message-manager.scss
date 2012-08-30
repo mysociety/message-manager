@@ -321,21 +321,20 @@ body {
 	  				&:hover { background-color: #efe;}
   				}
 					ul.mm-reply-thread {
-						background-color: inherit;
 						li {
 							margin:0;
 						}
 						.mm-reply {
-							background-color: inherit;
+							background-color: #ccc;
 							&:hover {background-color: #eef;}
 						}
-						.mm-reply-0 { margin-left: 0em;}
-						.mm-reply-1 { margin-left: 1em;}
-						.mm-reply-2 { margin-left: 2em;}
-						.mm-reply-3 { margin-left: 3em;}
-						.mm-reply-4 { margin-left: 4em;}
-						.mm-reply-5 { margin-left: 5em;}
-						.mm-reply-6 { margin-left: 6em;}
+						.mm-reply-0 { margin-left: 0em; background-color: $color_bg_reply_0;}
+						.mm-reply-1 { margin-left: 1em; background-color: $color_bg_reply_1;}
+						.mm-reply-2 { margin-left: 2em; background-color: $color_bg_reply_2;}
+						.mm-reply-3 { margin-left: 3em; background-color: $color_bg_reply_3;}
+						.mm-reply-4 { margin-left: 4em; background-color: $color_bg_reply_4;}
+						.mm-reply-5 { margin-left: 5em; background-color: $color_bg_reply_5;}
+						.mm-reply-6 { margin-left: 6em; background-color: $color_bg_reply_6;}
 					}
   				&.msg-is-locked { background-color: #fdd;}
   				&.msg-is-owned { background-color: #dfd;}

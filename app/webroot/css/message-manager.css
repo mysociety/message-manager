@@ -239,28 +239,33 @@ body {
           padding: 0.5em 1em; }
           #container .dummy-client #mm-message-list ul li p:hover, #container .dummy-client #mm-message-list ul ul.mm-reply-thread li p:hover {
             background-color: #efe; }
-        #container .dummy-client #mm-message-list ul li ul.mm-reply-thread, #container .dummy-client #mm-message-list ul ul.mm-reply-thread li ul.mm-reply-thread {
-          background-color: inherit; }
-          #container .dummy-client #mm-message-list ul li ul.mm-reply-thread li, #container .dummy-client #mm-message-list ul ul.mm-reply-thread li ul.mm-reply-thread li {
-            margin: 0; }
-          #container .dummy-client #mm-message-list ul li ul.mm-reply-thread .mm-reply, #container .dummy-client #mm-message-list ul ul.mm-reply-thread li ul.mm-reply-thread .mm-reply {
-            background-color: inherit; }
-            #container .dummy-client #mm-message-list ul li ul.mm-reply-thread .mm-reply:hover, #container .dummy-client #mm-message-list ul ul.mm-reply-thread li ul.mm-reply-thread .mm-reply:hover {
-              background-color: #eef; }
-          #container .dummy-client #mm-message-list ul li ul.mm-reply-thread .mm-reply-0, #container .dummy-client #mm-message-list ul ul.mm-reply-thread li ul.mm-reply-thread .mm-reply-0 {
-            margin-left: 0em; }
-          #container .dummy-client #mm-message-list ul li ul.mm-reply-thread .mm-reply-1, #container .dummy-client #mm-message-list ul ul.mm-reply-thread li ul.mm-reply-thread .mm-reply-1 {
-            margin-left: 1em; }
-          #container .dummy-client #mm-message-list ul li ul.mm-reply-thread .mm-reply-2, #container .dummy-client #mm-message-list ul ul.mm-reply-thread li ul.mm-reply-thread .mm-reply-2 {
-            margin-left: 2em; }
-          #container .dummy-client #mm-message-list ul li ul.mm-reply-thread .mm-reply-3, #container .dummy-client #mm-message-list ul ul.mm-reply-thread li ul.mm-reply-thread .mm-reply-3 {
-            margin-left: 3em; }
-          #container .dummy-client #mm-message-list ul li ul.mm-reply-thread .mm-reply-4, #container .dummy-client #mm-message-list ul ul.mm-reply-thread li ul.mm-reply-thread .mm-reply-4 {
-            margin-left: 4em; }
-          #container .dummy-client #mm-message-list ul li ul.mm-reply-thread .mm-reply-5, #container .dummy-client #mm-message-list ul ul.mm-reply-thread li ul.mm-reply-thread .mm-reply-5 {
-            margin-left: 5em; }
-          #container .dummy-client #mm-message-list ul li ul.mm-reply-thread .mm-reply-6, #container .dummy-client #mm-message-list ul ul.mm-reply-thread li ul.mm-reply-thread .mm-reply-6 {
-            margin-left: 6em; }
+        #container .dummy-client #mm-message-list ul li ul.mm-reply-thread li, #container .dummy-client #mm-message-list ul ul.mm-reply-thread li ul.mm-reply-thread li {
+          margin: 0; }
+        #container .dummy-client #mm-message-list ul li ul.mm-reply-thread .mm-reply, #container .dummy-client #mm-message-list ul ul.mm-reply-thread li ul.mm-reply-thread .mm-reply {
+          background-color: #ccc; }
+          #container .dummy-client #mm-message-list ul li ul.mm-reply-thread .mm-reply:hover, #container .dummy-client #mm-message-list ul ul.mm-reply-thread li ul.mm-reply-thread .mm-reply:hover {
+            background-color: #eef; }
+        #container .dummy-client #mm-message-list ul li ul.mm-reply-thread .mm-reply-0, #container .dummy-client #mm-message-list ul ul.mm-reply-thread li ul.mm-reply-thread .mm-reply-0 {
+          margin-left: 0em;
+          background-color: #e8e8e8; }
+        #container .dummy-client #mm-message-list ul li ul.mm-reply-thread .mm-reply-1, #container .dummy-client #mm-message-list ul ul.mm-reply-thread li ul.mm-reply-thread .mm-reply-1 {
+          margin-left: 1em;
+          background-color: #dedede; }
+        #container .dummy-client #mm-message-list ul li ul.mm-reply-thread .mm-reply-2, #container .dummy-client #mm-message-list ul ul.mm-reply-thread li ul.mm-reply-thread .mm-reply-2 {
+          margin-left: 2em;
+          background-color: #d6d6d6; }
+        #container .dummy-client #mm-message-list ul li ul.mm-reply-thread .mm-reply-3, #container .dummy-client #mm-message-list ul ul.mm-reply-thread li ul.mm-reply-thread .mm-reply-3 {
+          margin-left: 3em;
+          background-color: #d1d1d1; }
+        #container .dummy-client #mm-message-list ul li ul.mm-reply-thread .mm-reply-4, #container .dummy-client #mm-message-list ul ul.mm-reply-thread li ul.mm-reply-thread .mm-reply-4 {
+          margin-left: 4em;
+          background-color: #c9c9c9; }
+        #container .dummy-client #mm-message-list ul li ul.mm-reply-thread .mm-reply-5, #container .dummy-client #mm-message-list ul ul.mm-reply-thread li ul.mm-reply-thread .mm-reply-5 {
+          margin-left: 5em;
+          background-color: #bfbfbf; }
+        #container .dummy-client #mm-message-list ul li ul.mm-reply-thread .mm-reply-6, #container .dummy-client #mm-message-list ul ul.mm-reply-thread li ul.mm-reply-thread .mm-reply-6 {
+          margin-left: 6em;
+          background-color: #b8b8b8; }
         #container .dummy-client #mm-message-list ul li.msg-is-locked, #container .dummy-client #mm-message-list ul ul.mm-reply-thread li.msg-is-locked {
           background-color: #fdd; }
         #container .dummy-client #mm-message-list ul li.msg-is-owned, #container .dummy-client #mm-message-list ul ul.mm-reply-thread li.msg-is-owned {
