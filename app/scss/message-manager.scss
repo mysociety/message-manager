@@ -298,11 +298,16 @@ body {
     }
     
     #mm-message-list {
+			/*
+			ul > li > ul.mm-reply-thread {
+				display: none;
+			}
+			*/
   		ul {
   			list-style-type: none;
   			padding: 0;
   			margin: 0;
-  			li {
+  			li, ul.mm-reply-thread li {
   				position: relative;
   				clear: both;
   				margin: 4px 0 0 0;
@@ -313,11 +318,28 @@ body {
   					background-color: inherit;
   					margin: 0.25em 0 0 0;
   					padding: 0.5em 1em;
+	  				&:hover { background-color: #efe;}
   				}
+					ul.mm-reply-thread {
+						background-color: inherit;
+						li {
+							margin:0;
+						}
+						.mm-reply {
+							background-color: inherit;
+							&:hover {background-color: #eef;}
+						}
+						.mm-reply-0 { margin-left: 0em;}
+						.mm-reply-1 { margin-left: 1em;}
+						.mm-reply-2 { margin-left: 2em;}
+						.mm-reply-3 { margin-left: 3em;}
+						.mm-reply-4 { margin-left: 4em;}
+						.mm-reply-5 { margin-left: 5em;}
+						.mm-reply-6 { margin-left: 6em;}
+					}
   				&.msg-is-locked { background-color: #fdd;}
   				&.msg-is-owned { background-color: #dfd;}
   				&.msg-is-busy { background-color: #ffd;}
-  				&:hover { background-color: #efe;}
   				span.msg-tag {
   					width: 3em;
   					float:left;

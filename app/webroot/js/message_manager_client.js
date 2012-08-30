@@ -131,6 +131,49 @@ var message_manager = (function() {
         }
     };
 
+    var extract_replies = function(replies, depth) {
+        var $ul = "";
+        if (replies) {
+            var indent = new Array( depth + 1 ).join('&nbsp;');
+            $ul = $('<ul class="mm-reply-thread"/>');
+            for (var i=0; i<replies.length; i++) {
+                $ul.append(get_message_li(replies[i], depth));
+            }
+        }
+        return $ul;
+    }
+    
+    var get_message_li = function(message_root, depth) {
+        var msg = message_root.Message; // or use label value
+        var lockkeeper = message_root.Lockkeeper.username;
+        var escaped_text = $('<div/>').text(msg.message).html();
+        var $p = $('<p/>');
+        if (depth == 0) {
+            var tag = (!msg.tag || msg.tag === 'null')? '&nbsp;' : msg.tag;
+            tag = $('<span class="msg-tag"/>').html(tag);
+            var radio = depth > 0? null : $('<input type="radio"/>').attr({
+                'id': 'mm_text_' + msg.id,
+                'name': 'mm_text',
+                'value': escaped_text
+            }).wrap('<p/>').parent().html();
+            var label = $('<label/>', {
+                'class': 'msg-text',
+                'for': 'mm_text_' + msg.id
+            }).text(escaped_text).wrap('<p/>').parent().html();
+            $p.append(tag).append(radio).append(label);
+        } else {
+            $p.text(escaped_text).addClass('mm-reply mm-reply-' + depth);
+        }
+        var litem = $('<li id="' + _msg_prefix + msg.id + '" class="mm-msg">').append($p);
+        if (lockkeeper) {
+            litem.addClass(lockkeeper == _username? 'msg-is-owned' : 'msg-is-locked'); 
+        }
+        if (message_root.children) {
+            litem.append(extract_replies(message_root.children, depth+1));
+        }
+        return litem;
+    }
+    
     var show_available_messages = function(data) {
         var messages = data.messages;
         _username = data.username;
@@ -141,25 +184,7 @@ var message_manager = (function() {
             } else {
                 var $ul = $('<ul/>');
                 for(var i=0; i< messages.length; i++) {
-                    var msg = messages[i].Message; // or use label value
-                    var lockkeeper = messages[i].Lockkeeper.username;
-                    var escaped_text = $('<div/>').text(msg.message).html();
-                    var tag = (!msg.tag || msg.tag === 'null')? '&nbsp;' : msg.tag;
-                    tag = $('<span class="msg-tag"/>').html(tag);
-                    var radio = $('<input type="radio"/>').attr({
-                        'id': 'mm_text_' + msg.id,
-                        'name': 'mm_text',
-                        'value': escaped_text
-                    }).wrap('<p/>').parent().html();
-                    var label = $('<label/>', {
-                        'class': 'msg-text',
-                        'for': 'mm_text_' + msg.id
-                    }).text(escaped_text).wrap('<p/>').parent().html();
-                    var p = $('<p/>').append(tag).append(radio).append(label);
-                    var litem = $('<li id="' + _msg_prefix + msg.id + '" class="mm-msg">').append(p);
-                    if (lockkeeper) {
-                        litem.addClass(lockkeeper == _username? 'msg-is-owned' : 'msg-is-locked'); 
-                    }
+                    var litem = get_message_li(messages[i], 0);
                     $ul.append(litem);
                 }
                 $output.empty().append($ul);
