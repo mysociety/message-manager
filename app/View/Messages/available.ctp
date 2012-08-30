@@ -41,31 +41,6 @@
 					<?php echo $this->Html->link(__('View'), array('action' => 'view', $message['Message']['id']), null); ?>
 				</td>
 			</tr>
-			<?php foreach ($message['Reply'] as $reply) { ?>
-				<tr class="message-reply">
-					<td class="message-reply">
-						<?= $reply['created']?>
-					</td>
-					<td class="message-reply status-<?php echo ($reply['Status']['name']); ?>"><?php echo h($reply['Status']['name']); ?>
-						<?php if (! empty($reply['lock_expires'])) {
-							echo('*');
-							$c_locks++;
-						} ?>
-					</td>
-					<td class="message-reply">
-						<?php
-							if (!empty($reply['Source'])) {
-								echo h($reply['Source']['name']);
-							}
-						?>
-					</td>
-					<td class="message-reply"><?php echo h($reply['tag']); ?></td>
-					<td class="message-reply"><?php echo h($reply['message']); ?></td>
-					<td class="actions">
-						<?php echo $this->Html->link(__('View'), array('action' => 'view', $reply['id']), null); ?>
-					</td>
-				</tr>
-			<?php } ?>
 				
 		<?php endforeach; ?>
 	</table>

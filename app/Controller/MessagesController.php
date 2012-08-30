@@ -83,6 +83,8 @@ class MessagesController extends AppController {
 	// NB strips unwanted message details, e.g., no from_address etc, because this is
 	// used to serve requests "outside" the Message Manager itself
 	// only serve messages with matching tag
+	// note: this automatically exludes messages with status "available" if they are not root-level messages, 
+	//       that is, if they are not replies
     public function available() {
 		$this->Message->recursive = 1;
 		$allowed_tags =  $this->Auth->user('allowed_tags');
@@ -91,27 +93,29 @@ class MessagesController extends AppController {
 		if (! empty($allowed_tags)) {
 			$conditions['Message.tag'] = strtoupper(trim($allowed_tags));
 		}
-		/*
+		
 		$this->Message->Behaviors->attach('Containable');
 		$messages = $this->Message->find('threaded',
 			array(
-				'contain' => array(
-					'Reply' => array(
-						'contain' => array('Reply', 'Source', 'Status', 'Lockkeeper'), 
-						'fields' => self::_json_fields()
-					), 
-					'Source', 
-					'Status', 
-					'Lockkeeper'),
 				'conditions' => $conditions,
 				'recursive' => 1,
 				'fields'	=> self::_json_fields(),
+				'contain' => array('Source', 'Status', 'Lockkeeper'),
 				'order' => array('Message.created ASC'),
 				'limit' => 20 // for now FIXME -- paginate?
 			)
 		);
-		*/
-		$messages = $this->Message->children(null, false, self::_json_fields(), null, null, 1, 1);
+		foreach ($messages as &$message) {
+			 $subtree = $this->Message->find('threaded', array(
+			    'conditions' => array(
+			        'Message.lft >=' => $message['Message']['lft'], 
+			        'Message.rght <=' => $message['Message']['rght']
+			    ),
+				'fields'	=> self::_json_fields(),
+				'contain' => array('Source', 'Status', 'Lockkeeper'),
+			));			
+			$message['children'] = $subtree[0]['children'];
+		}
 		$this->set('messages', $messages);	
 		$this->set('allowed_tags', $allowed_tags);	
 	}
@@ -584,7 +588,8 @@ class MessagesController extends AppController {
 			'id', 'source_id', 'external_id', 'message', 'created', 'received',
 			'replied', 'sender_token', 
 			'lock_expires', 'status', 'owner_id', 'fms_id', 'tag', 'Source.id',
-			'Source.name', 'Status.name', 'Lockkeeper.username'
+			'Source.name', 'Status.name', 'Lockkeeper.username',
+			'lft', 'rght', 'parent_id'
 		);
 	}
 	
