@@ -26,12 +26,15 @@
 			</dd>
 		</dl>
 		<hr/>
-		<div>
-				<?php
-					// echo $this->Form->input('status',array('type'=>'radio','options'=>$statuses));	
-					echo $this->Form->input('tag');	
-				?>
-		</div>
+		<?php
+			// echo $this->Form->input('status',array('type'=>'radio','options'=>$statuses));	
+			echo $this->Form->input('tag', array('style' => "width:5em;"));	
+			echo $this->Form->input('parent_id', array(
+				'type' => 'text',
+				'style' => 'width:5em;',
+				'label' => 'ID of parent message (if any). Use this to indicate that this message is a reply.'
+			)); 
+		?>
 	<?php echo $this->Form->end(__('Submit'));?>
 </div>
 <div class="actions">

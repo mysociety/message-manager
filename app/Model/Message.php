@@ -59,6 +59,13 @@ class Message extends AppModel {
 			'message' => 'A message from this source with this external ID already exists',
 			'on'      => 'create'
 		),
+		'parent_id' => array(
+			'rule'    => 'parent_exists_if_specified',
+			'required' => false,
+			'allowEmpty' => true,
+			'message' => 'The parent_id must be the ID for an existing message (and not the message itself)',
+			'on'      => 'edit'
+		)
 	);
 	
 	// beforeSave:
@@ -217,6 +224,10 @@ class Message extends AppModel {
 	public function source_exists($check) {
 		$source = $this->Source->findById($check['source_id']);
 		return !empty($source['Source']['id']);
+	}
+
+	public function parent_exists_if_specified($check) {
+		return self::exists($check['parent_id']) && $this->id != $check['parent_id'];
 	}
 
 }

@@ -210,7 +210,8 @@ class MessagesController extends AppController {
 			$saved_ok = false;
 			if (! $is_admin_group) {
 				// currently only the tag is editable by managers
-				$this->Message->tag = $this->request->data['Message']['tag'];
+				$this->Message->set('tag', $this->request->data['Message']['tag']);
+				$this->Message->set('parent_id', $this->request->data['Message']['parent_id']);
 				$save_ok = $this->Message->save();
 			} else { // admins can edit anything (if the view exists)
 				$saved_ok = $this->Message->save($this->request->data);
@@ -226,7 +227,7 @@ class MessagesController extends AppController {
 		}
 		// actually, don't allow status edit: there are buttons for that which are better (i.e., reverting when unhiding)
 		// $this->set('statuses', $this->Message->Status->find('list', array('conditions' => array('name !=' => 'unknown')))); // populate the drop-down
-		$this->set('message', $this->Message->data);
+		$this->set('message', $this->Message->findById($id));
 		$this->set('is_admin_group', $is_admin_group);
 	}
 	
