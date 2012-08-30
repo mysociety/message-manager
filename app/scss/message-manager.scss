@@ -189,7 +189,7 @@ body {
       text-decoration: none;
       color: black;
       &:hover {
-        background-color: red;
+        background-color: $nav_hover_color;
       }
       .message-sender {
         float:right;

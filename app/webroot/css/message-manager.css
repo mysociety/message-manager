@@ -138,7 +138,7 @@ body {
   text-decoration: none;
   color: black; }
   #container .mm-messages a.reply-link:hover {
-    background-color: red; }
+    background-color: #aa9999; }
   #container .mm-messages a.reply-link .message-sender {
     float: right;
     display: block;
