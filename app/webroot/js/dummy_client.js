@@ -31,6 +31,10 @@ $(document).ready(function() {
 	var dummy_hide_cleanup = function(data) {
 		dummy_busy = false;
 	}
+	
+	function sanitise_id(css_id) {
+	    return css_id.replace(/\D/g, "");
+	}
 
 	//------------------------------------------------------------
 	// message_manager has been declared in clients.js
@@ -77,7 +81,9 @@ $(document).ready(function() {
 			confirm('Are you sure you want to delete the following message?\n\n"' 
 				+ $('p', $(this).parent()).first().text() + '"\n');
 		if (want_hide) {
-			console.log("call message_manager.hide(" + $(this).parent().attr('id') + ")");
+		    message_manager.hide(
+			    sanitise_id($(this).parent().attr('id')),
+			    {callback:dummy_hide_cleanup});
 		}
 	});
 

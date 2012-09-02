@@ -109,7 +109,8 @@ class MessagesController extends AppController {
 			 $subtree = $this->Message->find('threaded', array(
 			    'conditions' => array(
 			        'Message.lft >=' => $message['Message']['lft'], 
-			        'Message.rght <=' => $message['Message']['rght']
+			        'Message.rght <=' => $message['Message']['rght'],
+					'Message.status !=' => Status::$STATUS_HIDDEN 
 			    ),
 				'fields'	=> self::_json_fields(),
 				'contain' => array('Source', 'Status', 'Lockkeeper'),
