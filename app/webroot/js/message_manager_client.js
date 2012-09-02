@@ -28,6 +28,8 @@
  *     message_manager.get_available_messages([options])
  *     message_manager.request_lock(msg_id, [options])  (default use: client code doesn't need to call this explicitly)
  *     message_manager.assign_fms_id(msg_id, fms_id, [options])
+ *     message_manager.hide(msg_id, [options])
+ *     message_manager.reply(msg_id, reply_text, [options])
  *
  *  Note: options are {name:value, ...} hashes and often include "callback" which is a function that is executed on success
  *        but see the docs (request_lock executes callback if the call is successful even if the lock was denied, for example).
@@ -148,6 +150,8 @@ var message_manager = (function() {
         var lockkeeper = message_root.Lockkeeper.username;
         var escaped_text = $('<div/>').text(msg.message).html();
         var $p = $('<p/>');
+        var $hide_button = $('<span class="mm-msg-action mm-hide" id="mm-hide-' + msg.id + '">X</span>');
+        var $reply_button = $('<span class="mm-msg-action mm-rep" id="mm-rep-' + msg.id + '">reply</span>');
         if (depth == 0) {
             var tag = (!msg.tag || msg.tag === 'null')? '&nbsp;' : msg.tag;
             tag = $('<span class="msg-tag"/>').html(tag);
@@ -164,14 +168,17 @@ var message_manager = (function() {
         } else {
             $p.text(escaped_text).addClass('mm-reply mm-reply-' + depth);
         }
-        var litem = $('<li id="' + _msg_prefix + msg.id + '" class="mm-msg">').append($p);
+        var $litem = $('<li id="' + _msg_prefix + msg.id + '" class="mm-msg">').append($p).append($hide_button)
+        if (msg.is_outbound != 1) {
+          $litem.append($reply_button);
+        };
         if (lockkeeper) {
-            litem.addClass(lockkeeper == _username? 'msg-is-owned' : 'msg-is-locked'); 
+            $litem.addClass(lockkeeper == _username? 'msg-is-owned' : 'msg-is-locked'); 
         }
         if (message_root.children) {
-            litem.append(extract_replies(message_root.children, depth+1));
+            $litem.append(extract_replies(message_root.children, depth+1));
         }
-        return litem;
+        return $litem;
     }
     
     var show_available_messages = function(data) {
@@ -182,7 +189,7 @@ var message_manager = (function() {
             if (messages.length === 0) {
                 $output.html('<p class="mm-empty">No messages available.</p>');
             } else {
-                var $ul = $('<ul/>');
+                var $ul = $('<ul class="mm-root"/>');
                 for(var i=0; i< messages.length; i++) {
                     var litem = get_message_li(messages[i], 0);
                     $ul.append(litem);

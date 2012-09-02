@@ -67,6 +67,24 @@ $(document).ready(function() {
 		}
 	});
 	
+	$('#mm-message-list').on('mouseover', 'ul.mm-root > li.mm-msg', function(e){
+		$('.mm-msg-action', $('#mm-message-list')).hide();
+		$(this).find('.mm-msg-action').show();
+	});
+
+	$('#mm-message-list').on('click', '.mm-hide', function(e){
+		var want_hide =
+			confirm('Are you sure you want to delete the following message?\n\n"' 
+				+ $('p', $(this).parent()).first().text() + '"\n');
+		if (want_hide) {
+			console.log("call message_manager.hide(" + $(this).parent().attr('id') + ")");
+		}
+	});
+
+	$('#mm-message-list').on('click', '.mm-rep', function(e){
+		console.log("call message_manager.reply(" + $(this).parent().attr('id') + ", reply_text)");
+	});
+	
 	$('#reply-submit').click(function(e) {
 		e.preventDefault();
 		if (! dummy_busy) {

@@ -355,6 +355,23 @@ body {
   					margin: 0.1em 0 0.1em 4.5em;
 						cursor: pointer;
   				}
+					.mm-msg-action {
+						display: none;
+						padding: 0.2em 0.4em;
+						color: white;
+						text-align: center;
+						position: absolute;
+						top: 0;
+						&:hover { background-color: black;}
+					}
+					.mm-hide {
+						right:0px;
+						background-color: red;
+					}
+					.mm-rep {
+						right:1.4em;
+						background-color: green;
+					}
   			}
   		}
   	}

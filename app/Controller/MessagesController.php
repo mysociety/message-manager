@@ -587,7 +587,7 @@ class MessagesController extends AppController {
 	private function _json_fields() {
 		return array(
 			'id', 'source_id', 'external_id', 'message', 'created', 'received',
-			'replied', 'sender_token', 
+			'replied', 'sender_token', 'is_outbound',
 			'lock_expires', 'status', 'owner_id', 'fms_id', 'tag', 'Source.id',
 			'Source.name', 'Status.name', 'Lockkeeper.username',
 			'lft', 'rght', 'parent_id'
