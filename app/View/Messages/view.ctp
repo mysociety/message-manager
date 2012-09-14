@@ -144,7 +144,7 @@
 	<?php echo $this->Form->hidden('message_id', array('value'=>$message['Message']['id']));?>
 	<!-- user_id inferred by login -->
 	<?php echo $this->Form->hidden('type_id', array('value'=>ActionType::$ACTION_NOTE)); ?>
-	<?php echo $this->Form->textarea('note');?>
+	<?php echo $this->Form->input('note', array('type' => 'textarea', 'label' => 'Add a note (only seen on Message Manager)', 'rows'=>2));?>
 	<?php echo $this->Form->end(__('Add note'));?>
 	
 
