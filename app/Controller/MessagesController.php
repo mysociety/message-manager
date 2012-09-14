@@ -58,7 +58,14 @@ class MessagesController extends AppController {
 	}
 	
 	// index shows all messages... maybe filtered on is_outbound;
+	// note: convenience utility: send ?recover_tree=1 to force a TreeBehaviour rebuild on Messages
 	public function index($direction = null) {
+		if (isset($this->request->query['recover_tree'])) {
+			$success = $this->Message->recover();
+			$this->Session->setFlash($success? __('Reply thread tree has been recovered.') : __('Reply thread tree recovery failed'));
+			$this->redirect(array('action' => 'index'));
+			return;
+		}
 		$title = "";
 		if ($direction == 'sent') {
 			$title = __("Messages sent");
@@ -574,7 +581,7 @@ class MessagesController extends AppController {
 		$this->Session->setFlash(__('All expired locks have been purged.'));
 		$this->redirect(array('action' => 'index'));
 	}
-	
+
 	private function _load_record($id) {
 		$this->Message->id = $id;
 		if (!$this->Message->exists()) {
