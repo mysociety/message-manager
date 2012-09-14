@@ -114,8 +114,10 @@ class MessagesController extends AppController {
 			    ),
 				'fields'	=> self::_json_fields(),
 				'contain' => array('Source', 'Status', 'Lockkeeper'),
-			));			
-			$message['children'] = $subtree[0]['children'];
+			));
+			if (! empty($subtree)) {
+				$message['children'] = $subtree[0]['children'];
+			}
 		}
 		$this->set('messages', $messages);	
 		$this->set('allowed_tags', $allowed_tags);	
@@ -140,9 +142,12 @@ class MessagesController extends AppController {
 			    ),
 				'contain' => array(), // empty, restricts to just the Message
 			));
-			
+			$children = array();
+			if (! empty($messages)) {
+				$children = $messages[0]['children'];
+			}
 			$this->set('message', $message);
-			$this->set('children', $messages[0]['children']);
+			$this->set('children', $children);
 			$this->set('is_locked', $this->Message->is_locked()? 1 : 0);
 			$this->set('seconds_until_lock_expiry', $this->Message->seconds_until_lock_expiry());
 
