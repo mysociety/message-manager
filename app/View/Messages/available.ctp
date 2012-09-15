@@ -20,28 +20,10 @@
 			<th> </th>
 		</tr>
 		<?php $c_locks = 0; foreach ($messages as $message): ?>
-			<tr>
-				<td><?php echo h($message['Message']['created']); ?></td>
-				<td class="status-<?php echo ($message['Status']['name']); ?>"><?php echo h($message['Status']['name']); ?>
-					<?php if (! empty($message['Message']['lock_expires'])) {
-						echo('*');
-						$c_locks++;
-					} ?>
-				</td>
-				<td>
-					<?php
-						if (!empty($message['Source'])) {
-							echo h($message['Source']['name']);
-						}
-					?>
-				</td>
-				<td><?php echo h($message['Message']['tag']); ?></td>
-				<td><?php echo h($message['Message']['message']); ?></td>
-				<td class="actions">
-					<?php echo $this->Html->link(__('View'), array('action' => 'view', $message['Message']['id']), null); ?>
-				</td>
-			</tr>
-				
+			<?php echo $this->element('message', array(
+				"message" => $message,
+				"depth" => 0,
+			)); ?>
 		<?php endforeach; ?>
 	</table>
 	<p class="pagination-legend">
