@@ -90,8 +90,12 @@ class MessagesController extends AppController {
 	// NB strips unwanted message details, e.g., no from_address etc, because this is
 	// used to serve requests "outside" the Message Manager itself
 	// only serve messages with matching tag
-	// note: this automatically exludes messages with status "available" if they are not root-level messages, 
-	//       that is, if they are not replies
+	// ---------------------------------------------------------------------------------
+	// note: this automatically exludes messages with status "available" if they are not
+	//       root-level messages, that is, if they are not replies
+        //       This might not be what you're expecting since it means not all messages with
+        //       status='available' are actually available. Hmm.
+
     public function available() {
 		$this->Message->recursive = 1;
 		$allowed_tags =  $this->Auth->user('allowed_tags');
@@ -100,7 +104,6 @@ class MessagesController extends AppController {
 		if (! empty($allowed_tags)) {
 			$conditions['Message.tag'] = strtoupper(trim($allowed_tags));
 		}
-		
 		$this->Message->Behaviors->attach('Containable');
 		$messages = $this->Message->find('threaded',
 			array(
