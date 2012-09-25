@@ -14,6 +14,9 @@
  *
  *     msg_prefix         all message <li> items have this as their ID prefix
  *
+ *     mm_name            name of Message Manager (used in error messages shown
+ *                        to user, e.g., "please log in to Message Manager"
+ *
  *     *_selector         these are the jQuery selects that will be used to find
  *                        the respective elements:
  *
@@ -44,6 +47,7 @@ var message_manager = (function() {
     var _want_unique_locks     = true; 
     var _msg_prefix            = "msg-";
     var _username;
+    var _mm_name               = "Message Manager";
 
     // cached jQuery elements, populated by the (mandatory) call to config()
     var $message_list_element;
@@ -78,6 +82,9 @@ var message_manager = (function() {
                 if (typeof settings[sel] === 'string') {
                     selectors[sel] = settings[sel];
                 }
+            }
+            if (typeof settings.mm_name === 'string') {
+                _mm_name = settings.mm_name;
             }
         }
         $message_list_element = $(selectors.message_list_selector);
@@ -249,7 +256,8 @@ var message_manager = (function() {
             error:    function(jqXHR, textStatus, errorThrown) {
                         var st = jqXHR.status; 
                         if (st == 401 || st == 403) {
-                            var msg = (st == 401)? "Invalid username or password" : "Access denied: please log in";
+                            var msg = (st == 401 ? "Invalid username or password for" : "Access denied: please log in to") 
+                                      + " " + _mm_name;
                             say_status(msg);
                             show_login_form();
                         } else {
