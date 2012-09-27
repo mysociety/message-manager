@@ -23,8 +23,7 @@ $(document).ready(function() {
 	}
 	
 	var dummy_reply_cleanup = function(data) {
-		$('#reply_tet').val('');
-		$('#reply-form-container').stop().hide(500);
+		$('#reply_text').val('');
 		dummy_busy = false;
 	}
 
@@ -53,15 +52,6 @@ $(document).ready(function() {
 		    $('#fms_id').val(), 
 		    {callback:dummy_clear_assign_boxes});
 	});    
-
-	$('#reveal-reply-form').click(function(e) {
-		e.preventDefault();
-		if (!$('#message_id').val()) {
-			$('#reply-form-container').stop().hide(500);
-		} else {
-			$('#reply-form-container').stop().toggle(1000);
-		}
-	});
 
 	$('#hide-button').click(function() {
 		if ($('#message_id').val()) {
@@ -94,16 +84,14 @@ $(document).ready(function() {
 	$('#reply-submit').click(function(e) {
 		e.preventDefault();
 		if (! dummy_busy) {
-			if (! $('#message_id').val()) {
-				alert("No: won't send without a message ID");
-			} else {
-				dummy_busy = true;
-				message_manager.reply(
-				    $('#message_id').val(), 
-				    $('#reply_text').val(), 
-				    {callback:dummy_reply_cleanup});
-			}
+			dummy_busy = true;
+			console.log("sending reply to: " + $('#reply_to_msg_id').val());
+			message_manager.reply(
+			    $('#reply_to_msg_id').val(), 
+			    $('#reply_text').val(), 
+			    {callback:dummy_reply_cleanup});
 		}
 	});
     
+    $("a#reply").fancybox({onClosed: function(){dummy_busy=false;}});
 });

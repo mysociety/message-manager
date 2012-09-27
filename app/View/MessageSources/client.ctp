@@ -1,8 +1,11 @@
 <?php 
+echo $this->Html->css('/js/fancybox/jquery.fancybox-1.3.4.css');
+
 echo $this->Html->script('jquery-1.7.2.min', false); 
 echo $this->Html->script('modernizr.custom', false);
 echo $this->Html->script('message_manager_client', false);
 echo $this->Html->script('dummy_client', false);
+echo $this->Html->script('/js/fancybox/jquery.fancybox-1.3.4.pack.js', false);
 ?>
 
 <h2>
@@ -59,6 +62,7 @@ echo $this->Html->script('dummy_client', false);
     	    	<?php 
     				echo $this->Form->create(array('id' => 'reply-form','default'=>false));
     				echo $this->Form->input('reply_text', array('label'=>'Reply text', 'type'=>'text', 'name'=>'reply_text', 'id'=>'reply_text'));
+    				echo $this->Form->input('reply_to_msg_id', array('type'=>'hidden', 'name'=>'message_id', 'id'=>'reply_to_msg_id'));
     				echo $this->Form->submit(__('Send Reply'), array('id' => 'reply-submit'));
     				echo $this->Form->end();
     			?>
@@ -69,7 +73,6 @@ echo $this->Html->script('dummy_client', false);
 				echo $this->Form->input('message_id', array('label'=>'Message ID', 'type'=>'text', 'name'=>'message_id', 'id'=>'message_id'));
 				echo $this->Form->input('fms_id', array('label'=>'FMS ID', 'type'=>'text', 'name'=>'fms_id', 'id'=>'fms_id'));
 				echo $this->Form->submit(__('Assign FMS ID'), array('id' => 'assign-fms-submit'));
-				echo $this->Form->submit(__('Reply'), array('id' => 'reveal-reply-form'));
 				echo $this->Form->submit(__('Hide'), array('id' => 'hide-button'));
 				echo $this->Form->end();
 			?>

@@ -44,7 +44,8 @@ var message_manager = (function() {
     var _want_unique_locks     = true; 
     var _msg_prefix            = "msg-";
     var _username;
-
+    var _use_fancybox          = true; // note: currently *must* have fancybox!
+    
     // cached jQuery elements, populated by the (mandatory) call to config()
     var $message_list_element;
     var $status_element;
@@ -151,7 +152,10 @@ var message_manager = (function() {
         var escaped_text = $('<div/>').text(msg.message).html();
         var $p = $('<p/>');
         var $hide_button = $('<span class="mm-msg-action mm-hide" id="mm-hide-' + msg.id + '">X</span>');
-        var $reply_button = $('<span class="mm-msg-action mm-rep" id="mm-rep-' + msg.id + '">reply</span>');
+        var $reply_button = $('<a class="mm-msg-action mm-rep" id="mm-rep-' + msg.id + '" href="#reply-form-container">reply</a>');
+        if (_use_fancybox) {
+            $reply_button.fancybox();
+        }
         if (depth == 0) {
             var tag = (!msg.tag || msg.tag === 'null')? '&nbsp;' : msg.tag;
             tag = $('<span class="msg-tag"/>').html(tag);
@@ -217,6 +221,10 @@ var message_manager = (function() {
             }
             request_lock(id, options);
         });
+        // clicking the reply button loads the id into the (modal/fancybox) reply form
+        $message_list_element.on('click', '.mm-rep', function(event) {
+            $('#reply_to_msg_id').val($(this).closest('li').attr('id').replace(_msg_prefix, ''));
+        })
     };
 
     // gets messages or else requests login
@@ -366,6 +374,9 @@ var message_manager = (function() {
     };
 
     var reply = function(msg_id, reply_text, options) {
+        if (_use_fancybox){
+            $.fancybox.close();
+        }
         var check_li_exists = false;
         if (options) {
             if (typeof(options.callback) === 'function') {
