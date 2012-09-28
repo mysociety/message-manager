@@ -60,10 +60,12 @@ $(document).ready(function() {
 			    {callback:dummy_hide_cleanup});
 		}
 	});
-	
-	$('#mm-message-list').on('mouseover', 'ul.mm-root > li.mm-msg', function(e){
-		$('.mm-msg-action', $('#mm-message-list')).hide();
-		$(this).find('.mm-msg-action').show();
+		
+	$('#mm-message-list').on('mouseover', 'li.mm-msg', function(e){
+		e.stopPropagation(); // because replies are nested
+		$('.mm-msg-action', $('#mm-message-list')).stop().fadeOut(200);
+		$(this).find('> .mm-msg-action').stop().show();
+		console.log("clicked on: " + $(this).attr('id'));
 	});
 
 	$('#mm-message-list').on('click', '.mm-hide', function(e){
