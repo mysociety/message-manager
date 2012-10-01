@@ -130,8 +130,11 @@ var message_manager = (function() {
         }
     };
 
-    var show_login_form = function() {
+    var show_login_form = function(suggest_username) {
         $('.mm-msg', $message_list_element).remove(); // remove (old) messages
+        if ($htauth_username.size() && ! $htauth_username.val()) {
+            $htauth_username.val(suggest_username)
+        }
         $login_element.stop().slideDown();
     };
 
@@ -144,14 +147,13 @@ var message_manager = (function() {
     var extract_replies = function(replies, depth) {
         var $ul = "";
         if (replies && replies.length > 0) {
-            var indent = new Array( depth + 1 ).join('&nbsp;');
             $ul = $('<ul class="mm-reply-thread"/>');
             for (var i=0; i<replies.length; i++) {
                 $ul.append(get_message_li(replies[i], depth));
             }
         }
         return $ul;
-    }
+    };
     
     var get_message_li = function(message_root, depth) {
         var msg = message_root.Message; // or use label value
@@ -163,7 +165,7 @@ var message_manager = (function() {
         if (_use_fancybox) {
             $reply_button.fancybox();
         }
-        if (depth == 0) {
+        if (depth === 0) {
             var tag = (!msg.tag || msg.tag === 'null')? '&nbsp;' : msg.tag;
             tag = $('<span class="msg-tag"/>').html(tag);
             var radio = depth > 0? null : $('<input type="radio"/>').attr({
@@ -179,10 +181,10 @@ var message_manager = (function() {
         } else {
             $p.text(escaped_text).addClass('mm-reply mm-reply-' + depth);
         }
-        var $litem = $('<li id="' + _msg_prefix + msg.id + '" class="mm-msg">').append($p).append($hide_button)
+        var $litem = $('<li id="' + _msg_prefix + msg.id + '" class="mm-msg">').append($p).append($hide_button);
         if (msg.is_outbound != 1) {
           $litem.append($reply_button);
-        };
+        }
         if (lockkeeper) {
             $litem.addClass(lockkeeper == _username? 'msg-is-owned' : 'msg-is-locked'); 
         }
@@ -190,7 +192,7 @@ var message_manager = (function() {
             $litem.append(extract_replies(message_root.children, depth+1));
         }
         return $litem;
-    }
+    };
     
     var show_available_messages = function(data) {
         var messages = data.messages;
@@ -231,20 +233,25 @@ var message_manager = (function() {
         // clicking the reply button loads the id into the (modal/fancybox) reply form
         $message_list_element.on('click', '.mm-rep', function(event) {
             $('#reply_to_msg_id').val($(this).closest('li').attr('id').replace(_msg_prefix, ''));
-        })
+        });
     };
 
     // gets messages or else requests login
+    // options: suggest_username, if provided, is preloaded into the login form if provided
     var get_available_messages = function(options) {
         var base_auth = get_current_auth_credentials();
-        if (base_auth === "") {
-            show_login_form();
-            return;
-        }
+        var suggest_username = "";
         if (options) {
             if (typeof(options.callback) === 'function') {
                 callback = options.callback;
             }
+            if (typeof options.suggest_username === 'string') {
+                suggest_username = options.suggest_username;
+            }
+        }
+        if (base_auth === "") {
+            show_login_form(suggest_username);
+            return;
         }
         $login_element.stop().hide();
         $.ajax({
@@ -264,10 +271,9 @@ var message_manager = (function() {
             error:    function(jqXHR, textStatus, errorThrown) {
                         var st = jqXHR.status; 
                         if (st == 401 || st == 403) {
-                            var msg = (st == 401 ? "Invalid username or password for" : "Access denied: please log in to") 
-                                      + " " + _mm_name;
+                            var msg = (st == 401 ? "Invalid username or password for" : "Access denied: please log in to") + " " + _mm_name;
                             say_status(msg);
-                            show_login_form();
+                            show_login_form(suggest_username);
                         } else {
                             var err_msg = "Unable to load messages: ";
                             if (st === 0 && textStatus === 'error') { // x-domain hard to detect, sometimes intermittent?
