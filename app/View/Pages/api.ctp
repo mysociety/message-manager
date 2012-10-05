@@ -143,7 +143,10 @@ error: A message from this source with this external ID already exists
 		error code first!
 	</p>
 	<h3>Message data</h3>
-	<p> The calls that return message data do so with the following structure: </p>
+	<p> 
+            The calls that return message data do so with the following structure. Note the <code>children</code> entry 
+            which contains more messages (children are messages received as direct replies to this, the parent message).
+            Because replies can have replies, the children may themselves have non-empty <code>children</code>. </p>
 	<pre>
 {
   "Message": {
@@ -170,6 +173,9 @@ error: A message from this source with this external ID already exists
   },
   "Lockkeeper": {
     "username":     "bilbo"
+  }
+  "children": {
+    [...]
   }
 }
 	</pre>
