@@ -17,7 +17,8 @@ echo $this->Html->script('/js/fancybox/jquery.fancybox-1.3.4.pack.js', false);
 	set <code>enable_dummy_client=0</code> in <code>app/Config/MessageManager.php</code>.
 </p>
 <?php if ($group_name == 'administrators' || $group_name == 'message-sources') { ?>
-	<div class="dummy-client" <?php if ($group_name != 'message-sources') { ?>style="float:right;"<?php } ?>>
+	<div class="dummy-client" 
+		style="float:<?php if ($group_name != 'message-sources') { ?>right<?php } else { ?>left<?php } ?>;">
 		<h3>Incoming Message</h3>
 		<p> Simulates a message coming in from e.g., SMS gateway.</p>
 		<?php 
@@ -35,6 +36,9 @@ echo $this->Html->script('/js/fancybox/jquery.fancybox-1.3.4.pack.js', false);
 			Note: no FMS IDs in incoming messages: assign them with an AJAX call.
 		</p>
 	</div>
+	<?php if ($group_name == 'message-sources') { ?>
+		<img src="img/mobile-phone.png" alt="mobile phone" style="float:left;"/>
+	<?php } ?>
 <?php } ?>
 <?php if ($group_name != 'message-sources') { ?>
 	<div class="dummy-client">
