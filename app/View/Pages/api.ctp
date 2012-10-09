@@ -130,7 +130,7 @@ error: A message from this source with this external ID already exists
 		<li>POST <code>/messages/unlock/<em>msg-id</em></code></li>
 		<li>POST <code>/messages/unlock_all</code></li>
 		<li>POST <code>/messages/reply/<em>msg-id</em></code> with <code>reply_text=<em>reply text</em></code></li>
-		<li>POST <code>/messages/assign_fmd_is/<em>msg-id</em></code> with <code>fms_id=<em>FMS-id</em></code></li>
+		<li>POST <code>/messages/assign_fms_id/<em>msg-id</em></code> with <code>fms_id=<em>FMS-id</em></code></li>
 	</ul>
 	<h3>Authorisation credentials</h3>
 	<p>
