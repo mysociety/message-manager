@@ -288,6 +288,12 @@ class MessagesController extends AppController {
 							$this->Message->data['Message']['replied']=date('Y-m-d H:i:s'); // date of *most recent* reply
 							$this->Message->save();
 						}
+						
+						// FIXME: recent problems with treeBehaviour in demos? try forcing recover_tree
+						// FIXME: once we've seen if this is the issue, deal with it
+						// FIXME: don't leave this in production because it won't scale!
+						$success = $this->Message->recover();
+						
 						if ($this->RequestHandler->accepts('json')) {
 							$this->response->body( json_encode(self::mm_json_response(true, null)) );
 							return $this->response;
