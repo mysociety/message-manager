@@ -52,14 +52,6 @@ $(document).ready(function() {
 		    $('#fms_id').val(), 
 		    {callback:dummy_clear_assign_boxes});
 	});    
-
-	$('#hide-button').click(function() {
-		if ($('#message_id').val()) {
-			message_manager.hide(
-			    $('#message_id').val(), 
-			    {callback:dummy_hide_cleanup});
-		}
-	});
 		
 	$('#mm-message-list').on('mouseover', 'li.mm-msg', function(e){
 		e.stopPropagation(); // because replies are nested

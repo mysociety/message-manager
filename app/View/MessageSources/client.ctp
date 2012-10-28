@@ -20,21 +20,18 @@ echo $this->Html->script('/js/fancybox/jquery.fancybox-1.3.4.pack.js', false);
 	<div class="dummy-client" 
 		style="float:<?php if ($group_name != 'message-sources') { ?>right<?php } else { ?>left<?php } ?>;">
 		<h3>Incoming Message</h3>
-		<p> Simulates a message coming in from e.g., SMS gateway.</p>
+		<p> Simulates an incoming message from, e.g., SMS gateway.</p>
 		<?php 
 			echo $this->Form->create('Message', array('action' => 'incoming')); 
 			// echo $this->Form->input('username');
 			// echo $this->Form->input('password');
 			echo $this->Form->input('messageSource_id', array('name' => 'data[Message][source_id]'));
-			echo $this->Form->input('external_id', array('label' => 'External ID (optional: a message ID)', 'type' => 'text'));
+			echo $this->Form->input('external_id', array('label' => 'External ID (optional: a transaction ID assigned by some gateways)', 'type' => 'text'));
 			echo $this->Form->input('from_address', array('label' => 'Sender phone number'));
 			echo $this->Form->input('message', array('label' => 'Message'));
 			echo $this->Form->submit();
 			echo $this->Form->end();
 		?>
-		<p>
-			Note: no FMS IDs in incoming messages: assign them with an AJAX call.
-		</p>
 	</div>
 	<?php if ($group_name == 'message-sources') { ?>
 		<img src="img/mobile-phone.png" alt="mobile phone" style="float:left;"/>
@@ -77,7 +74,6 @@ echo $this->Html->script('/js/fancybox/jquery.fancybox-1.3.4.pack.js', false);
 				echo $this->Form->input('message_id', array('label'=>'Message ID', 'type'=>'text', 'name'=>'message_id', 'id'=>'message_id'));
 				echo $this->Form->input('fms_id', array('label'=>'FMS ID', 'type'=>'text', 'name'=>'fms_id', 'id'=>'fms_id'));
 				echo $this->Form->submit(__('Assign FMS ID'), array('id' => 'assign-fms-submit'));
-				echo $this->Form->submit(__('Hide'), array('id' => 'hide-button'));
 				echo $this->Form->end();
 			?>
 			<p style="clear:both;padding-top:1em;">
