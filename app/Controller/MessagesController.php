@@ -93,8 +93,8 @@ class MessagesController extends AppController {
 	// ---------------------------------------------------------------------------------
 	// note: this automatically exludes messages with status "available" if they are not
 	//       root-level messages, that is, if they are not replies
-        //       This might not be what you're expecting since it means not all messages with
-        //       status='available' are actually available. Hmm.
+	//       This might not be what you're expecting since it means not all messages with
+	//       status='available' are actually available. Hmm.
 
     public function available() {
 		$this->Message->recursive = 1;
