@@ -189,8 +189,12 @@ var message_manager = (function() {
         if (lockkeeper) {
             $litem.addClass(lockkeeper == _username? 'msg-is-owned' : 'msg-is-locked'); 
         }
-        var info_text = "sent on " + msg.created;
-        info_text += ' by <abbr title="'+ msg.sender_token + '">user</abbr>';
+        var info_text = "";
+        if (msg.is_outbound == 1) {
+            info_text = 'sent on ' + msg.created + ' by ' + msg.sender_token;
+        } else {
+            info_text = 'received on ' + msg.created + ' from ' + '<abbr title="'+ msg.sender_token + '">user</abbr>';
+        }
         $p.append('<div class="msg-info-box" id="msg-info-box-' + msg.id + '">' + info_text + '</div>');
         if (message_root.children) {
             $litem.append(extract_replies(message_root.children, depth+1));

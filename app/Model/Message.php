@@ -73,6 +73,8 @@ class Message extends AppModel {
 	//   Save a unique-per-from_address token (sender_token) so FMS users can tell when two messages
 	//   are from the same sender without knowing their phone numbers, etc.
 	//   In anticipation of from_address being non-numeric (twitter handles, etc) this is done case-insensitively.
+	//   Note that outbound messages (that is, message sent from Message Manager (i.e.., replies via FMS)) do
+	//   not strip/hide the from-address, which is the username of the MM user).
 	//
 	// * extract tag
 	//   Scans the (presumably) incoming message for tags, possibly stripping them
@@ -82,7 +84,11 @@ class Message extends AppModel {
 	
 	public function beforeSave() {
 		if (!empty($this->data['Message']['from_address'])) {
-			$this->data['Message']['sender_token'] = hash('md5', strtolower(trim($this->data['Message']['from_address'])));
+			if ($this->data['Message']['is_outbound']) {
+				$this->data['Message']['sender_token'] = $this->data['Message']['from_address'];
+			} else {
+				$this->data['Message']['sender_token'] = hash('md5', strtolower(trim($this->data['Message']['from_address'])));
+			}
 		}
 		if (!empty($this->data['Message']['message'])) {
 			$message_text = $this->data['Message']['message'];
