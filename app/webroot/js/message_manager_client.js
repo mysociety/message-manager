@@ -31,7 +31,7 @@
  *     message_manager.get_available_messages([options])
  *     message_manager.request_lock(msg_id, [options])  (default use: client code doesn't need to call this explicitly)
  *     message_manager.assign_fms_id(msg_id, fms_id, [options])
- *     message_manager.hide(msg_id, [options])
+ *     message_manager.hide(msg_id, reason_text, [options])
  *     message_manager.reply(msg_id, reply_text, [options])
  *
  *  Note: options are {name:value, ...} hashes and often include "callback" which is a function that is executed on success
@@ -160,11 +160,12 @@ var message_manager = (function() {
         var lockkeeper = message_root.Lockkeeper.username;
         var escaped_text = $('<div/>').text(msg.message).html();
         var $p = $('<p/>');
-        var $hide_button = $('<span class="mm-msg-action mm-hide" id="mm-hide-' + msg.id + '">X</span>');
+        var $hide_button = $('<a class="mm-msg-action mm-hide" id="mm-hide-' + msg.id + '" href="#hide-form-container">X</a>');
         var $info_button = $('<span class="mm-msg-action mm-info" id="mm-info-' + msg.id + '">i</span>');
         var $reply_button = $('<a class="mm-msg-action mm-rep" id="mm-rep-' + msg.id + '" href="#reply-form-container">reply</a>');
         if (_use_fancybox) {
             $reply_button.fancybox();
+            $hide_button.fancybox();
         }
         if (depth === 0) {
             var tag = (!msg.tag || msg.tag === 'null')? '&nbsp;' : msg.tag;
@@ -241,6 +242,11 @@ var message_manager = (function() {
         // clicking the reply button loads the id into the (modal/fancybox) reply form
         $message_list_element.on('click', '.mm-rep', function(event) {
             $('#reply_to_msg_id').val($(this).closest('li').attr('id').replace(_msg_prefix, ''));
+        });
+        // clicking the hide button loads the id into the (modal/fancybox) hide form
+        $message_list_element.on('click', '.mm-hide', function(event) {
+            $('#hide_msg_id').val($(this).closest('li').attr('id').replace(_msg_prefix, ''));
+            // $('#hide-form-message-text').val(TODO);
         });
     };
 
@@ -449,7 +455,10 @@ var message_manager = (function() {
         });
     };
 
-    var hide = function(msg_id, options) {
+    var hide = function(msg_id, reason_text, options) {
+        if (_use_fancybox){
+            $.fancybox.close();
+        }
         var check_li_exists = false;
         if (options) {
             if (typeof(options.callback) === 'function') {
@@ -466,10 +475,12 @@ var message_manager = (function() {
                 return;
             }
         }
+        reason_text = $.trim(reason_text);
         $li.addClass('msg-is-busy');
         $.ajax({
             dataType:"json", 
             type:"post", 
+            data: {reason_text: reason_text},
             url: _url_root +"messages/hide/" + msg_id + ".json",
             beforeSend: function (xhr){
                 xhr.setRequestHeader('Authorization', get_current_auth_credentials());

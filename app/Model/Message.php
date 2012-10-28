@@ -148,11 +148,16 @@ class Message extends AppModel {
 		}
 	}
 
-	// relinquish record lock
-	public function hide() {
+	// hide a message (effectively deleting it from clients)
+	public function hide($reason_text=null) {
 		if (!$this->id && empty($this->data)) {
 			return "missing id/data";
 		} else {
+			if (empty($reason_text)) {
+				$this->data['Message']['hide_reason'] = null;
+			} else {
+				$this->data['Message']['hide_reason'] = $reason_text;
+			}
 			$this->data['Message']['status'] = Status::$STATUS_HIDDEN;
 		}
 	}
@@ -161,6 +166,7 @@ class Message extends AppModel {
 		if (!$this->id && empty($this->data)) {
 			return "missing id/data";
 		} else {
+			$this->data['Message']['hide_reason'] = null;
 			$this->_revert_status();
 		}
 	}

@@ -80,6 +80,16 @@ echo $this->Html->script('/js/fancybox/jquery.fancybox-1.3.4.pack.js', false);
 				<input name="random-fms-id" id="random-fms-id" type="checkbox"><label for="random-fms-id">randomize FMS ID integers</label>
 			</p>
 		</div>
+		<div id="hide-form-container">
+			<p style="color:#000">Hiding message: <span id="hide-form-message-text"></span></p>
+	    	<?php 
+				echo $this->Form->create(array('id' => 'hide-form','default'=>false));
+				echo $this->Form->input('reason_text', array('label'=>'Reason for hiding message', 'type'=>'text', 'name'=>'reason_text', 'id'=>'reason_text'));
+				echo $this->Form->input('msg_id', array('type'=>'hidden', 'name'=>'msg_id', 'id'=>'hide_msg_id'));
+				echo $this->Form->submit(__('Hide Message'), array('id' => 'hide-submit'));
+				echo $this->Form->end();
+			?>
+		</div>
 	</div>
 <?php } ?>
 

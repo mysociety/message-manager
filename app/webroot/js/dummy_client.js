@@ -28,6 +28,7 @@ $(document).ready(function() {
 	}
 
 	var dummy_hide_cleanup = function(data) {
+		$('#reason_text').val('');
 		dummy_busy = false;
 	}
 	
@@ -60,19 +61,30 @@ $(document).ready(function() {
 		console.log("clicked on: " + $(this).attr('id'));
 	});
 
-	$('#mm-message-list').on('click', '.mm-hide', function(e){
-		var want_hide =
-			confirm('Are you sure you want to delete the following message?\n\n"' 
-				+ $('p', $(this).parent()).first().text() + '"\n');
-		if (want_hide) {
-		    message_manager.hide(
-			    sanitise_id($(this).parent().attr('id')),
+	$('#hide-submit').click(function(e) {
+	    e.preventDefault();
+		if (! dummy_busy) {
+			dummy_busy = true;
+			console.log("hiding message: " + $('#reply_to_msg_id').val());
+			message_manager.hide(
+			    $('#hide_msg_id').val(), 
+			    $('#reason_text').val(), 
 			    {callback:dummy_hide_cleanup});
 		}
 	});
+		
+        // $('#mm-message-list').on('click', '.mm-hide', function(e){
+        // var want_hide =
+        //  confirm('Are you sure you want to delete the following message?\n\n"' 
+        //      + $('p', $(this).parent()).first().text() + '"\n');
+        // if (want_hide) {
+        //     message_manager.hide(
+        //      sanitise_id($(this).parent().attr('id')),
+        //      {callback:dummy_hide_cleanup});
+        // }
+	    //});
 
 	$('#mm-message-list').on('click', '.mm-info', function(e){
-		console.log("call message_manager.show_info(" + $(this).parent().attr('id') + ")");
 		message_manager.show_info(sanitise_id($(this).parent().attr('id')));
 	});
 	
@@ -89,4 +101,5 @@ $(document).ready(function() {
 	});
     
     $("a#reply").fancybox({onClosed: function(){dummy_busy=false;}});
+    $("a#hide").fancybox({onClosed: function(){dummy_busy=false;}});
 });

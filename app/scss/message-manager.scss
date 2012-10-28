@@ -402,6 +402,17 @@ body {
         background-color: #ffdddd;
       }
     }
+    #hide-form-container {
+      display:none;
+      p {
+        color: #000;
+      }
+      #hide-form{
+        margin-top: 2em;
+        border: 1px solid $weak_text_color;
+        background-color: #ffdddd;
+      }
+    }
     #assign-fms-container {
       margin-top: 2em;
       padding-top: 1em;

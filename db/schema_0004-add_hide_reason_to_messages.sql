@@ -1,0 +1,1 @@
+ALTER TABLE  `messages` ADD  `hide_reason` TEXT NULL DEFAULT NULL;

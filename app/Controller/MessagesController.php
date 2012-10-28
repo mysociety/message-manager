@@ -440,9 +440,11 @@ class MessagesController extends AppController {
 	
 	public function hide($id = null) {
 		self::_load_record($id);
-		$this->Message->hide(); 
+		$reason_text = $this->request->data('reason_text');
+		
+		$this->Message->hide($reason_text); 
 		if ($this->Message->save()) {
-			self::_logAction(ActionType::$ACTION_HIDE);
+			self::_logAction(ActionType::$ACTION_HIDE, $reason_text);
 			$msg = __('Message hidden');
 			if ($this->RequestHandler->accepts('json')) {
 				$this->response->body( json_encode(self::mm_json_response(true, null)) );
@@ -631,6 +633,8 @@ class MessagesController extends AppController {
 			$params['item_id'] = $custom_param_2;
 		} elseif ($action_type==ActionType::$ACTION_ASSIGN) {
 			$params['item_id'] = intval($custom_param_1);
+		} elseif ($action_type==ActionType::$ACTION_HIDE) {
+			$params['note'] = $custom_param_1;
 		}
 		$action->create($params);
 		$action->save();

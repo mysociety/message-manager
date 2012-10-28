@@ -56,6 +56,13 @@
 			<strong><?php echo h($message['Status']['name']) ?></strong>
 			&nbsp;
 		</dd>
+		<?php if ($message['Message']['status']==Status::$STATUS_HIDDEN) { ?>
+			<dt>Hide reason</dt>
+			<dd <?php if (! empty($message['Message']['hide_reason'])) { echo 'class="status-hidden"'; }?>>
+				 <?php echo h($message['Message']['hide_reason']) ?>
+				&nbsp;
+			</dd>
+		<?php } ?>
 		<dt>Lock</dt>
 		<dd class="status-<?php echo($is_locked?'locked':'unlocked'); ?>">
 			<?php if ($message['Message']['lock_expires']) {

@@ -322,6 +322,14 @@ body {
       margin-top: 2em;
       border: 1px solid #666666;
       background-color: #ffdddd; }
+  #container .dummy-client #hide-form-container {
+    display: none; }
+    #container .dummy-client #hide-form-container p {
+      color: #000; }
+    #container .dummy-client #hide-form-container #hide-form {
+      margin-top: 2em;
+      border: 1px solid #666666;
+      background-color: #ffdddd; }
   #container .dummy-client #assign-fms-container {
     margin-top: 2em;
     padding-top: 1em;
