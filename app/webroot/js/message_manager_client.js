@@ -161,6 +161,7 @@ var message_manager = (function() {
         var escaped_text = $('<div/>').text(msg.message).html();
         var $p = $('<p/>');
         var $hide_button = $('<span class="mm-msg-action mm-hide" id="mm-hide-' + msg.id + '">X</span>');
+        var $info_button = $('<span class="mm-msg-action mm-info" id="mm-info-' + msg.id + '">i</span>');
         var $reply_button = $('<a class="mm-msg-action mm-rep" id="mm-rep-' + msg.id + '" href="#reply-form-container">reply</a>');
         if (_use_fancybox) {
             $reply_button.fancybox();
@@ -181,13 +182,16 @@ var message_manager = (function() {
         } else {
             $p.text(escaped_text).addClass('mm-reply mm-reply-' + depth);
         }
-        var $litem = $('<li id="' + _msg_prefix + msg.id + '" class="mm-msg">').append($p).append($hide_button);
+        var $litem = $('<li id="' + _msg_prefix + msg.id + '" class="mm-msg">').append($p).append($hide_button).append($info_button);
         if (msg.is_outbound != 1) {
           $litem.append($reply_button);
         }
         if (lockkeeper) {
             $litem.addClass(lockkeeper == _username? 'msg-is-owned' : 'msg-is-locked'); 
         }
+        var info_text = "sent on " + msg.created;
+        info_text += ' by <abbr title="'+ msg.sender_token + '">user</abbr>';
+        $p.append('<div class="msg-info-box" id="msg-info-box-' + msg.id + '">' + info_text + '</div>');
         if (message_root.children) {
             $litem.append(extract_replies(message_root.children, depth+1));
         }
@@ -485,6 +489,17 @@ var message_manager = (function() {
             }
         });
     };
+    
+    var show_info = function(msg_id) {
+        var $info = $("#msg-info-box-" + msg_id);
+        if ($info.size()==1) {
+            if ($info.is(':hidden')) {
+                $info.slideDown();                
+            } else {
+                $info.slideUp();                
+            }
+        }
+    };
 
     // revealed public methods:
     return {
@@ -495,6 +510,7 @@ var message_manager = (function() {
        assign_fms_id: assign_fms_id,
        reply: reply,
        hide: hide,
+       show_info: show_info,
        sign_out: sign_out
      };
 })();

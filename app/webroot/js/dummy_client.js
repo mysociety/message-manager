@@ -79,8 +79,9 @@ $(document).ready(function() {
 		}
 	});
 
-	$('#mm-message-list').on('click', '.mm-rep', function(e){
-		console.log("call message_manager.reply(" + $(this).parent().attr('id') + ", reply_text)");
+	$('#mm-message-list').on('click', '.mm-info', function(e){
+		console.log("call message_manager.show_info(" + $(this).parent().attr('id') + ")");
+		message_manager.show_info(sanitise_id($(this).parent().attr('id')));
 	});
 	
 	$('#reply-submit').click(function(e) {

@@ -319,6 +319,14 @@ body {
   					margin: 0.25em 0 0 0;
   					padding: 0.5em 1em;
 	  				&:hover { background-color: #efe;}
+						.msg-info-box {
+							font-style: italic;
+							color: #666;
+							border-top: 1px dashed #666;
+							padding:4px 0 0 0;
+							margin: 4px 0 0 0;
+							display: none;
+						}
   				}
 					ul.mm-reply-thread {
 						li {
@@ -368,8 +376,12 @@ body {
 						right:0px;
 						background-color: red;
 					}
+					.mm-info {
+						right:1.5em;
+						background-color: blue;
+					}
 					.mm-rep {
-						right:1.4em;
+						right:2.6em;
 						background-color: green;
 					}
   			}
