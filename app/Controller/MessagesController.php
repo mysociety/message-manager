@@ -439,6 +439,9 @@ class MessagesController extends AppController {
 	}
 	
 	public function hide($id = null) {
+		if (!$this->request->is('post')) {
+			throw new MethodNotAllowedException();
+		}
 		self::_load_record($id);
 		$reason_text = $this->request->data('reason_text');
 		
