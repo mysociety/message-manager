@@ -1,10 +1,19 @@
 /*
- *  message_manager.config(settings)
+ * creates a message_manage object that uses the Message Manager API:
+ * include this file, then initialise the object when the page is loaded with
+ * message_manager.config(settings)
  *
- * Accepts settings for the Message Manager client. Even if you accept all the defaults,
- * you *MUST* call config when the page is loaded (i.e., call message_manager.config())
+ * i.e., you *must* do something like:
  *
- * The (optional) single parameter is a hash of name-value pairs:
+ *   $(document).ready(function() { 
+ *     message_manager.config({url_root:'http://yourdomain.com/messages'})
+ *   }
+ *
+ * You'll need to set the url_root, but you can leave everything else to default 
+ * provided your HTML ids and classes are the same as ours (which they might be:
+ * see the Message Manager's dummy client (at /client) to see the HTML we use).
+ *
+ * The (optional) single parameter for .config() is a hash of name-value pairs:
  *
  *     url_root           accepts the root URL to the message manager.
  *
@@ -12,10 +21,10 @@
  *                        when claiming a new one so want_unique_locks defaults 
  *                        to true; but you can set it explicitly here.
  *
- *     msg_prefix         all message <li> items have this as their ID prefix
- *
  *     mm_name            name of Message Manager (used in error messages shown
- *                        to user, e.g., "please log in to Message Manager"
+ *                        to user, e.g., "please log in to Message Manager")
+ *
+ *     msg_prefix         all message <li> items have this as their ID prefix
  *
  *     *_selector         these are the jQuery selects that will be used to find
  *                        the respective elements:
@@ -24,7 +33,7 @@
  *                              status_selector:       status message display
  *                              login_selector:        login form 
  *
- *
+ * 
  *   Summary of all methods:
  *     message_manager.config([options])
  *     message_manager.setup_click_listener([options])
@@ -33,6 +42,8 @@
  *     message_manager.assign_fms_id(msg_id, fms_id, [options])
  *     message_manager.hide(msg_id, reason_text, [options])
  *     message_manager.reply(msg_id, reply_text, [options])
+ *     message_manager.show_info(msg_id)
+ *     message_manager.sign_out()
  *
  *  Note: options are {name:value, ...} hashes and often include "callback" which is a function that is executed on success
  *        but see the docs (request_lock executes callback if the call is successful even if the lock was denied, for example).

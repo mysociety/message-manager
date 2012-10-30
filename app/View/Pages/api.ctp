@@ -122,9 +122,35 @@ error: A message from this source with this external ID already exists
 		<?php echo $this->Html->link(__('user'), array('controller'=>"Users", 'action'=>'index'));?> 
 		in the <code>managers</code> group).
 	</p>
+	<h3>Full working example and <code>message_manager_client.js</code></h3>
+	<p>
+		This Message Manager includes a dummy client (which by default is running at 
+		<?php echo $this->Html->link(__('/client'), array('controller'=>"MessageSources", 'action'=>'client'));?> 
+		&mdash; although that might be disabled if you're looking at this on a production server) which uses this API to do all the things
+		that a FixMyStreet integration needs. In the codebase, look inside 
+		<code><a href="/js/message_manager_client.js">message_manager_client.js</a></code> to see the API being used.
+		The dummy client makes its (custom) calls from 
+		<code><a href="/js/dummy_client.js">dummy_client.js</a></code>
+	</p>
+	<p>
+		In fact, the <code>message_manager_client.js</code> file is currently <i>identical</i> to the one used in the FixMyStreet
+		application and if you want to build your own code for talking to the Message Manager you'll probably want to drop that
+		file into your own application as it is, and make your JavaScript calls via the <code>message_manager</code> object it 
+		creates. Note that the functions on that object allow you to specific options, including callback functions to run after the
+		calls have been completed, so you should be able to write custom code quickly. If you need to change the behaviour of
+		<code>message_manager_client.js</code>'s <code>message_manager</code>, please let us know because it may be something
+		that we can add back to the codebase for everyone's benefit.
+	</p>
+	<p style="border:1px solid #ccc; padding:1em;font-weight:bold;">
+		Summary: the rest of this document describes the JSON API, but it's probably much easier to use
+		<code><a href="/js/message_manager_client.js">message_manager_client.js</a></code> to create a 
+		<code>message_manager</code> object (which has the API calls in it),  and call the equivalent methods on that. See 
+	</p>
+		
 	<h3>API Summary</h3>
 	<ul>
 		<li>GET <code>/messages/available</code></li>
+		<li>POST <code>/messages/hide/<em>msg-id</em></code> with optional <code>reason_text=<em>reason_text</em></code></li>
 		<li>POST <code>/messages/lock/<em>msg-id</em></code></li>
 		<li>POST <code>/messages/lock_unique/<em>msg-id</em></code></li>
 		<li>POST <code>/messages/unlock/<em>msg-id</em></code></li>
@@ -146,11 +172,26 @@ error: A message from this source with this external ID already exists
 	<p> 
             The calls that return message data do so with the following structure. Note the <code>children</code> entry 
             which contains more messages (children are messages received as direct replies to this, the parent message).
-            Because replies can have replies, the children may themselves have non-empty <code>children</code>. </p>
+            Because replies can have replies, the children may themselves have non-empty <code>children</code>. 
+	</p>
+	<p>
+			The <code>sender_token</code> will be a value that is unique for a given user (so two messages with identical
+			tokens will have been sent by the same user). For incoming messages, these are unique
+			hashes not actual addresses because the JSPN API doesn't expose the actual from-address 
+			(i.e., the senders' phone numbers/MSIDNs). However, note that for outgoing messages (that is, 
+			where <code>is_outbound=='1'</code>), the <code>sender_token</code> is the Message Manager username 
+			of the staff member who sent the reply. 
+	</p>
+	<p>
+			The <code>parent_id</code> is the ID of the message (if any) to which <em>this</em> message is a reply. Since the
+			tree-like structure of the messages and their replies is represented by the nested <code>children</code> entry,
+			you probably don't need to use this. Similarly, the <code>lft</code> and <code>rght</code> entries are part of 
+			the tree structure and can be ignored.
+	</p>
 	<pre>
 {
   "Message": {
-    "id":           "1",
+    "id":           "1062",
     "source_id":    12,
     "external_id":  null,
     "sender_token": "8b1a9953c4611296a827abf8c47804d7",
@@ -162,7 +203,11 @@ error: A message from this source with this external ID already exists
     "status":       "1",
     "owner_id":     "3",
     "fms_id":       null,
-    "tag":          "LUZ"
+    "tag":          "LUZ",
+    "is_outbound":  "0",
+    "lft":          "0",
+    "rght":         "0",
+    "parent_id":    "0",
   },
   "Source": {
     "id":           12,
@@ -244,6 +289,53 @@ error: A message from this source with this external ID already exists
 </pre>
 		</dd>
 	</dl>
+
+	<h4>Hide message</h4>
+	<dl>
+		<dt>address</dt>
+		<dd >
+			<code>/messages/hide/<em>id</em></code>
+		</dd>
+		<dt>params</dt>
+		<dd><code>reason_text=</code><em>string explaining why the message was hidden</em> (optional)</dd>
+		<dt>method</dt>
+		<dd>POST</dd>
+		<dt>operation</dt>
+		<dd>
+			<p>
+				Hides a message by setting its status to <em>hidden</em>. Hidden messages are not included in the 
+				messages returned by a call to <code>/available</code> so hiding a message
+				effectively removes it from the pool of available messages (and their replies).
+			</p>
+			<p>
+				The optional parameter <code>reason_text</code> may contain a string that explains why
+				the message was hidden.
+			</p>
+			<p>
+				Hidden messages are not actually deleted, but remain in the Message Manager database.
+				They can be inspected (and potentially unhidden) by a manager or admin
+				user within the Message Manager application.
+			</p>
+			<p>
+				Currently, the reverse of this operation, <code>unhide</code> is not implemented as a JSON
+				call because clients generally don't have the ID of a hidden message with which to make it.
+			</p>
+		</dd>
+		<dt>returns</dt>
+		<dd>
+			<p> The <code>hide</code> call returns an array of one or two objects:
+			</p>
+			<ul>
+				<li><strong>success</strong>: 
+					which is <code>true</code> or <code>false</code>
+				</li>
+				<li><strong>error</strong> (only on failure): 
+					a message describing the fault
+				</li>
+			</ul>
+		</dd>
+	</dl>
+
 	
 	<h4>Lock message</h4>
 	<dl>
@@ -293,7 +385,7 @@ error: A message from this source with this external ID already exists
 		</dd>
 		<dt>returns</dt>
 		<dd>
-			<p> The available call returns an array of three objects:
+			<p> The <code>lock_unique</code> call returns an array of three objects:
 			</p>
 			<ul>
 				<li><strong>success</strong>: 
