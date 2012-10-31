@@ -73,19 +73,12 @@ $(document).ready(function() {
 		}
 	});
 		
-        // $('#mm-message-list').on('click', '.mm-hide', function(e){
-        // var want_hide =
-        //  confirm('Are you sure you want to delete the following message?\n\n"' 
-        //      + $('p', $(this).parent()).first().text() + '"\n');
-        // if (want_hide) {
-        //     message_manager.hide(
-        //      sanitise_id($(this).parent().attr('id')),
-        //      {callback:dummy_hide_cleanup});
-        // }
-	    //});
-
 	$('#mm-message-list').on('click', '.mm-info', function(e){
 		message_manager.show_info(sanitise_id($(this).parent().attr('id')));
+	});
+	
+	$('#mm-pro-reasons').change(function(e){
+	    $('#reason_text').val($(this).val()); // load reason_text with proforma reason
 	});
 	
 	$('#reply-submit').click(function(e) {

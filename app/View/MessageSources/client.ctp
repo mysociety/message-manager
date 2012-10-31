@@ -84,7 +84,19 @@ echo $this->Html->script('/js/fancybox/jquery.fancybox-1.3.4.pack.js', false);
 			<p style="color:#000">Hiding message: <span id="hide-form-message-text"></span></p>
 	    	<?php 
 				echo $this->Form->create(array('id' => 'hide-form','default'=>false));
-				echo $this->Form->input('reason_text', array('label'=>'Reason for hiding message', 'type'=>'text', 'name'=>'reason_text', 'id'=>'reason_text'));
+			?>
+			<!-- TODO load from db and make a Cake FormHelper call -->
+			<div class="input" style="overflow:hidden">
+				<label for="proforma-reasons">Preloaded reason:</label>
+				<select name="proforma-reasons" id="mm-pro-reasons">
+					<option value="">--none--</option>
+					<option>Not this barangay</option>
+					<option>Outside scope (not pothole or streetlight)</option>
+					<option>Not a problem report</option>
+				</select>
+			</div>
+			<?php
+				echo $this->Form->input('reason_text', array('label'=>'Reason for hiding message', 'type'=>'textarea', 'name'=>'reason_text', 'id'=>'reason_text'));
 				echo $this->Form->input('msg_id', array('type'=>'hidden', 'name'=>'msg_id', 'id'=>'hide_msg_id'));
 				echo $this->Form->submit(__('Hide Message'), array('id' => 'hide-submit'));
 				echo $this->Form->end();
