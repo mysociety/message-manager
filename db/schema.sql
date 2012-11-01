@@ -58,7 +58,8 @@ CREATE TABLE messages (
   id serial not null primary key,
   source_id integer default null,
   external_id varchar(32) default null,
-  msisdn varchar(24) default null,
+  from_address varchar(128) default null,
+  to_address varchar(128) default null,
   sender_token varchar(255) default null,
   message text,
   created timestamp default null,
@@ -71,10 +72,17 @@ CREATE TABLE messages (
   owner_id integer default null,
   session_key varchar(255) default null,
   fms_id integer default null,
-  tag varchar(64) default null
+  tag varchar(64) default null,
+  hide_reason text null default null,
+  is_outbound boolean not null default '0',
+
+  lft integer,
+  rght integer,
+  parent_id integer
 );
 create index messages_external_id_idx on messages(external_id);
-create index messages_msisdn_idx on messages(msisdn);
+create index messages_from_address_idx on messages(from_address);
+create index messages_to_address_idx on messages(to_address);
 create index messages_status_idx on messages(status);
 create index messages_owner_id_idx on messages(owner_id);
 	
@@ -101,7 +109,7 @@ CREATE TABLE users (
   password char(40) not null,
   group_id integer not null,
   allowed_tags varchar(255) default null,
-  can_reply smallint default null,
+  can_reply boolean not null default '0',
   created timestamp default null,
   modified timestamp default null,
   email varchar(132) DEFAULT null
