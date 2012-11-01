@@ -556,7 +556,7 @@ var message_manager = (function() {
             dataType:"json", 
             type:"post", 
             data: {lang: 'en', boilerplate_type: boilerplate_type},
-            url: _url_root +"boilerplatestrings/index/" + boilerplate_type + ".json",
+            url: _url_root +"boilerplate_strings/index/" + boilerplate_type + ".json",
             success:function(data, textStatus) {
                 if (data.success) {
                     var fixme = "";
@@ -611,10 +611,8 @@ var message_manager = (function() {
         }
         if ($target) {
             if (html) {
-                console.log("setting html to target where id=" + $target.attr('id'));
-                $target.find('select').html(html);
+                $target.show().find('select').html(html);
             } else {
-                console.log("hiding target where id=" + $target.attr('id'));
                 $target.hide();
             }
         }
