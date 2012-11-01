@@ -62,6 +62,14 @@ echo $this->Html->script('/js/fancybox/jquery.fancybox-1.3.4.pack.js', false);
     	<div id="reply-form-container">
     	    	<?php 
     				echo $this->Form->create(array('id' => 'reply-form','default'=>false));
+				?>
+				<!-- populated by Ajax call -->
+				<div class="input" id="mm-boilerplate-replies-box">
+					<label for="boilerplate-replies">Use preloaded reply:</label>
+					<select name="boilerplate-replies" id="mm-boilerplate-replies">
+					</select>
+				</div>
+				<?php
     				echo $this->Form->input('reply_text', array('label'=>'Reply text', 'type'=>'text', 'name'=>'reply_text', 'id'=>'reply_text'));
     				echo $this->Form->input('reply_to_msg_id', array('type'=>'hidden', 'name'=>'message_id', 'id'=>'reply_to_msg_id'));
     				echo $this->Form->submit(__('Send Reply'), array('id' => 'reply-submit'));
@@ -85,14 +93,10 @@ echo $this->Html->script('/js/fancybox/jquery.fancybox-1.3.4.pack.js', false);
 	    	<?php 
 				echo $this->Form->create(array('id' => 'hide-form','default'=>false));
 			?>
-			<!-- TODO load from db and make a Cake FormHelper call -->
-			<div class="input" style="overflow:hidden">
-				<label for="proforma-reasons">Preloaded reason:</label>
-				<select name="proforma-reasons" id="mm-pro-reasons">
-					<option value="">--none--</option>
-					<option>Not this barangay</option>
-					<option>Outside scope (not pothole or streetlight)</option>
-					<option>Not a problem report</option>
+			<!-- populated by Ajax call -->
+			<div class="input" id="mm-boilerplate-hide-reasons-box">
+				<label for="boilerplate-hide-reasons">Use preloaded reason:</label>
+				<select name="boilerplate-hide-reasons" id="mm-hide-reasons">
 				</select>
 			</div>
 			<?php

@@ -401,6 +401,10 @@ body {
         border: 1px solid $weak_text_color;
         background-color: #ffdddd;
       }
+		  #mm-boilerplate-replies-box {
+	      overflow: hidden;
+	      display: none;
+	    }
     }
     #hide-form-container {
       display:none;
@@ -412,6 +416,10 @@ body {
         border: 1px solid $weak_text_color;
         background-color: #ffdddd;
       }
+	    #mm-boilerplate-hide-reasons-box {
+	      overflow: hidden;
+	      display: none;
+	    }
     }
     #assign-fms-container {
       margin-top: 2em;

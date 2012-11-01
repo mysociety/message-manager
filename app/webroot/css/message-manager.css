@@ -322,6 +322,9 @@ body {
       margin-top: 2em;
       border: 1px solid #666666;
       background-color: #ffdddd; }
+    #container .dummy-client #reply-form-container #mm-boilerplate-replies-box {
+      overflow: hidden;
+      display: none; }
   #container .dummy-client #hide-form-container {
     display: none; }
     #container .dummy-client #hide-form-container p {
@@ -330,6 +333,9 @@ body {
       margin-top: 2em;
       border: 1px solid #666666;
       background-color: #ffdddd; }
+    #container .dummy-client #hide-form-container #mm-boilerplate-hide-reasons-box {
+      overflow: hidden;
+      display: none; }
   #container .dummy-client #assign-fms-container {
     margin-top: 2em;
     padding-top: 1em;

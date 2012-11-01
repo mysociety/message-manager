@@ -67,6 +67,8 @@ var message_manager = (function() {
     var $login_element;
     var $htauth_username;
     var $htauth_password;
+    var $hide_reasons;
+    var $boilerplate_replies;
 
     var config = function(settings) {
         var selectors = {
@@ -75,7 +77,9 @@ var message_manager = (function() {
             login_selector:           '#mm-login-container',
             username_selector:        '#mm-received-username',
             htauth_username_selector: '#mm-htauth-username',
-            htauth_password_selector: '#mm-htauth-password'
+            htauth_password_selector: '#mm-htauth-password',
+            boilerplate_hide_reasons: '#mm-boilerplate-hide-reasons-box',
+            boilerplate_replies:      '#mm-boilerplate-replies-box'
         };
         if (settings) {
             if (typeof settings.url_root === 'string') {
@@ -104,6 +108,8 @@ var message_manager = (function() {
         $login_element = $(selectors.login_selector);
         $htauth_username = $(selectors.htauth_username_selector);
         $htauth_password = $(selectors.htauth_password_selector);
+        $hide_reasons = $(selectors.boilerplate_hide_reasons);
+        $boilerplate_replies = $(selectors.boilerplate_replies);
     };
 
     // btoa doesn't work on all browers?
@@ -134,7 +140,7 @@ var message_manager = (function() {
     
     var sign_out = function() { // clear_current_auth_credentials
         if (Modernizr.sessionstorage) {
-            sessionStorage.removeItem('mm_auth'); // FF doesn't support .clear()?
+            sessionStorage.removeItem('mm_auth');
         }
         if ($htauth_password) {
             $htauth_password.val('');
@@ -266,6 +272,7 @@ var message_manager = (function() {
     var get_available_messages = function(options) {
         var base_auth = get_current_auth_credentials();
         var suggest_username = "";
+        var callback = null;
         if (options) {
             if (typeof(options.callback) === 'function') {
                 callback = options.callback;
@@ -360,6 +367,7 @@ var message_manager = (function() {
     var assign_fms_id = function(msg_id, fms_id, options) {
         var check_li_exists = false;
         var is_async = true;
+        var callback = null;
         if (options) {
             if (typeof(options.callback) === 'function') {
                 callback = options.callback;
@@ -416,6 +424,7 @@ var message_manager = (function() {
         if (_use_fancybox){
             $.fancybox.close();
         }
+        var callback = null;
         var check_li_exists = false;
         if (options) {
             if (typeof(options.callback) === 'function') {
@@ -470,6 +479,7 @@ var message_manager = (function() {
         if (_use_fancybox){
             $.fancybox.close();
         }
+        var callback = null;
         var check_li_exists = false;
         if (options) {
             if (typeof(options.callback) === 'function') {
@@ -526,7 +536,90 @@ var message_manager = (function() {
             }
         }
     };
+    
+    // if boilerplate is not already in local storage, make ajax call and load them
+    // otherwise, populate the boilerplate select lists: these are currently the
+    // reasons for hiding a message, and pre-loaded replies.message-manager.dev.mysociety.org
+    // NB no auth required on this call
+    var populate_boilerplate_strings = function(boilerplate_type, options) {
+        if (Modernizr.sessionstorage && sessionStorage.getItem('boilerplate_' + boilerplate_type)) {
+            populate_boilerplate(boilerplate_type, sessionStorage.getItem('boilerplate_' + boilerplate_type));
+            return;
+        }
+        var callback = null;
+        if (options) {
+            if (typeof(options.callback) === 'function') {
+                callback = options.callback;
+            }
+        }
+        $.ajax({
+            dataType:"json", 
+            type:"post", 
+            data: {lang: 'en', boilerplate_type: boilerplate_type},
+            url: _url_root +"boilerplatestrings/index/" + boilerplate_type + ".json",
+            success:function(data, textStatus) {
+                if (data.success) {
+                    var fixme = "";
+                    var raw_data = data.data;
+                    var select_html = get_select_tag_html(data.data, boilerplate_type);
+                    if (Modernizr.sessionstorage) {
+                        sessionStorage.setItem('boilerplate_' + boilerplate_type, select_html);
+                    }
+                    populate_boilerplate(boilerplate_type, select_html);
+                     if (typeof(callback) === "function") {
+                         callback.call($(this), data.data); 
+                     }
+                } else {
+                    // fail silently; console.log("failed to load boilerplate");
+                }
+            }, 
+            error: function(jqXHR, textStatus, errorThrown) {
+                // fail silently: console.log("boilerplate error: " + textStatus + ": " + errorThrown);
+            }
+        })
+    };
 
+    // TODO flatten all HTML in boilerplate text
+    var get_select_tag_html = function(boilerplate_data, boilerplate_type) {
+        var html = "<option value=''>--none--</option>\n";
+        var qty_langs = 0;
+        var qty_strings = 0;
+        for (var lang in boilerplate_data) {qty_langs++;} // not lovely
+        for (var lang in boilerplate_data) {
+            var options = "";
+            for (var i in boilerplate_data[lang]) {
+                options += "<option>" + boilerplate_data[lang][i] + "</option>\n";
+                qty_strings++;
+            }
+            if (qty_langs > 1) { // really need pretty name for language
+                options = '<optgroup label="' + lang + '">\n' + options + '</optgroup>\n';
+            }
+            html += options;
+        }
+        if (qty_strings == 0) {
+            html = '';
+        }
+        return html;
+    }
+    
+    // actually load the select tag
+    var populate_boilerplate = function(boilerplate_type, html) {
+        var $target = null;
+        switch(boilerplate_type) {
+            case 'hide-reason': $target = $hide_reasons; break;
+            case 'reply': $target = $boilerplate_replies; break;
+        }
+        if ($target) {
+            if (html) {
+                console.log("setting html to target where id=" + $target.attr('id'));
+                $target.find('select').html(html);
+            } else {
+                console.log("hiding target where id=" + $target.attr('id'));
+                $target.hide();
+            }
+        }
+    }
+    
     // revealed public methods:
     return {
        config: config,
@@ -537,6 +630,7 @@ var message_manager = (function() {
        reply: reply,
        hide: hide,
        show_info: show_info,
-       sign_out: sign_out
+       sign_out: sign_out,
+       populate_boilerplate_strings: populate_boilerplate_strings
      };
 })();

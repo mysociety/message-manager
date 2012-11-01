@@ -58,7 +58,6 @@ $(document).ready(function() {
 		e.stopPropagation(); // because replies are nested
 		$('.mm-msg-action', $('#mm-message-list')).stop().fadeOut(200);
 		$(this).find('> .mm-msg-action').stop().show();
-		console.log("clicked on: " + $(this).attr('id'));
 	});
 
 	$('#hide-submit').click(function(e) {
@@ -77,8 +76,11 @@ $(document).ready(function() {
 		message_manager.show_info(sanitise_id($(this).parent().attr('id')));
 	});
 	
-	$('#mm-pro-reasons').change(function(e){
-	    $('#reason_text').val($(this).val()); // load reason_text with proforma reason
+	$('#mm-hide-reasons').change(function(e){
+	    $('#reason_text').val($(this).val()); // load reason_text with boilerplate reason
+	});
+	$('#mm-boilerplate-replies').change(function(e){
+	    $('#reply_text').val($(this).val()); // load reason_text with boilerplate reason
 	});
 	
 	$('#reply-submit').click(function(e) {
@@ -92,7 +94,20 @@ $(document).ready(function() {
 			    {callback:dummy_reply_cleanup});
 		}
 	});
+
+    /* TODO: callbacks not running as expected
+    $("a#reply").fancybox({onClosed: function(){
+        alert("cleared replies");
+        dummy_busy=false; 
+        $('#reply_text').val(""); 
+        $("#mm-boilerplate-replies option").removeAttr("selected"); 
+        $("#mm-boilerplate-replies option:first-child").attr("selected", true); 
+    }});
+    $("a#hide").fancybox({onClosed: function(){
+        dummy_busy=false; $('#reason_text').val(""); $("#mm-hide-reasons option:first-child").attr("selected", true); 
+    }});
+    */
     
-    $("a#reply").fancybox({onClosed: function(){dummy_busy=false;}});
-    $("a#hide").fancybox({onClosed: function(){dummy_busy=false;}});
+    message_manager.populate_boilerplate_strings('hide-reason');
+    message_manager.populate_boilerplate_strings('reply');
 });
