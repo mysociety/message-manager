@@ -40,4 +40,49 @@ class BoilerplateStringsController extends AppController {
 		$this->set('boilerplate_strings', $this->paginate('BoilerplateString'));
     }
 
+	public function edit($id = null) {
+		$this->BoilerplateString->id = $id;
+		if (!$this->BoilerplateString->exists()) {
+			throw new NotFoundException(__('Invalid boilerplate string'));
+		}
+		if ($this->request->is('post') || $this->request->is('put')) {
+			if ($this->BoilerplateString->save($this->request->data)) {
+				$this->Session->setFlash(__('The string has been saved'));
+				$this->redirect(array('action' => 'index'));
+			} else {
+				$this->Session->setFlash(__('The string could not be saved. Please, try again.'));
+			}
+		} else {
+			$this->request->data = $this->BoilerplateString->read(null, $id);
+		}
+	}
+
+	public function delete($id = null) {
+		if (!$this->request->is('post')) {
+			throw new MethodNotAllowedException();
+		}
+		$this->BoilerplateString->id = $id;
+		if (!$this->BoilerplateString->exists()) {
+			throw new NotFoundException(__('Invalid boilerplate string ID'));
+		}
+		if ($this->BoilerplateString->delete()) {
+			$this->Session->setFlash(__('Boilerplate string deleted'));
+			$this->redirect(array('action' => 'index'));
+		}
+		$this->Session->setFlash(__('Boilerplate string was not deleted'));
+		$this->redirect(array('action' => 'index'));
+	}
+
+	public function add() {
+		if ($this->request->is('post')) {
+			$this->BoilerplateString->create();
+			if ($this->BoilerplateString->save($this->request->data)) {
+				$this->Session->setFlash(__('The new string has been saved'));
+				$this->redirect(array('action' => 'index'));
+			} else {
+				$this->Session->setFlash(__('The string could not be saved. Please, try again.'));
+			}
+		}
+	}
+
 }

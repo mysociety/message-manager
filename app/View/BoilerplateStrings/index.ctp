@@ -6,6 +6,7 @@
 		<th><?php echo $this->Paginator->sort('lang');?></th>
 		<th><?php echo $this->Paginator->sort('type');?></th>
 		<th><?php echo $this->Paginator->sort('text');?></th>
+		<th><?php echo $this->Paginator->sort('sort_index');?></th>
 		<th > </th>
 	</tr>
 	<?php
@@ -15,6 +16,12 @@
 		<td><?php echo h($string['BoilerplateString']['lang']); ?>&nbsp;</td>
 		<td><?php echo h($string['BoilerplateString']['type']); ?>&nbsp;</td>
 		<td><?php echo h($string['BoilerplateString']['text_value']); ?>&nbsp;</td>
+		<td><?php echo h($string['BoilerplateString']['sort_index']); ?>&nbsp;</td>
+		<td class="actions">
+			<?php echo $this->Html->link(__('Edit'), array('action' => 'edit', $string['BoilerplateString']['id'])); ?>
+			<?php echo $this->Form->postLink(__('Delete'), array('action' => 'delete', 
+				$string['BoilerplateString']['id']), null, __('Are you sure you want to delete this string?\n\n"%s"\n', h($string['BoilerplateString']['text_value']))); ?>
+		</td>
 	</tr>
 <?php endforeach; ?>
 	</table>
@@ -35,5 +42,7 @@
 </div>
 <div class="actions">
 	<ul>
+		<li><?php echo $this->Html->link(__('Add new string'), array('action' => 'add')); ?></li>
 	</ul>
 </div>
+
