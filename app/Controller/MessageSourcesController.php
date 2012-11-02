@@ -28,10 +28,10 @@ class MessageSourcesController extends AppController {
 		}
 		if ($this->MessageSource->delete()) {
 			$this->Session->setFlash(__('Message source deleted'));
-			$this->redirect(array('message_source' => 'index'));
+			$this->redirect(array('action' => 'index'));
 		}
 		$this->Session->setFlash(__('Message source was not deleted'));
-		$this->redirect(array('message_source' => 'index'));
+		$this->redirect(array('action' => 'index'));
 	}
 	
 	public function edit($id = null) {
