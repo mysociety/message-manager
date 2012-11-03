@@ -1,5 +1,9 @@
 <div class="mm-boilerplatestrings view">
 	<h2><?php echo $title;?></h2>
+	<p>
+		Boilerplate strings are short texts that are available to clients to help their users
+		fill in forms (such as standard replies and reasons hiding messages).
+	</p>
 	<table cellpadding="0" cellspacing="0">
 	<tr>
 		<th><?php echo $this->Paginator->sort('id');?></th>

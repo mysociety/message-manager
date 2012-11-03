@@ -4,6 +4,7 @@
 		<li><?php echo $this->Html->link(__('Sent'), array('controller' => 'messages', 'action' => 'index', 'sent')); ?></li>
 		<li><?php echo $this->Html->link(__('Sources'), array('controller' => 'MessageSources', 'action' => 'index')); ?></li>
 		<li><?php echo $this->Html->link(__('Users'), array('controller' => 'users', 'action' => 'index')); ?></li>
+		<li><?php echo $this->Html->link(__('Strings'), array('controller' => 'BoilerplateStrings', 'action' => 'index')); ?></li>
 		<li><?php echo $this->Html->link(__('Activity'), array('controller' => 'actions', 'action' => 'index')); ?></li>
 		<?php if (Configure::read('enable_dummy_client')==1) { ?> 
 			<li><?php echo $this->Html->link(__('Dummy client'), array('controller' => 'MessageSources', 'action' => 'client')); ?></li>
