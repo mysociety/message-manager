@@ -125,11 +125,27 @@ class UsersController extends AppController {
 				unset($this->request->data['User']['confirm_password']);
 				$this->User->read(null, $id);
 			}
-			if ($this->User->save($this->request->data)) {
-				$this->Session->setFlash(__('The user has been saved'));
-				$this->redirect(array('action' => 'index'));
-			} else {
-				$this->Session->setFlash(__('The user could not be saved. Please, try again.'));
+			try {
+				if ($this->User->save($this->request->data)) {
+					$this->Session->setFlash(__('The user has been saved'));
+					$this->redirect(array('action' => 'index'));
+				} else {
+					$this->Session->setFlash(__('The user could not be saved. Please, try again.'));
+				}
+			} catch (Exception $e) {
+				// There's a problem (bug?) when editing User records with the current group-based AROs:
+				// only admins can edit User records (which is right) but an exception is thrown
+				// looking for the User entry -- there isn't one, because all the AROs are Groups.
+				// We're explicitly checking group here just to be sure this isn't exposing anything, but
+				// if this user is an admin, it's safe to ignore exceptions triggered by missing user AROs.
+				// Still, ugh.
+				$is_admin_group = ($this->Auth->user('group_id') == Group::$ADMIN_GROUP_ID)? 1 : 0;
+				if ($is_admin_group && preg_match("/Couldn't find Aro node identified by/", $e->getMessage())) {
+					$this->Session->setFlash(__('The user has been saved'));
+					$this->redirect(array('action' => 'index'));
+				} else {
+					throw $e;
+				}
 			}
 		} else {
 			$this->request->data = $this->User->read(null, $id);
