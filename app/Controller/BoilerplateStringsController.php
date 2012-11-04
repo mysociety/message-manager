@@ -13,8 +13,11 @@ class BoilerplateStringsController extends AppController {
     );
 
 	public function beforeFilter() {
-	    parent::beforeFilter();
-	    $this->Auth->allow('*'); // allow access to the dummy client for testing Basic Auth
+		parent::beforeFilter();
+		// currently allow JSON API access without any auth, since this isn't sensitive data (yet?)
+		if ($this->RequestHandler->accepts('json')) {
+			$this->Auth->allow('index');
+		}
 	}
 	
 	/* returns list of boilerplate strings, by type (really for AJAX-populated UI) */
@@ -39,7 +42,7 @@ class BoilerplateStringsController extends AppController {
 		$this->set('title', "Boilerplate strings for " . ($boilerplate_type? $boilerplate_type : "all types") );
 		$this->set('boilerplate_strings', $this->paginate('BoilerplateString'));
     }
-
+	
 	public function edit($id = null) {
 		$this->BoilerplateString->id = $id;
 		if (!$this->BoilerplateString->exists()) {
