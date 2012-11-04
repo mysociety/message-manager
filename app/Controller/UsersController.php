@@ -29,7 +29,7 @@ class UsersController extends AppController {
 			}
 		}
 
-		//$this->Auth->allow('initDB'); // uncomment to enable re-build of the aros_acos table
+		$this->Auth->allow('initDB'); // uncomment to enable re-build of the aros_acos table
 	}
 	
 	public $helpers = array('Js' =>  array('Jquery'));
@@ -160,17 +160,23 @@ class UsersController extends AppController {
 	}
 	
 	public function initDB() {
-		//------------------------------ 
+		//-------------------------------------------------------------------------------------
 		// safety! only run this once, if you need to!
-		$this->Session->setFlash(__('initDB is disabled!'));
-		$this->redirect(array('controller' => 'Pages', 'action' => 'display'));
-		return;
-		//------------------------------ 
+		// see comments at the top of db/initial_auth.sql to understand why you might need to.
+		$ENABLE_INIT_DB = false; // <-- should be false unless you're sure you need to run it
+		//--------------------------------------------------------------------------------------
+		
+		if (! $ENABLE_INIT_DB) { 
+			$this->Session->setFlash(__('initDB is disabled!'));
+			$this->redirect(array('controller' => 'Pages', 'action' => 'display'));
+			return;
+		}
 
 		$group = $this->User->Group;
 		// allow admins to do everything
 		$group->id = Group::$ADMIN_GROUP_ID;
 		$this->Acl->allow($group, 'controllers');
+		$this->Acl->allow($group, 'controllers/Users/edit'); // see if this fixes the user-edit bug
 
 		// allow managers to deal with most things except users and groups
 		$group->id = Group::$MANAGER_GROUP_ID;
@@ -178,6 +184,7 @@ class UsersController extends AppController {
 		$this->Acl->allow($group, 'controllers/Actions/add');  // for adding notes to messages
 		$this->Acl->allow($group, 'controllers/Actions/index');
 		$this->Acl->allow($group, 'controllers/Actions/view');
+		$this->Acl->allow($group, 'controllers/BoilerplateStrings');
 		$this->Acl->allow($group, 'controllers/Groups/index');
 		$this->Acl->allow($group, 'controllers/Groups/view');
 		$this->Acl->allow($group, 'controllers/Messages');
@@ -192,6 +199,7 @@ class UsersController extends AppController {
 		// note nothing here gives access to from_address, etc.
 		$group->id = Group::$API_USER_GROUP_ID;
 		$this->Acl->deny($group, 'controllers');
+		$this->Acl->allow($group, 'controllers/BoilerplateStrings/index');
 		$this->Acl->allow($group, 'controllers/Messages/assign_fms_id');
 		$this->Acl->allow($group, 'controllers/Messages/available');
 		$this->Acl->allow($group, 'controllers/Messages/lock');
