@@ -8,9 +8,9 @@ class MessagesController extends AppController {
 		 'RequestHandler'
 	);
 	
-    public $paginate = array(
-        'order' => array('Message.created' => 'asc')
-    );
+	public $paginate = array(
+		'order' => array('Message.created' => 'asc')
+	);
 	
 	public function beforeFilter() {
 		parent::beforeFilter();
@@ -29,7 +29,7 @@ class MessagesController extends AppController {
 		if ( $this->request->is('options') ) {
 			$this->response->header('Access-Control-Allow-Origin', Configure::read('cors_allowed'));
 			$this->response->header('Access-Control-Allow-Credentials', 'true');
-			$this->response->header('Access-Control-Allow-Headers', 'Origin, Accept, Authorization, Content-Type,  Depth,  User-Agent,  X-File-Size,  X-Requested-With,  If-Modified-Since,  X-File-Name,  Cache-Control');
+			$this->response->header('Access-Control-Allow-Headers', 'Origin, Accept, Authorization, Content-Type,  Depth,  User-Agent,	X-File-Size,  X-Requested-With,	 If-Modified-Since,	 X-File-Name,  Cache-Control');
 			$this->response->header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
 			$this->response->send();
 			// otherwise it send things that upset the CORS pre-flight request
@@ -45,7 +45,7 @@ class MessagesController extends AppController {
 				if ($this->Auth->loggedIn() || $this->Auth->login()) {
 					$this->set('username', $this->Auth->user('username'));
 					// do nothing more: they're logged in
-			    } else {
+				} else {
 					throw new ForbiddenException('Not logged in');
 				}
 			}
@@ -83,7 +83,7 @@ class MessagesController extends AppController {
 		);
 		$this->set('title', $title);
 		$this->set('messages', $this->paginate('Message'));
-    }
+	}
 
 	// get available messages: 
 	// provided as the main AJAX call for FMS to populate its messages
@@ -92,13 +92,13 @@ class MessagesController extends AppController {
 	// only serve messages with matching tag
 	// ---------------------------------------------------------------------------------
 	// note: this automatically exludes messages with status "available" if they are not
-	//       root-level messages, that is, if they are not replies
-	//       This might not be what you're expecting since it means not all messages with
-	//       status='available' are actually available. Hmm.
+	//		 root-level messages, that is, if they are not replies
+	//		 This might not be what you're expecting since it means not all messages with
+	//		 status='available' are actually available. Hmm.
 
-    public function available() {
+	public function available() {
 		$this->Message->recursive = 1;
-		$allowed_tags =  $this->Auth->user('allowed_tags');
+		$allowed_tags =	 $this->Auth->user('allowed_tags');
 		$conditions = array('Message.status' => Status::$STATUS_AVAILABLE, 'Message.parent_id' => null);
 		// TODO really, allowed tags should be comma-separated list; for now, consider it a single tag
 		if (! empty($allowed_tags)) {
@@ -117,11 +117,11 @@ class MessagesController extends AppController {
 		);
 		foreach ($messages as &$message) {
 			 $subtree = $this->Message->find('threaded', array(
-			    'conditions' => array(
-			        'Message.lft >=' => $message['Message']['lft'], 
-			        'Message.rght <=' => $message['Message']['rght'],
+				'conditions' => array(
+					'Message.lft >=' => $message['Message']['lft'], 
+					'Message.rght <=' => $message['Message']['rght'],
 					'Message.status !=' => Status::$STATUS_HIDDEN 
-			    ),
+				),
 				'fields'	=> self::_json_fields(),
 				'contain' => array('Source', 'Status', 'Lockkeeper'),
 			));
@@ -146,10 +146,10 @@ class MessagesController extends AppController {
 			));
 			$this->Message->Behaviors->attach('Containable');
 			$messages = $this->Message->find('threaded', array(
-			    'conditions' => array(
-			        'Message.lft >=' => $message['Message']['lft'], 
-			        'Message.rght <=' => $message['Message']['rght']
-			    ),
+				'conditions' => array(
+					'Message.lft >=' => $message['Message']['lft'], 
+					'Message.rght <=' => $message['Message']['rght']
+				),
 				'contain' => array(), // empty, restricts to just the Message
 			));
 			$children = array();
@@ -162,7 +162,7 @@ class MessagesController extends AppController {
 			$this->set('seconds_until_lock_expiry', $this->Message->seconds_until_lock_expiry());
 
 		}
-    }
+	}
 
 	// note: better if JSON returned the message data even on failure to grant a lock,
 	// since it's an opportunity for the client to update the message list?
@@ -190,7 +190,7 @@ class MessagesController extends AppController {
 					foreach($all_locked as $message) {
 						$this->Message->read(null, $message['Message']['id']);
 						$this->Message->unlock();
-					    $this->Message->save();
+						$this->Message->save();
 					}
 					$msg_unlocked = __(', other locks released: %s', count($all_locked));
 				}				
@@ -198,8 +198,8 @@ class MessagesController extends AppController {
 			if ($this->RequestHandler->accepts('json')) {
 				$this->Message->recursive = 0;
 				$message = $this->Message->read(self::_json_fields(), $id);
-        $this->response->body( json_encode(self::mm_json_response(true, $message) ) );
-        return $this->response;
+		$this->response->body( json_encode(self::mm_json_response(true, $message) ) );
+		return $this->response;
 			} else {
 				$this->Session->setFlash(__('Message locked (expires in %s seconds)%s', 
 					Configure::read('lock_expiry_seconds'), $msg_unlocked));
@@ -207,8 +207,8 @@ class MessagesController extends AppController {
 		} else {
 			$err_msg = __("Lock not granted: " . $lock_err );
 			if ($this->RequestHandler->accepts('json')) {
-        $this->response->body( json_encode(self::mm_json_response(false, null, $err_msg)) );
-        return $this->response;
+		$this->response->body( json_encode(self::mm_json_response(false, null, $err_msg)) );
+		return $this->response;
 			}
 			$this->Session->setFlash(__($err_msg));
 		}
@@ -275,7 +275,7 @@ class MessagesController extends AppController {
 						$reply = new Message;
 						$reply->create();
 						$reply->save(array(
-								'parent_id' =>  $id,
+								'parent_id' =>	$id,
 								'is_outbound' => 1,
 								'message' => $reply_text,
 								'status' => Status::$STATUS_PENDING,
@@ -345,7 +345,7 @@ class MessagesController extends AppController {
 		}
 		if ($this->RequestHandler->accepts('json')) {
 				$this->response->body( json_encode(self::mm_json_response(false, null, $unlocked_msg)) );
-        return $this->response;
+		return $this->response;
 		}
 		$this->Session->setFlash($unlocked_msg);
 		$this->redirect(array('action' => 'view', $id));
@@ -368,7 +368,7 @@ class MessagesController extends AppController {
 			foreach($all_locked as $message) {
 				$this->Message->read(null, $message['Message']['id']);
 				$this->Message->unlock();
-			    $this->Message->save();
+				$this->Message->save();
 			}
 			$unlocked_msg = __('locks released: %s', count($all_locked));
 		} else {
@@ -376,7 +376,7 @@ class MessagesController extends AppController {
 		}
 		if ($this->RequestHandler->accepts('json')) {
 				$this->response->body( json_encode(self::mm_json_response(false, null, $unlocked_msg)) );
-        return $this->response;
+		return $this->response;
 		}
 		$this->Session->setFlash($unlocked_msg);
 		$this->redirect(array('action' => 'index'));
@@ -409,14 +409,14 @@ class MessagesController extends AppController {
 					self::_logAction(ActionType::$ACTION_ASSIGN, $fms_id);
 					if ($this->RequestHandler->accepts('json')) {
 							$this->response->body( json_encode(self::mm_json_response(true, null)) );
-              return $this->response;
+			  return $this->response;
 					}
 					$this->Session->setFlash(__('Message assigned to FMS report %s', $fms_id));
 				} else {
 					$err_msg = __('Failed to assign FMS report %s to message', $fms_id);
 					if ($this->RequestHandler->accepts('json')) {
 							$this->response->body( json_encode(self::mm_json_response(false, null, $err_msg)) );
-              return $this->response;
+			  return $this->response;
 					}
 					$this->Session->setFlash($err_msg);
 				}
@@ -502,19 +502,25 @@ class MessagesController extends AppController {
 			"use /messages/incoming instead, logged into the message-sources user group."));
 		$this->redirect(array('controller' => 'Pages', 'action' => 'display/api'));
 		// if ($this->request->is('post')) {
-		// 	$this->Message->create();
-		// 	if ($this->Message->save($this->request->data)) {
-		// 		$this->Session->setFlash(__('The message has been saved'));
-		// 		$this->redirect(array('action' => 'index'));
-		// 	} else {
-		// 		$this->Session->setFlash(__('The message could not be saved. Please, try again.'));
-		// 	}
+		//	$this->Message->create();
+		//	if ($this->Message->save($this->request->data)) {
+		//		$this->Session->setFlash(__('The message has been saved'));
+		//		$this->redirect(array('action' => 'index'));
+		//	} else {
+		//		$this->Session->setFlash(__('The message could not be saved. Please, try again.'));
+		//	}
 		// } 
 		// $this->set('sources', $this->Message->Source->find('list')); // populate the drop-down
 	}
 
-	// alias for add... although this may be customised depending on currently unknown behaviour
-	// of message sources (e.g. might be a get not a post, etc)
+	//-----------------------------------------------------------------------------------------------------------
+	// "incoming" is used to create a new message in the Message Manager: that is, an SMS gateway (for example)
+	//	can pass incoming messages to MM by hitting this URL (with a POST, and params).
+	//	Effectively this is an alias for the add action, which (see above) is disabled.
+	//	This incoming method is a hypothetical once since you might not have the choice of how the gateway
+	//	access the MM, but it's used by the dummy client for testing, and serves as an example if you need
+	//	to roll your own.
+	//-----------------------------------------------------------------------------------------------------------
 	public function incoming() {
 		if (!$this->request->is('post')) { // for now
 			throw new MethodNotAllowedException(); 
@@ -528,7 +534,7 @@ class MessagesController extends AppController {
 		// ...otherwise if there was no source_id, infer it from the current user.
 		// After checking this, $source_user_id will be null if there's no match.
 		//---------------
-		Controller::loadModel('MessageSource'); // really?  This needs tidying!... should be using user's MessageSource association
+		Controller::loadModel('MessageSource'); // really?	This needs tidying!... should be using user's MessageSource association
 		$source_user_id = $this->Auth->user('id');
 		$source_by_user = $this->MessageSource->findByUserId($source_user_id);
 		// for now, infer source_id from user unless it's been explicitly sent
@@ -556,12 +562,12 @@ class MessagesController extends AppController {
 			} elseif ($this->Message->save()) {
 				$response_text = __("OK\nSaved message id=%s", $this->Message->id);
 				// check to see if this looks like a reply: 
-				//    -- has no tag (easiest to detect *after* the save, but not beautiful)
-				//    -- sent with a from_address that was the to_address of a message sent out in the last N days
+				//	  -- has no tag (easiest to detect *after* the save, but not beautiful)
+				//	  -- sent with a from_address that was the to_address of a message sent out in the last N days
 				self::_load_record($this->Message->id);
 				if (empty($this->Message->data['Message']['tag'])) {
 					$response = $this->Message->find('first', array(
-						'conditions' =>  array(
+						'conditions' =>	 array(
 							'Message.to_address' => $this->Message->data['Message']['from_address'],
 							'Message.created >=' => date('Y-m-d', strtotime('-' . Configure::read('autodetect_reply_period')))
 						),
@@ -583,14 +589,15 @@ class MessagesController extends AppController {
 			'statusCode' => $return_code,
 			'type' => 'text',
 			'body' => $response_text . "\n" 
-		));	}
+		)); 
+	}
 	
 	// purge all expired locks from the data
 	public function purge_locks() {
 		$this->Message->recursive = 0;
 		$this->Message->updateAll(
-		    array('Message.lock_expires' => null, 'Message.owner_id' => null),
-		    array('Message.lock_expires <=' => date('Y-m-d H:i:s', time()))
+			array('Message.lock_expires' => null, 'Message.owner_id' => null),
+			array('Message.lock_expires <=' => date('Y-m-d H:i:s', time()))
 		);
 		$this->Session->setFlash(__('All expired locks have been purged.'));
 		$this->redirect(array('action' => 'index'));
@@ -599,7 +606,7 @@ class MessagesController extends AppController {
 	private function _load_record($id) {
 		$this->Message->id = $id;
 		if (!$this->Message->exists()) {
-			throw new NotFoundException(__('Invalid message'));
+			throw new NotFoundException(__("No message found with id=\"%s\"", $id));
 		}
 		$this->Message->read(null, $id);
 	}
@@ -621,6 +628,7 @@ class MessagesController extends AppController {
 		);
 	}
 	
+	// logging an action creates an Action entry
 	private function _logAction($action_type, $custom_param_1=null, $custom_param_2=null) {
 		Controller::loadModel('Action');
 		$action = new Action;
