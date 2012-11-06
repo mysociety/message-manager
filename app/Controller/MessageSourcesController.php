@@ -5,7 +5,7 @@ class MessageSourcesController extends AppController {
 	public function beforeFilter() {
 	    parent::beforeFilter();
 		
-	    $this->Auth->allow('client'); // allow access to the dummy client for testing Basic Auth
+	    $this->Auth->allow('client', 'gateway_test'); // allow access to the dummy client for testing Basic Auth
 		Controller::loadModel('Group'); // to access static methods on it
 	}
 	
@@ -15,6 +15,9 @@ class MessageSourcesController extends AppController {
 
     public function view($id = null) {
         $this->MessageSource->id = $id;
+		if (!$this->MessageSource->exists()) {
+			throw new NotFoundException(__('Message source with id="%s" not found', $id));
+		}
         $this->set('message_source', $this->MessageSource->read());
     }
 
@@ -37,7 +40,7 @@ class MessageSourcesController extends AppController {
 	public function edit($id = null) {
 		$this->MessageSource->id = $id;
 		if (!$this->MessageSource->exists()) {
-			throw new NotFoundException(__('Invalid message source'));
+			throw new NotFoundException(__('Message source with id="%s" not found', $id));
 		}
 		if ($this->request->is('post') || $this->request->is('put')) {
 			if ($this->MessageSource->save($this->request->data)) {
@@ -97,5 +100,84 @@ class MessageSourcesController extends AppController {
 			$this->Session->setFlash(__('The dummy client has been disabled.'));
 			$this->redirect("/");
 		}
+	}
+	
+	public function gateway_test($id = null) {
+        $this->MessageSource->id = $id;
+		if (!$this->MessageSource->exists()) {
+			throw new NotFoundException(__('Message source with id="%s" not found', $id));
+		}
+		$source = $this->MessageSource->read();
+        $this->set('message_source', $source);
+		$connection_test_result = 'No test was run.';
+		// Test the netcast connection
+		if (preg_match('/netcast/i', $this->MessageSource->data['MessageSource']['name'])) {
+			require_once("nusoap/nusoap.php");
+			$netcast_id = $this->MessageSource->data['MessageSource']['remote_id'];
+			$url = $this->MessageSource->data['MessageSource']['url'];
+			if (empty($url)) {
+				$connection_test_result = 'No test was run: you need to specify a URL';
+			} elseif (! preg_match('/^https?:\/\//', $url)) {
+				$connection_test_result = 'No test was run: URL must start with protocol (http or https)';
+			} else {
+				$netcast = new SoapClient($url);
+				$connection_test_result = $netcast->__soapCall("GETCONNECT", array($netcast_id)); 
+				$connection_test_result = $this->_decode_netcast_retval($connection_test_result);
+			}
+		}
+		$this->set('connection_test_result', $connection_test_result);
+	}
+	
+	private function _decode_netcast_retval($code) {
+		switch ($code) {
+			case 'RETEMP01':
+				$s="Netcast ID is empty";
+				break;
+			case 'RETEMP02':
+				$s="Mobile Number is empty";
+				break;
+			case 'RETEMP03':
+				$s="Message is empty";
+				break;
+			case 'RETEMP05':
+				$s="Transaction Reference Number is empty";
+				break;
+			case 'RETEMP06':
+				$s="Date is empty";
+				break;
+			case 'RETGMS01':
+				$s="Pending/Queued";
+				break;
+			case 'RETGMS02':
+				$s="SMS Sent";
+				break;
+			case 'RETGMS03':
+				$s="SMS Sending Failed";
+				break;
+			case 'RETGMS04':
+				$s="Invalid Transaction Reference Number";
+				break;
+			case 'RETVAL01':
+				$s="Unauthorized IP address";
+				break;
+			case 'RETVAL02':
+				$s="Unauthorized Netcast ID";
+				break;
+			case 'RETVAL03':
+				$s="Invalid Mobile Number";
+				break;
+			case 'RETVAL04':
+				$s="Unrecognized Mobile Number";
+				break;
+			case 'RETVAL05':
+				$s="Message contains illegal characters";
+				break;
+			case 'RETVAL07':
+				$s="Unauthorized Custom Mask";
+				break;
+			default:
+				$s="Unknown return code";
+		}
+		return "$code: $s";
 	}
 }

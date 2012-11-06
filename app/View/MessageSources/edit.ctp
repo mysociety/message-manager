@@ -7,6 +7,7 @@
 		echo $this->Form->input('description');
 		echo $this->Form->input('url');
 		echo $this->Form->input('ip_addresses', array('type' => 'text'));
+		echo $this->Form->input('remote_id', array('type' => 'text', 'label' => __('Remote ID (optional: may be required as an API key or ID token)')));
 		echo $this->Form->input('user_id', array('label' => __('Allocated user (note: must be a member of the %s group)', $source_group_name)));
 	?>
 	</fieldset>
