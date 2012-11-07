@@ -122,62 +122,10 @@ class MessageSourcesController extends AppController {
 			} else {
 				$netcast = new SoapClient($url);
 				$connection_test_result = $netcast->__soapCall("GETCONNECT", array($netcast_id)); 
-				$connection_test_result = $this->_decode_netcast_retval($connection_test_result);
+				$connection_test_result = MessageSource::decode_netcast_retval($connection_test_result);
 			}
 		}
 		$this->set('connection_test_result', $connection_test_result);
 	}
 	
-	private function _decode_netcast_retval($code) {
-		switch ($code) {
-			case 'RETEMP01':
-				$s="Netcast ID is empty";
-				break;
-			case 'RETEMP02':
-				$s="Mobile Number is empty";
-				break;
-			case 'RETEMP03':
-				$s="Message is empty";
-				break;
-			case 'RETEMP05':
-				$s="Transaction Reference Number is empty";
-				break;
-			case 'RETEMP06':
-				$s="Date is empty";
-				break;
-			case 'RETGMS01':
-				$s="Pending/Queued";
-				break;
-			case 'RETGMS02':
-				$s="SMS Sent";
-				break;
-			case 'RETGMS03':
-				$s="SMS Sending Failed";
-				break;
-			case 'RETGMS04':
-				$s="Invalid Transaction Reference Number";
-				break;
-			case 'RETVAL01':
-				$s="Unauthorized IP address";
-				break;
-			case 'RETVAL02':
-				$s="Unauthorized Netcast ID";
-				break;
-			case 'RETVAL03':
-				$s="Invalid Mobile Number";
-				break;
-			case 'RETVAL04':
-				$s="Unrecognized Mobile Number";
-				break;
-			case 'RETVAL05':
-				$s="Message contains illegal characters";
-				break;
-			case 'RETVAL07':
-				$s="Unauthorized Custom Mask";
-				break;
-			default:
-				$s="Unknown return code";
-		}
-		return "$code: $s";
-	}
 }
