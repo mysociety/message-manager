@@ -8,6 +8,7 @@ INSERT INTO action_types VALUES(5, 'hide',     'hid message');
 INSERT INTO action_types VALUES(6, 'unhide',   'revealed message by unhiding it');
 INSERT INTO action_types VALUES(7, 'note',     'note');
 INSERT INTO action_types VALUES(8, 'reply',    'replied to message');
+INSERT INTO action_types VALUES(9, 'gateway',    'activity with the SMS gateway');
 
 INSERT INTO statuses VALUES(0, 'unknown',   'unknown');
 INSERT INTO statuses VALUES(1, 'available', 'available for activity');
