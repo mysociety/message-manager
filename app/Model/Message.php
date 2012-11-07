@@ -93,16 +93,9 @@ class Message extends AppModel {
 		if (!empty($this->data['Message']['message'])) {
 			$message_text = $this->data['Message']['message'];
 			if (!empty($message_text)) {
-				$tags = Configure::read('tags');
-				foreach ($tags as $tag => $desc) {
-					$pattern = '/^\s*' . $tag . '\s*\b/i';
-					if (preg_match($pattern, $message_text)) {
-						$this->data['Message']['tag'] = $tag;
-						if (Configure::read('remove_tags_when_matched')) {
-							$this->data['Message']['message'] = preg_replace($pattern, "", $message_text);
-						}
-						break; // only test for one tag
-					}
+				$tag_data = Message::separate_out_tags($message_text);
+				foreach ($tag_data as $key => $value) {
+					$this->data['Message'][$key] = $value; // sets 'message' and maybe 'tag'
 				}
 			}	
 		}
@@ -242,4 +235,24 @@ class Message extends AppModel {
 		return self::exists($check['parent_id']) && $this->id != $check['parent_id'];
 	}
 
+	// accepts message text, returns array suitable for saving:
+	// array(
+	//		'message' => message_text possibly with tag stripped
+	//		'tag'     => extracted tag
+	// )
+	public static function separate_out_tags($message_text) {
+		$tags = Configure::read('tags');
+		$ret_val = array('message' => $message_text);
+		foreach ($tags as $tag => $desc) {
+			$pattern = '/^\s*' . $tag . '\s*\b/i';
+			if (preg_match($pattern, $message_text)) {
+				$ret_val['tag'] = $tag;
+				if (Configure::read('remove_tags_when_matched')) {
+					$ret_val['message'] = preg_replace($pattern, "", $message_text);
+				}
+				break; // only test for one tag
+			}
+		}
+		return $ret_val;
+	}
 }
