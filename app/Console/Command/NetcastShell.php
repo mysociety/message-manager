@@ -10,7 +10,7 @@
  *
  *----------------------------------------------------------------*/
 class NetcastShell extends AppShell {
-	public $uses = array('MessageSource', 'Message', 'Status');
+	public $uses = array('MessageSource', 'Message', 'Status', 'Action', 'ActionType');
 
 	public function getOptionParser() {
 	    $parser = parent::getOptionParser();
@@ -35,7 +35,7 @@ class NetcastShell extends AppShell {
 		$this->out(__("Testing connection to message source \"%s\"", $ms['name']), 1, Shell::VERBOSE);
 		$this->check_url($ms);
 		$netcast = $this->get_netcast_connection($ms);
-		$ret_val = $this->call_netcast_function($netcast, $ms, "GETCONNECT");
+		$ret_val = $this->call_netcast_function($netcast, "GETCONNECT", array($ms['remote_id']));
 		$ret_val = MessageSource::decode_netcast_retval($ret_val);
 		$this->out($ret_val, 1, Shell::QUIET);
 	}
@@ -46,7 +46,7 @@ class NetcastShell extends AppShell {
 		$this->out(__("Getting incoming messages from message source \"%s\"", $ms['name']), 1, Shell::VERBOSE);
 		$this->check_url($ms);
 		$netcast = $this->get_netcast_connection($ms);
-		$ret_val = $this->call_netcast_function($netcast, $ms, "GETINCOMING");
+		$ret_val = $this->call_netcast_function($netcast, "GETINCOMING", array($ms['remote_id']));
 		$msgs_received = count($ret_val);
 		$msgs_skipped = 0;
 		$msgs_saved = 0;
@@ -90,6 +90,76 @@ class NetcastShell extends AppShell {
 		}
 	}
 	
+	/*
+	 * SENDSMS Description: Send an SMS 
+	 * message Parameters: 
+	 *    Destination mobile no., your message, and your Netcast ID 
+	 *    Optional: Custom sender mask
+	 */
+	public function send_sms() {
+		$source = $this->get_message_source($this->args[0]);
+		$ms = $source['MessageSource'];
+		$this->out(__("Sending outgoing messages to message source \"%s\"", $ms['name']), 1, Shell::VERBOSE);
+		$this->check_url($ms);
+		$conditions = array(
+			'Message.status' => Status::$STATUS_PENDING,
+			'Message.is_outbound' => 1,
+			array("NOT" => array(
+			        "Message.to_address" => null
+			    )
+			)
+		);
+		$out_msgs = $this->Message->find('all', array('conditions' => $conditions));
+		$msgs_queued = count($out_msgs);
+		$msgs_sent = 0;
+		$msgs_failed = 0;
+		$msgs_sent_unsaved = 0;
+		$last_err_msg = "";
+		$this->out(__("Messages queued to be sent: %s", $msgs_queued), 1, Shell::VERBOSE);
+		if (!empty($out_msgs)) {
+			$netcast_mask = "FixMyBgy";
+			// $netcast = $this->get_netcast_connection($ms);
+			foreach ($out_msgs as $msg) {
+				$this->out(__("    Sending message id=%s", $msg['Message']['id']), 1, Shell::VERBOSE);
+				$this->out(__("                    to=%s", $msg['Message']['to_address']), 1, Shell::VERBOSE);
+				// $ret_val = $this->call_netcast_function($netcast, "SENDSMS", array(
+				//    $msg['Message']['to_address'], $msg['Message']['message'], $ms['remote_id'], $netcast_mask
+				// ));
+				// []--[]--[]--[]--[]--[]--[]--[]--[]--[]--[]--[]--[]--[]--[]--[]
+				$ret_val = rand(1000, 9999); // FIXME faking a return code for now
+				// []--[]--[]--[]--[]--[]--[]--[]--[]--[]--[]--[]--[]--[]--[]--[]
+				if (preg_match('/^\d+$/', $ret_val)) { // sent OK 'cos we got a numeric transaction id back
+					$transaction_id = $ret_val;
+					$this->Message->id = $msg['Message']['id'];
+					$this->Message->set('status', Status::$STATUS_SENT);
+					$this->Message->set('external_id', $transaction_id);
+					if ($this->Message->save()) {
+						$msgs_sent++;
+						$this->out(__("   Sent and updated OK"), 1, Shell::VERBOSE);
+						$this->log_action($msg['Message']['id'], __("sent to gateway %s", $ms['name']), $transaction_id);
+					} else {
+						$msgs_sent_unsaved++;
+						$this->out(__("   Sent but update failed"), 1, Shell::NORMAL);
+						$this->log_action($msg['Message']['id'], __("sent to gateway %s but status update failed", $ms['name']), $transaction_id);
+					}
+				} else {
+					$msgs_failed++;
+					$ret_val = MessageSource::decode_netcast_retval($ret_val);
+					$last_err_msg = __("Gateway did not return a transaction id: %s", $ret_val); 
+					$this->out($last_err_msg, 1, Shell::NORMAL);
+					// later: add fail count to prevent endless repeats
+				}
+			}
+		} 
+		$this->out(__("Outgoing messages in queue: %s, sent: %s, failed: %s, sent-but-not-updated: %s", 
+			$msgs_queued, $msgs_sent, $msgs_failed, $msgs_sent_unsaved), 1, Shell::NORMAL);
+		if ($msgs_failed > 0) {
+			$this->error("GETINCOMING fail", __("Messages failed: %s, last message was: %s", $msgs_failed, $last_err_msg));
+		}
+		$this->out(__("Done"), 1, Shell::VERBOSE);
+	}
+	
+
 	private function get_message_source($id_or_name) {
 		$source = null;
 		if (preg_match('/^\d+$/', $id_or_name)) {
@@ -98,7 +168,7 @@ class NetcastShell extends AppShell {
 			$source = $this->MessageSource->findByName($id_or_name);
 		}
 		if (empty($source)) {
-			$this->error("No such source", "Could not find a message source that matched the id (or name) that you provided");
+			$this->error("No such source", __("Could not find a message source that matched the id (or name) that you provided"));
 		}
 		return $source;
 	}
@@ -108,8 +178,8 @@ class NetcastShell extends AppShell {
 		return new SoapClient($ms['url']);
 	}
 	
-	private function call_netcast_function($conn, $ms, $function_name) {
-		return $conn->__soapCall($function_name, array($ms['remote_id'])); 
+	private function call_netcast_function($conn, $function_name, $param_array) {
+		return $conn->__soapCall($function_name, $param_array); 
 	}
 	
 	private function check_url($message_source) {
@@ -120,5 +190,18 @@ class NetcastShell extends AppShell {
 			$this->error("Missing protocol", 'No test was run: URL must start with protocol (http or https');
 		}		
 	}
+	
+	private function log_action($id, $note, $transaction_id=null) {
+		$action = new Action;
+		$params = array(
+			'type_id' =>  ActionType::$ACTION_GATEWAY,
+			'message_id' => $this->Message->id,
+			'note' => $note,
+			'item_id' => $transaction_id
+		);
+		$action->create($params);
+		$action->save();
+	}
+	
 }
 
