@@ -11,21 +11,46 @@
  *----------------------------------------------------------------*/
 class NetcastShell extends AppShell {
 	public $uses = array('MessageSource', 'Message', 'Status', 'Action', 'ActionType');
+	
+	public static $RETRY_LIMIT = 3;
 
 	public function getOptionParser() {
+		$source_id_arg_def = array(
+			'source_id' => array(
+				'help' => __('The id or name of the message souce (gateway)'),
+				'required' => true
+			)
+		);
 	    $parser = parent::getOptionParser();
-		$parser->addArgument('source_id', array(
-					'help' => __('The id or name of the message souce (gateway)'), 'required' => true));
+		$parser->addSubcommand('gateway_list', array('help' => __('List available sources.')));
 		$parser->addSubcommand('gateway_test', array(
-					'help' => __('Test the connection to the gateway (like pinging).')));
+					'help' => __('Test the connection to the gateway (like pinging).'),
+					'parser' => array('arguments' => $source_id_arg_def)
+				));
 		$parser->addSubcommand('get_incoming', array(
-					'help' => __('Pull down incoming messages from the gateway and load them into the database.')));
+					'help' => __('Pull down incoming messages from the gateway and load them into the database.'),
+					'parser' => array(
+						'options' => array(
+							'allow-dups' => array(
+								'help' => __('Save messages even if they already seem to be in the database (defaults to false, ' .
+											'so duplicate messages will be skipped).'), 
+								'boolean' => true,
+								'short' => 'a',
+								'default' => false
+							)
+						),
+						'arguments' => $source_id_arg_def
+					)
+				));
+				
+	/*			
 		$parser->addOption('allow-dups', array(
 					'help' => __('Save messages even if they already seem to be in the database (defaults to false, ' .
 								'so duplicate messages will be skipped).'), 
 					'boolean' => true,
 					'short' => 'a',
 					'default' => false));
+	*/
 	    return $parser;
 	}
 	
@@ -38,6 +63,16 @@ class NetcastShell extends AppShell {
 		$ret_val = $this->call_netcast_function($netcast, "GETCONNECT", array($ms['remote_id']));
 		$ret_val = MessageSource::decode_netcast_retval($ret_val);
 		$this->out($ret_val, 1, Shell::QUIET);
+	}
+
+	public function gateway_list() {
+		$sources = $this->MessageSource->find('all', array('fields' => array('id', 'name', 'url')));
+		foreach ($sources as $s) {
+			$this->out(sprintf("%4s %24s  %s", "id", "name", "url"), 1, Shell::NORMAL);
+			$this->out(sprintf("%4s %24s  %s", "----", "------------------------", "---"), 1, Shell::NORMAL);
+			$this->out(sprintf("%4s %24s  %s", $s['MessageSource']['id'], $s['MessageSource']['name'], $s['MessageSource']['url']), 1, Shell::QUIET);
+		}
+		$this->out(__("Done"), 1, Shell::VERBOSE);
 	}
 
 	public function get_incoming() {
