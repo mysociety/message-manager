@@ -34,7 +34,19 @@
 				'style' => 'width:5em;',
 				'label' => 'ID of parent message (if any). Use this to indicate that this message is a reply.'
 			)); 
+			if ($message['Message']['send_fail_count'] > 0) {
+				echo "<div style='border:1px solid #f00; background:#fee; padding:0.5em;'>";
+				echo $this->Form->input('send_fail_count', array('label' => "Send fail count (maybe set this to 0 to force retries, once you've cleared the problem)", 'style' => "width:5em;"));	
+				if (!empty($message['Message']['send_fail_reason'])) {
+					echo(__('Last failure message was: %s', h($message['Message']['send_fail_reason'])));
+					if (!empty($message['Message']['send_failed_at'])) {
+						echo(__('<br/> at %s', h($message['Message']['send_failed_at'])));
+					}
+				}
+				echo "</div>";
+			}
 		?>
+		
 	<?php echo $this->Form->end(__('Submit'));?>
 </div>
 <div class="actions">
