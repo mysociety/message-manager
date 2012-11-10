@@ -16,6 +16,7 @@ class NetcastShell extends AppShell {
 	public $uses = array('MessageSource', 'Message', 'Status', 'Action', 'ActionType');
 	
 	public static $RETRY_LIMIT = 3;
+	public static $NETCAST_MASK = 'FixMyBgy';
 
 	/* suppress output/header message */
 	public function startup() {
@@ -177,7 +178,7 @@ class NetcastShell extends AppShell {
 		$last_err_msg = "";
 		$this->out(__("Messages queued to be sent: %s", $msgs_queued), 1, Shell::VERBOSE);
 		if (!empty($out_msgs)) {
-			$netcast_mask = "FixMyBgy";
+			$netcast_mask = NetCastShell::$NETCAST_MASK;
 			if (! $this->params['dry-run']) {
 				$netcast = $this->get_netcast_connection($ms);
 			}
