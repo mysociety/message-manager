@@ -143,8 +143,42 @@
 			<?php echo h($message['Message']['tag'])?>
 			&nbsp;
 		</dd>
+		<dt>
+			Send errors
+		</dt>
+		<dd>
+			<?php if ($has_send_failures) { ?>
+				<table>
+					<tr>
+						<td>
+							Failed attempts
+						</td>
+						<td>
+							<?php echo h($message['Message']['send_fail_count'])?>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							Fail reason
+						</td>
+						<td>
+							<?php echo h($message['Message']['send_fail_reason'])?>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							Last attempted
+						</td>
+						<td>
+							<?php echo h($message['Message']['send_failed_at'])?>
+						</td>
+					</tr>
+				</table>
+			<?php } else { ?>
+				<em>No failed attempts</em>
+			<?php }  ?>
+		</dd>
 	</dl>
-
 	
 	<!-- add note -->
 	<?php echo $this->Form->create('Action', array('controller'=>'Actions', 'action'=>'add'));?>

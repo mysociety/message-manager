@@ -160,7 +160,10 @@ class MessagesController extends AppController {
 			$this->set('children', $children);
 			$this->set('is_locked', $this->Message->is_locked()? 1 : 0);
 			$this->set('seconds_until_lock_expiry', $this->Message->seconds_until_lock_expiry());
-
+			$this->set('has_send_failures', (
+				$message['Message']['send_fail_count']  || 
+				$message['Message']['send_fail_reason'] || 
+				$message['Message']['send_failed_at']));
 		}
 	}
 

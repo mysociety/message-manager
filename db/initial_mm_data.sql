@@ -10,13 +10,16 @@ INSERT INTO action_types VALUES(7, 'note',     'note');
 INSERT INTO action_types VALUES(8, 'reply',    'replied to message');
 INSERT INTO action_types VALUES(9, 'gateway',    'activity with the SMS gateway');
 
-INSERT INTO statuses VALUES(0, 'unknown',   'unknown');
-INSERT INTO statuses VALUES(1, 'available', 'available for activity');
-INSERT INTO statuses VALUES(2, 'assigned',  'has been assigned to a FMS report');
-INSERT INTO statuses VALUES(3, 'hidden',    'has been hidden (deleted)');
-INSERT INTO statuses VALUES(4, 'pending', 'outbound message waiting to be sent');
-INSERT INTO statuses VALUES(5, 'sent', 'outbound message has been sent');
-INSERT INTO statuses VALUES(6, 'error', 'message send failed');
+INSERT INTO statuses VALUES(0, 'unknown',      'unknown');
+INSERT INTO statuses VALUES(1, 'available',    'available for activity');
+INSERT INTO statuses VALUES(2, 'assigned',     'has been assigned to a FMS report');
+INSERT INTO statuses VALUES(3, 'hidden',       'has been hidden (deleted)');
+INSERT INTO statuses VALUES(4, 'pending',      'outbound message waiting to be sent');
+INSERT INTO statuses VALUES(5, 'sent',         'outbound message has been sent');
+INSERT INTO statuses VALUES(6, 'error',        'message send failed');
+INSERT INTO statuses VALUES(7, 'sent_pending', 'delivered to SMS gateway, pending');
+INSERT INTO statuses VALUES(8, 'sent_ok',      'delivered to SMS gateway, sent OK');
+INSERT INTO statuses VALUES(9, 'sent_fail',    'delivered to SMS gateway, send failed');
 
 INSERT INTO groups VALUES(1, 'administrators', '2012-05-25 00:00:00', '2012-05-25 00:00:00');
 INSERT INTO groups VALUES(2, 'managers', '2012-05-25 00:00:00', '2012-05-25 00:00:00');

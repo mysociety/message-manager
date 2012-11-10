@@ -139,6 +139,7 @@ class NetcastShell extends AppShell {
 		$conditions = array(
 			'Message.status' => Status::$STATUS_PENDING,
 			'Message.is_outbound' => 1,
+			'Message.send_fail_count <' => $RETRY_LIMIT,
 			array("NOT" => array(
 			        "Message.to_address" => null
 			    )
@@ -181,8 +182,11 @@ class NetcastShell extends AppShell {
 					$msgs_failed++;
 					$ret_val = MessageSource::decode_netcast_retval($ret_val);
 					$last_err_msg = __("Gateway did not return a transaction id: %s", $ret_val); 
+					$this->Message->set('send_fail_count', $msg['Message']['send_fail_count']+1);
+					$this->Message->set('send_failed_at', time());
+					$this->Message->set('send_fail_reason', $ret_val);
+					$this->Message->save();
 					$this->out($last_err_msg, 1, Shell::NORMAL);
-					// later: add fail count to prevent endless repeats
 				}
 			}
 		} 

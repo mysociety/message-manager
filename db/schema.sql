@@ -75,7 +75,9 @@ CREATE TABLE messages (
   tag varchar(64) default null,
   hide_reason text null default null,
   is_outbound boolean not null default '0',
-
+  send_fail_count integer null default '0',
+  send_fail_reason text null default null,
+  send_failed_at timestamp null default null,
   lft integer,
   rght integer,
   parent_id integer
