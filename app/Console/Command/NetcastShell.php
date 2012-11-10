@@ -59,7 +59,14 @@ class NetcastShell extends AppShell {
 						'boolean' => true,
 						'short' => 'f',
 						'default' => false
-					)
+					),
+					'dry-run' => array(
+						'help' => __('Don\'t send any messages, or update the database: just see what would be sent', NetCastShell::$RETRY_LIMIT), 
+						'boolean' => true,
+						'short' => 'd',
+						'default' => false
+					),
+					
 				),
 				'arguments' => $source_id_arg_def
 			)
@@ -146,6 +153,9 @@ class NetcastShell extends AppShell {
 	 *    Optional: Custom sender mask
 	 */
 	public function send_sms() {
+		if ($this->params['dry-run']) {
+			$this->print_dry_run_notice();
+		}
 		$source = $this->get_message_source($this->args[0]);
 		$ms = $source['MessageSource'];
 		$this->out(__("Sending outgoing messages to message source \"%s\"", $ms['name']), 1, Shell::VERBOSE);
@@ -168,7 +178,9 @@ class NetcastShell extends AppShell {
 		$this->out(__("Messages queued to be sent: %s", $msgs_queued), 1, Shell::VERBOSE);
 		if (!empty($out_msgs)) {
 			$netcast_mask = "FixMyBgy";
-			$netcast = $this->get_netcast_connection($ms);
+			if (! $this->params['dry-run']) {
+				$netcast = $this->get_netcast_connection($ms);
+			}
 			foreach ($out_msgs as $msg) {
 				$qty_retries = $msg['Message']['send_fail_count']+0;
 				if (!$this->params['force'] && $qty_retries >= NetCastShell::$RETRY_LIMIT) {
@@ -179,7 +191,11 @@ class NetcastShell extends AppShell {
 					$retry_no = $qty_retries==0? __('this will be first attempt'):__('this will be no. %s', $qty_retries+1);
 					$this->out(__("  * Sending message id=%s", $msg['Message']['id']), 1, Shell::VERBOSE);
 					$this->out(__("                    to=%s", $msg['Message']['to_address']), 1, Shell::VERBOSE);
-					$this->out(__("               retries=%s (%s)", $qty_retries, $retry_no), 1, Shell::VERBOSE);
+					$this->out(__("                    retries=%s (%s)", $qty_retries, $retry_no), 1, Shell::VERBOSE);
+					if ($this->params['dry-run']) {
+						$msgs_sent++;
+						continue;
+					}
 					$ret_val = $this->call_netcast_function($netcast, "SENDSMS", array(
 						$msg['Message']['to_address'], $msg['Message']['message'], $ms['remote_id'], $netcast_mask
 					));
@@ -214,14 +230,24 @@ class NetcastShell extends AppShell {
 				}
 			}
 		} 
+		$this->out("", 2, Shell::VERBOSE);
 		$this->out(__("Outgoing messages in queue: %s, sent: %s, failed: %s, sent-but-not-updated: %s, skipped: %s", 
 			$msgs_queued, $msgs_sent, $msgs_failed, $msgs_sent_unsaved, $msgs_skipped), 1, Shell::NORMAL);
+		if ($this->params['dry-run']) {
+			$this->print_dry_run_notice();
+		}
 		if ($msgs_failed > 0) {
 			$this->error("SENDSMS fail", __("Messages failed: %s, last message was: %s", $msgs_failed, $last_err_msg));
 		}
 		$this->out(__("Done"), 1, Shell::VERBOSE);
 	}
 	
+	private function print_dry_run_notice() {
+		$this->out("\n", 1, Shell::QUIET);
+		$this->out(__("***---------------------------------------------------------***"), 1, Shell::QUIET);
+		$this->out(__("*** this is a DRY RUN: no messages sent or records updated! ***"), 1, Shell::QUIET);
+		$this->out(__("***---------------------------------------------------------***"), 2, Shell::QUIET);
+	}
 
 	private function get_message_source($id_or_name) {
 		$source = null;
