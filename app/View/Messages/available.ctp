@@ -1,7 +1,7 @@
 <div class="mm-messages">
 	<h2>
 		Available Messages
-		<?php if (! empty($allowed_tags)) {echo h("(tags: $allowed_tags)");} ?>
+		<?php if (! empty($pretty_allowed_tags)) {echo "(tags: $pretty_allowed_tags)";} ?>
 	</h2>
 	<div class="actions inline-buttons">
 		<?php 	

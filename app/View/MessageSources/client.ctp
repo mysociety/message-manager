@@ -40,7 +40,7 @@ echo $this->Html->script('/js/fancybox/jquery.fancybox-1.3.4.pack.js', false);
 <?php if ($group_name != 'message-sources') { ?>
 	<div class="dummy-client">
 		<p id="mm-username">
-			tag:&nbsp;<?php echo (empty($allowed_tags)? "<i>any</i>":strtoupper($allowed_tags)); ?>,
+			tags:&nbsp;<?php echo $this->MessageUtils->pretty_tag_list_html($allowed_tags); ?>;
 			username:&nbsp;<span id="mm-received-username"><?php echo (empty($username)? "<i>none</i>":h($username)); ?></span> 
 		</p>
 		<h3>Mock FMS Client</h3>

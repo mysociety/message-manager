@@ -9,7 +9,8 @@
 		echo $this->Form->input('confirm_password', array('type'=>'password','label'=>'Repeat password to confirm'));
 		echo $this->Form->input('User.email', array('errors'=>true));
 		echo $this->Form->input('group_id');
-		echo $this->Form->input('allowed_tags');
+		echo $this->Form->input('allowed_tags', array('label' => 'Allowed tags: user only sees messages which have these tags.<br/>Use the special tag "' .
+								 Configure::read('no_tag_symbol') . '" to match untagged messages.<br/>Leave this whole entry blank to match every message.'));
 		echo $this->Form->input('can_reply', array('label'=>'Can send replies?'));
 	?>
 	</fieldset>

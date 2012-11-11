@@ -15,7 +15,7 @@
 		<td><?php echo h($user['User']['username']); ?>&nbsp;</td>
 		<td><?php echo h($user['User']['email']); ?>&nbsp;</td>
 		<td><?php echo h($user['Group']['name']); ?>&nbsp;</td>
-		<td><?php echo h(strtoupper($user['User']['allowed_tags'])); ?>&nbsp;</td>
+		<td><?php echo $this->MessageUtils->pretty_tag_list_html($user['User']['allowed_tags']); ?>&nbsp;</td>
 		<td><?php echo($user['User']['can_reply']?"yes":"no"); ?>&nbsp;</td>
 		<td class="actions">
 			<?php echo $this->Html->link(__('View'), array('action' => 'view', $user['User']['id'])); ?>

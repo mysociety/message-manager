@@ -20,6 +20,12 @@ $config = array(
 	 *-----------------------------------------------*/
 	'remove_tags_when_matched' => 1,
 
+	/*-----------------------------------------------
+	 * The symbol that is used to explicitly match a 
+	 * message that has no tag: you probably don't
+	 * need to change this (alphanum+hyphens only)
+	 *-----------------------------------------------*/
+	'no_tag_symbol' => 'NO-TAG',
 	
 	/*-----------------------------------------------
 	 * URL of the FixMyStreet-like site (where the

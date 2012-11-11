@@ -22,7 +22,7 @@
 				if (empty($user['User']['allowed_tags'])) {
 					echo('<em>' . __("any") . '</em>');
 				} else {
-			 		echo h(strtoupper($user['User']['allowed_tags'])); 
+			 		echo $this->MessageUtils->pretty_tag_list_html($user['User']['allowed_tags']); 
 				}
 			?>
 			&nbsp;

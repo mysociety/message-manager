@@ -1,5 +1,6 @@
 <?php
 class Message extends AppModel {
+	
 	public $hasMany = array(
 		'Action' => array(
 			'className' 	=> 'Action',
@@ -98,6 +99,11 @@ class Message extends AppModel {
 					$this->data['Message'][$key] = $value; // sets 'message' and maybe 'tag'
 				}
 			}	
+		}
+		if (!empty($this->data['Message']['tag'])) {
+			$this->data['Message']['tag'] = strtoupper($this->data['Message']['tag']);
+		} else {
+			$this->data['Message']['tag'] = null;
 		}
 		return true;
 	}
@@ -235,18 +241,46 @@ class Message extends AppModel {
 		return self::exists($check['parent_id']) && $this->id != $check['parent_id'];
 	}
 
+	// tag_conditions array is suitable for using in cake find()s... the catch here is that 
+	// the "no tag" tag is special, and matches an empty tag (null or empty string)
+	// Maybe in the future we'll add !TAG to negate specific tags, but for now we don't need it
+	public static function get_tag_conditions($allowed_tags = null) {
+		if (is_null($allowed_tags)) {
+			return array();
+		} 
+		if (is_string($allowed_tags)) {
+			$allowed_tags = preg_split("/[\s,]+/", strtoupper($allowed_tags));
+		}
+		$empty_tag_indices = array_keys($allowed_tags, Configure::read('no_tag_symbol'));
+		foreach ($empty_tag_indices as $ix) {
+			array_splice($allowed_tags, $ix, 1); // delete that element (may be dups, so iterate)
+		}
+		$allowed_tags = array('Message.tag' => $allowed_tags);
+		if ($empty_tag_indices) {
+			$allowed_tags = array(
+				'OR' => array(
+					array('Message.tag' => null), 
+					array('Message.tag' => ''), // really shouldn't be an empty string, but be helpful
+					$allowed_tags
+				)
+			);
+		}
+		return $allowed_tags;
+	}	
+	
 	// accepts message text, returns array suitable for saving:
 	// array(
 	//		'message' => message_text possibly with tag stripped
 	//		'tag'     => extracted tag
 	// )
+	// If there are many tags, better to use a lookup rather than iterate through all $tags
 	public static function separate_out_tags($message_text) {
 		$tags = Configure::read('tags');
 		$ret_val = array('message' => $message_text);
 		foreach ($tags as $tag => $desc) {
 			$pattern = '/^\s*' . $tag . '\s*\b/i';
 			if (preg_match($pattern, $message_text)) {
-				$ret_val['tag'] = $tag;
+				$ret_val['tag'] = strtoupper($tag);
 				if (Configure::read('remove_tags_when_matched')) {
 					$ret_val['message'] = preg_replace($pattern, "", $message_text);
 				}

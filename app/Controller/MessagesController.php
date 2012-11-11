@@ -52,9 +52,11 @@ class MessagesController extends AppController {
 		} else {
 			$this->Auth->authenticate = array('Form');
 		}
-		Controller::loadModel('ActionType'); // to access static methods on it
-		Controller::loadModel('Group'); // to access static methods on it
-		Controller::loadModel('Status'); // to access static methods on it
+		// loading models here just to access the static methods on them (hmmm, seems a bit... heavyweight)
+		Controller::loadModel('ActionType'); 
+		Controller::loadModel('Group'); 
+		Controller::loadModel('Status'); 
+		Controller::loadModel('Message');
 	}
 	
 	// index shows all messages... maybe filtered on is_outbound;
@@ -97,13 +99,17 @@ class MessagesController extends AppController {
 	//		 status='available' are actually available. Hmm.
 
 	public function available() {
+		// note: auth user is cached, so if you edit tags the user concerned (and that's you if
+		//       you edit your own tags) you'll need to log out for changes to take effect
+		$allowed_tags = $this->Auth->user('allowed_tags'); 
+		$conditions = array_merge(
+			array(
+				'Message.status' => Status::$STATUS_AVAILABLE, 
+				'Message.parent_id' => null
+			),
+			Message::get_tag_conditions($allowed_tags)
+		);
 		$this->Message->recursive = 1;
-		$allowed_tags =	 $this->Auth->user('allowed_tags');
-		$conditions = array('Message.status' => Status::$STATUS_AVAILABLE, 'Message.parent_id' => null);
-		// TODO really, allowed tags should be comma-separated list; for now, consider it a single tag
-		if (! empty($allowed_tags)) {
-			$conditions['Message.tag'] = strtoupper(trim($allowed_tags));
-		}
 		$this->Message->Behaviors->attach('Containable');
 		$messages = $this->Message->find('threaded',
 			array(

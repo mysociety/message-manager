@@ -85,6 +85,7 @@ class MessageSourcesController extends AppController {
 
 	public function client() {
 		if (Configure::read('enable_dummy_client')==1) {
+			$this->helpers[] = 'MessageUtils';
 			$this->set('username', $this->Auth->user('username'));
 			$group_id = $this->Auth->user('group_id');
 			Controller::loadModel('Group');

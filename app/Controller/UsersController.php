@@ -67,6 +67,7 @@ class UsersController extends AppController {
  * @return void
  */
 	public function index() {
+		$this->helpers[] = 'MessageUtils';
 		$this->User->recursive = 0;
 		$this->set('users', $this->paginate());
 	}
@@ -78,6 +79,7 @@ class UsersController extends AppController {
  * @return void
  */
 	public function view($id = null) {
+		$this->helpers[] = 'MessageUtils';
 		$this->User->recursive = 2;
 		$this->User->id = $id;
 		if (!$this->User->exists()) {

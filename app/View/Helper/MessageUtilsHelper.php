@@ -62,6 +62,27 @@ class MessageUtilsHelper extends AppHelper {
 			}
 		}
 	}
+	
+	// pretty print (HTML) tag list (sorted, comma-sep, "no-tag" at end)
+	// note: not sanitising the HTML because tags are currently alpha-num only
+	function pretty_tag_list_html($allowed_tags = null) {
+		if (is_string($allowed_tags)) {
+			$allowed_tags = preg_split("/[\s,]+/", strtoupper($allowed_tags));
+		}
+		if (empty($allowed_tags)) {
+			return __("<em>any</em>");
+		}
+		sort($allowed_tags);
+		$empty_tag_indices = array_keys($allowed_tags, Configure::read('no_tag_symbol'));
+		if ($empty_tag_indices) {
+			foreach ($empty_tag_indices as $ix) {
+				array_splice($allowed_tags, $ix, 1); // delete that element (may be dups, so iterate)
+			}
+			array_push($allowed_tags, __("<em>no&nbsp;tag</em>"));
+		}
+		return implode(', ', $allowed_tags);
+	}
+	
 } 
 
 ?>

@@ -93,6 +93,12 @@ class User extends AppModel {
 			)
 			
 		),
+		'allowed_tags' => array(
+			'space_separated' => array(
+				'rule' => array('tags_are_neat'),
+				'message' => 'Tags must be separated by spaces, and use only letters, numbers, or hyphens. Use the special "NO-TAG" to match messages without tags.'
+			)
+		)
 	);
 	
 	//---------------------------------------------------
@@ -108,6 +114,10 @@ class User extends AppModel {
 		return !empty($source['Group']['id']);
 	}
 	
+	public function tags_are_neat($check) {
+		return preg_match('/^\s*([-\d\w]+\s*)*$/', $check['allowed_tags']);
+	}
+	
 
     // importantly hashes the new_password, which ultimately fails if new_password doesn't validate
 	function beforeSave() {
@@ -115,9 +125,14 @@ class User extends AppModel {
 	    if (isset($this->data['User']['new_password']) && !empty($this->data['User']['new_password'])) {
 	        $this->data['User']['password'] = AuthComponent::password($this->data['User']['new_password']);
 		}
-		$tags = trim($this->data['User']['allowed_tags']);
+		// tidy up tags: trim and sort alphabetically (users aren't edited often, so may as well be neat)
+		$tags = preg_split("/\s+/", trim(strtoupper($this->data['User']['allowed_tags'])));
+		sort($tags);
+		$tags = implode(" ", $tags);
 		if (empty($tags)) {
-			$this->data['User']['allowed_tags'] = null; // tidy up tags
+			$this->data['User']['allowed_tags'] = null;
+		} else {
+			$this->data['User']['allowed_tags'] = $tags;			
 		}
 	    return true;
 	}
@@ -126,8 +141,7 @@ class User extends AppModel {
 	public function bindNode($user) {
 	    return array('model' => 'Group', 'foreign_key' => $user['User']['group_id']);
 	}
-
-
+		
 	/*
 	 * Static methods that can be used to retrieve the logged in user
 	 * from anywhere
