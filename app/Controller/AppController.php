@@ -56,6 +56,20 @@ class AppController extends Controller {
         $this->Auth->logoutRedirect = array('controller' => 'users', 'action' => 'login');
         $this->Auth->loginRedirect = array('controller' => 'pages', 'action' => 'display'); // to the home page
 
+		// arcane CORS magic, which is summoned by some FMS AJAX spellcasting
+		if ($this->request->is('options') ) {
+			$cors_allowed = Configure::read('cors_allowed');
+			if ($cors_allowed) {
+				$this->response->header('Access-Control-Allow-Origin', $cors_allowed);
+				$this->response->header('Access-Control-Allow-Credentials', 'true');
+				$this->response->header('Access-Control-Allow-Headers', 'Origin, Accept, Authorization, Content-Type,  Depth,  User-Agent,	X-File-Size,  X-Requested-With,	 If-Modified-Since,	 X-File-Name,  Cache-Control');
+				$this->response->header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+				$this->response->send();
+				// otherwise it sends things that upset the CORS pre-flight request
+				exit();
+			}
+		}
+
 		// make current user available across the whole application
 		App::import('Model', 'User');
 		User::store($this->Auth->user());

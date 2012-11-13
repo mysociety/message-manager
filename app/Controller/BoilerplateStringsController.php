@@ -17,17 +17,6 @@ class BoilerplateStringsController extends AppController {
 		// currently allow JSON API access without any auth, since this isn't sensitive data (yet?)
 		if ($this->RequestHandler->accepts('json')) {
 		 	$this->Auth->allow('index');
-		}
-		if ( $this->request->is('options') ) {
-			$this->response->header('Access-Control-Allow-Origin', Configure::read('cors_allowed'));
-			$this->response->header('Access-Control-Allow-Credentials', 'true');
-			$this->response->header('Access-Control-Allow-Headers', 'Origin, Accept, Authorization, Content-Type,  Depth,  User-Agent,	X-File-Size,  X-Requested-With,	 If-Modified-Since,	 X-File-Name,  Cache-Control');
-			$this->response->header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-			$this->response->send();
-			// otherwise it send things that upset the CORS pre-flight request
-			exit();
-		}
-		if ($this->RequestHandler->accepts('json')) {
 			$this->response->header('Access-Control-Allow-Origin', Configure::read('cors_allowed'));
 		}
 	}

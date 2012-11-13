@@ -26,16 +26,6 @@ class MessagesController extends AppController {
 			'unlock_all',
 			);
 
-		if ( $this->request->is('options') ) {
-			$this->response->header('Access-Control-Allow-Origin', Configure::read('cors_allowed'));
-			$this->response->header('Access-Control-Allow-Credentials', 'true');
-			$this->response->header('Access-Control-Allow-Headers', 'Origin, Accept, Authorization, Content-Type,  Depth,  User-Agent,	X-File-Size,  X-Requested-With,	 If-Modified-Since,	 X-File-Name,  Cache-Control');
-			$this->response->header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-			$this->response->send();
-			// otherwise it send things that upset the CORS pre-flight request
-			exit();
-		}
-
 		// would prefer to try Form first, because Basic logins stick in htauth
 		// but contrary to expectations, that doesn't seem to be working (?)
 		if ($this->RequestHandler->accepts('json')) {
