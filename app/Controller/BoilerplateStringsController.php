@@ -33,6 +33,9 @@ class BoilerplateStringsController extends AppController {
 				'fields' => array('BoilerplateString.id', 'BoilerplateString.text_value', 'BoilerplateString.lang'),
 				'conditions' => $conditions
 			));
+			$langs = array_keys($entries);
+			sort($langs);
+			$entries['langs'] = $langs;
 			$this->response->body( json_encode(self::mm_json_response(true, $entries, null)) );
 			return $this->response;
 		}
