@@ -96,7 +96,8 @@ CREATE TABLE message_sources (
   ip_addresses text,
   user_id integer default null,
   created timestamp default null,
-  modified timestamp default null
+  modified timestamp default null,
+  remote_id varchar(64) default null
 );
 
 CREATE TABLE statuses (
