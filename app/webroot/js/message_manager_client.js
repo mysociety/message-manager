@@ -71,7 +71,7 @@ var message_manager = (function() {
     var $boilerplate_replies;
 
     var no_config_err_msg = "Config error: no Message Manager URL has been specified";
-    
+
     var config = function(settings) {
         var selectors = {
             message_list_selector:    '#mm-message-list',
@@ -112,9 +112,9 @@ var message_manager = (function() {
         $htauth_password = $(selectors.htauth_password_selector);
         $hide_reasons = $(selectors.boilerplate_hide_reasons);
         $boilerplate_replies = $(selectors.boilerplate_replies);
-        if (typeof settings.url_root === 'string' && _url_root.length==0) {
+        if (typeof settings.url_root === 'string' && _url_root.length===0) {
             say_status(no_config_err_msg);
-        };
+        }
     };
 
     // btoa doesn't work on all browers?
@@ -155,7 +155,7 @@ var message_manager = (function() {
     var show_login_form = function(suggest_username) {
         $('.mm-msg', $message_list_element).remove(); // remove (old) messages
         if ($htauth_username.size() && ! $htauth_username.val()) {
-            $htauth_username.val(suggest_username)
+            $htauth_username.val(suggest_username);
         }
         $login_element.stop().slideDown();
     };
@@ -225,7 +225,21 @@ var message_manager = (function() {
         return $litem;
     };
     
-    var show_available_messages = function(data) {
+    var show_available_messages = function(data, anim_duration) {
+        var messages = data.messages;
+        _username = data.username;
+        var $output = $message_list_element;
+        if (anim_duration > 0) {
+            $output.stop().fadeOut(anim_duration, function(){
+                render_available_messages(data, anim_duration);
+            });
+        } else {
+            render_available_messages(data, anim_duration);
+        }
+    };
+    
+    // render allows animation (if required) to hide messages before repainting and then revealing them
+    var render_available_messages = function(data, anim_duration) {
         var messages = data.messages;
         _username = data.username;
         var $output = $message_list_element;
@@ -242,6 +256,9 @@ var message_manager = (function() {
             }
         } else {
             $output.html('<p>No messages (server did not send a list).</p>');
+        }
+        if (anim_duration > 0) {
+            $output.slideDown(anim_duration);
         }
     };
 
@@ -274,9 +291,11 @@ var message_manager = (function() {
 
     // gets messages or else requests login
     // options: suggest_username, if provided, is preloaded into the login form if provided
+    //          anim_duration: duration of fade/reveal (0, by defaut, does no animation)
     var get_available_messages = function(options) {
         var base_auth = get_current_auth_credentials();
         var suggest_username = "";
+        var anim_duration = 0;
         var callback = null;
         if (options) {
             if (typeof(options.callback) === 'function') {
@@ -285,13 +304,19 @@ var message_manager = (function() {
             if (typeof options.suggest_username === 'string') {
                 suggest_username = options.suggest_username;
             }
+            if (typeof options.anim_duration === 'string' || typeof options.anim_duration === 'number') {
+                anim_duration = parseInt(options.anim_duration, 10);
+                if (isNaN(anim_duration)) {
+                    anim_duration = 0;
+                }
+            }
         }
         if (base_auth === "") {
             show_login_form(suggest_username);
             return;
         }
         $login_element.stop().hide();
-        if (_url_root.length == 0) {
+        if (_url_root.length === 0) {
             say_status(no_config_err_msg);
         } else {
             $.ajax({
@@ -303,7 +328,7 @@ var message_manager = (function() {
                     xhr.withCredentials = true;
                 },
                 success:  function(data, textStatus) {
-                              show_available_messages(data);
+                              show_available_messages(data, anim_duration);
                               if (typeof(callback) === "function") {
                                   callback.call($(this), data); // execute callback
                               }
@@ -324,7 +349,7 @@ var message_manager = (function() {
                                 say_status(err_msg);
                             }
                           }
-            });    
+            });
         }
     };
 
@@ -563,8 +588,7 @@ var message_manager = (function() {
         }
         $.ajax({
             dataType:"json", 
-            type:"post", 
-            data: {lang: 'en', boilerplate_type: boilerplate_type},
+            type:"get",
             url: _url_root +"boilerplate_strings/index/" + boilerplate_type + ".json",
             success:function(data, textStatus) {
                 if (data.success) {
@@ -578,13 +602,13 @@ var message_manager = (function() {
                          callback.call($(this), data.data); 
                      }
                 } else {
-                    // fail silently; console.log("failed to load boilerplate");
+                    // console.log("failed to load boilerplate");
                 }
             }, 
             error: function(jqXHR, textStatus, errorThrown) {
-                // fail silently: console.log("boilerplate error: " + textStatus + ": " + errorThrown);
+                // console.log("boilerplate error: " + textStatus + ": " + errorThrown);
             }
-        })
+        });
     };
 
     // TODO flatten all HTML in boilerplate text
@@ -592,23 +616,27 @@ var message_manager = (function() {
         var html = "<option value=''>--none--</option>\n";
         var qty_langs = 0;
         var qty_strings = 0;
-        for (var lang in boilerplate_data) {qty_langs++;} // not lovely
-        for (var lang in boilerplate_data) {
-            var options = "";
-            for (var i in boilerplate_data[lang]) {
-                options += "<option>" + boilerplate_data[lang][i] + "</option>\n";
-                qty_strings++;
+        if (boilerplate_data.langs) {
+            for (var i=0; i< boilerplate_data.langs.length; i++) {
+                var lang = boilerplate_data.langs[i];
+                var options = "";
+                for (var j in boilerplate_data[lang]) {
+                    if (boilerplate_data[lang].hasOwnProperty(j)) {
+                        options += "<option>" + boilerplate_data[lang][j] + "</option>\n";
+                        qty_strings++;
+                    }
+                }
+                if (boilerplate_data.langs.length > 1) { // really need pretty name for language
+                    options = '<optgroup label="' + lang + '">\n' + options + '</optgroup>\n';
+                }
+                html += options;
             }
-            if (qty_langs > 1) { // really need pretty name for language
-                options = '<optgroup label="' + lang + '">\n' + options + '</optgroup>\n';
-            }
-            html += options;
         }
-        if (qty_strings == 0) {
+        if (qty_strings === 0) {
             html = '';
         }
         return html;
-    }
+    };
     
     // actually load the select tag
     var populate_boilerplate = function(boilerplate_type, html) {
@@ -624,7 +652,7 @@ var message_manager = (function() {
                 $target.hide();
             }
         }
-    }
+    };
     
     // revealed public methods:
     return {
