@@ -66,6 +66,10 @@ $config = array(
 	/*-----------------------------------------------
 	 * Comma seperated list of sites that can access the
 	 * JSON API
+	 * Note that this will typically be the same URL as
+	 * your fms_site_url, above.
+	 * Be careful here: CORS is unforgivingly precise.
+	 * Include protocol, no trailing slash.
 	 *-----------------------------------------------*/
 	'cors_allowed' => 'http://www.fixmystreet.com',
 	

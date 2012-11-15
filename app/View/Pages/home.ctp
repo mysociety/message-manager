@@ -39,10 +39,29 @@
 				?>
 			</dd>
 			<dt>
+				CORS URL
+			</dt>
+			<dd>
+				<?php 
+					$cors_url = Configure::read('cors_allowed'); 
+					if (empty($cors_url)) {
+						echo "<i>none: no CORS requests allowed</i>";
+					} else {
+						echo $this->Html->link($cors_url, $cors_url, array('class'=>'no-decoration'));
+					}
+				?>
+			</dd>
+			<dt>
 				Lock expiry
 			</dt>
 			<dd>
 				<?php echo Configure::read('lock_expiry_seconds'); ?> seconds
+			</dd>
+			<dt>
+				Autodetect reply period
+			</dt>
+			<dd>
+				<?php echo Configure::read('autodetect_reply_period'); ?>
 			</dd>
 		</dl>
 	</div>
