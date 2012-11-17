@@ -69,9 +69,15 @@ class NetcastShell extends AppShell {
 						'default' => false
 					),
 					'dry-run' => array(
-						'help' => __('Don\'t send any messages, or update the database: just see what would be sent', NetCastShell::$RETRY_LIMIT), 
+						'help' => __('Don\'t send any messages or update the database: just see what would be sent', NetCastShell::$RETRY_LIMIT), 
 						'boolean' => true,
 						'short' => 'd',
+						'default' => false
+					),
+					'no-mask' => array(
+						'help' => __('Don\'t use the mask when sending (which is currently "%s")', NetCastShell::$NETCAST_MASK), 
+						'boolean' => true,
+						'short' => 'M',
 						'default' => false
 					),
 				),
@@ -185,10 +191,11 @@ class NetcastShell extends AppShell {
 		if ($this->params['dry-run']) {
 			$this->print_dry_run_notice();
 		}
+		$mask_msg = $this->params['no-mask']? "no mask" : __("mask=\"%s\"", NetCastShell::$NETCAST_MASK);
 		$source = $this->get_message_source($this->args[0]);
 		$ms = $source['MessageSource'];
-		$this->out(__("Sending outgoing messages to message source \"%s\" with mask \"%s\"",
-			$ms['name'], NetCastShell::$NETCAST_MASK), 1, Shell::VERBOSE);
+		$this->out(__('Sending outgoing messages to message source "%s" with %s',
+			$ms['name'], $mask_msg), 1, Shell::VERBOSE);
 		$this->check_url($ms);
 		$conditions = array(
 			'Message.status' => Status::$STATUS_PENDING,
@@ -226,15 +233,18 @@ class NetcastShell extends AppShell {
 						$msgs_sent++;
 						continue;
 					}
-					$ret_val = $this->call_netcast_function($netcast, "SENDSMS", array(
-						$msg['Message']['to_address'], $msg['Message']['message'], $ms['remote_id'], $netcast_mask
-					));
+					$params_array = array( $msg['Message']['to_address'], $msg['Message']['message'], $ms['remote_id'] );
+					if (! $this->params['no-mask']) {
+						$params_array[] = $netcast_mask;
+					}
+					$ret_val = $this->call_netcast_function($netcast, "SENDSMS", $params_array);
 					$this->Message->id = $msg['Message']['id'];
 					$transaction_id = $ret_val;
 					if (preg_match('/^\d+$/', $ret_val)) { // sent OK 'cos we got a numeric transaction id back
 						$this->Message->set('status', Status::$STATUS_SENT);
 						$this->Message->set('external_id', $transaction_id);
 						$this->Message->set('send_fail_count', 0); // reset so we can re-use for get-status
+						$this->Message->set('replied', $this->timestamp()); // all MM outgoing messages are "replies"
 						if ($this->Message->save()) {
 							$msgs_sent++;
 							$this->out(__("   Sent and updated OK"), 1, Shell::VERBOSE);
@@ -249,7 +259,7 @@ class NetcastShell extends AppShell {
 						$ret_val = MessageSource::decode_netcast_retval($ret_val);
 						$last_err_msg = __("Gateway did not return a transaction id: %s", $ret_val); 
 						$this->Message->set('send_fail_count', $msg['Message']['send_fail_count']+1);
-						$this->Message->set('send_failed_at', date('Y-m-d H:i:s', time()));
+						$this->Message->set('send_failed_at', $this->timestamp());
 						$this->Message->set('send_fail_reason', $ret_val);
 						if ($this->Message->save()) {
 							$this->log_action($msg['Message']['id'], __("failed to send to gateway %s", $ms['name']));
@@ -352,7 +362,7 @@ class NetcastShell extends AppShell {
 						$last_err_msg = __("Gateway error (message id=%s/%s): %s", 
 							$msg['Message']['id'], $msg['Message']['external_id'], $ret_val);
 						$this->Message->set('send_fail_count', $msg['Message']['send_fail_count']+1);
-						$this->Message->set('send_failed_at', date('Y-m-d H:i:s', time()));
+						$this->Message->set('send_failed_at', $this->timestamp());
 						$this->Message->set('send_fail_reason', "[GETMSGSTATUS]: $ret_val");
 						$this->out($last_err_msg, 1, Shell::NORMAL);
 					} else {
@@ -418,6 +428,10 @@ class NetcastShell extends AppShell {
 		}		
 	}
 	
+	private function timestamp() {
+		return date('Y-m-d H:i:s', time());
+	}
+
 	private function log_action($id, $note, $transaction_id=null) {
 		$action = new Action;
 		$params = array(
