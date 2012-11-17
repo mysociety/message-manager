@@ -187,7 +187,8 @@ class NetcastShell extends AppShell {
 		}
 		$source = $this->get_message_source($this->args[0]);
 		$ms = $source['MessageSource'];
-		$this->out(__("Sending outgoing messages to message source \"%s\"", $ms['name']), 1, Shell::VERBOSE);
+		$this->out(__("Sending outgoing messages to message source \"%s\" with mask \"%s\"",
+			$ms['name'], NetCastShell::$NETCAST_MASK), 1, Shell::VERBOSE);
 		$this->check_url($ms);
 		$conditions = array(
 			'Message.status' => Status::$STATUS_PENDING,
