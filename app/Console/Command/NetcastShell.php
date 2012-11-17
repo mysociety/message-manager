@@ -6,7 +6,8 @@
  * netcast gateway_list
  * netcast gateway_test [source-name/id]
  * netcast get_incoming [source-name/id]
- * netcast send_sms 
+ * netcast send_sms [source-name/id]
+ * netcast get_sms_status [source-name/id]
  *
  * Issue with: "cd app & Console/cake netcast gateway_test netcast-gateway"
  * Note that Cake's shells outputs helpful usage info!
@@ -16,7 +17,7 @@ class NetcastShell extends AppShell {
 	public $uses = array('MessageSource', 'Message', 'Status', 'Action', 'ActionType');
 	
 	public static $RETRY_LIMIT = 3;
-	public static $NETCAST_MASK = 'FixMyBgy';
+	public static $NETCAST_MASK = 'FixMyBrgy';  // [sic] note: that's ...Brgy not ...Bgy
 
 	/* suppress output/header message */
 	public function startup() {
@@ -67,11 +68,31 @@ class NetcastShell extends AppShell {
 						'short' => 'd',
 						'default' => false
 					),
-					
 				),
 				'arguments' => $source_id_arg_def
 			)
 		));
+		$parser->addSubcommand('get_sms_status', array(
+			'help' => __('Update status of messages sent to the SMS gateway.'),
+			'parser' => array(
+				'options' => array(
+					'force' => array(
+						'help' => __('Force update even if get status has failed more than %s times', NetCastShell::$RETRY_LIMIT), 
+						'boolean' => true,
+						'short' => 'f',
+						'default' => false
+					),
+					'dry-run' => array(
+						'help' => __('Don\'t update the database or contact the gateway: just see what messages would be checked', NetCastShell::$RETRY_LIMIT), 
+						'boolean' => true,
+						'short' => 'd',
+						'default' => false
+					),
+				),
+				'arguments' => $source_id_arg_def
+			)
+		));
+		
 	    return $parser;
 	}
 	
@@ -205,6 +226,7 @@ class NetcastShell extends AppShell {
 					if (preg_match('/^\d+$/', $ret_val)) { // sent OK 'cos we got a numeric transaction id back
 						$this->Message->set('status', Status::$STATUS_SENT);
 						$this->Message->set('external_id', $transaction_id);
+						$this->Message->set('send_fail_count', 0); // reset so we can re-use for get-status
 						if ($this->Message->save()) {
 							$msgs_sent++;
 							$this->out(__("   Sent and updated OK"), 1, Shell::VERBOSE);
@@ -242,6 +264,113 @@ class NetcastShell extends AppShell {
 		}
 		$this->out(__("Done"), 1, Shell::VERBOSE);
 	}
+	
+	public function get_sms_status() {
+		if ($this->params['dry-run']) {
+			$this->print_dry_run_notice();
+		}
+		$status_lookup = $this->Status->find('list');
+		$source = $this->get_message_source($this->args[0]);
+		$ms = $source['MessageSource'];
+		$this->out(__("Getting SMS statuses for message source \"%s\"", $ms['name']), 1, Shell::VERBOSE);
+		$this->check_url($ms);
+		$conditions = array(
+			'Message.status' => array( Status::$STATUS_SENT, Status::$STATUS_SENT_PENDING ),
+			'Message.is_outbound' => 1,
+			array("NOT" => array("Message.external_id" => null)),
+			array("NOT" => array("Message.to_address" => null))
+		);
+		$statusless_msgs = $this->Message->find('all', array('conditions' => $conditions));
+		$msgs_unknown = count($statusless_msgs);
+		$msgs_checked = 0;
+		$msgs_updated = 0;
+		$msgs_failed = 0;
+		$msgs_skipped = 0;
+		$last_err_msg = "";
+		$this->out(__("Messages with unknown status: %s", $msgs_unknown), 1, Shell::VERBOSE);
+		if (!empty($statusless_msgs)) {
+			if (! $this->params['dry-run']) {
+				$netcast = $this->get_netcast_connection($ms);
+			}
+			foreach ($statusless_msgs as $msg) {
+				$qty_retries = $msg['Message']['send_fail_count']+0;
+				if (!$this->params['force'] && $qty_retries >= NetCastShell::$RETRY_LIMIT) {
+					$msgs_skipped++;
+					$this->out(__(" * Skipping message id=%s (%s attempts, cutoff is %s)", 
+						$msg['Message']['id'], $qty_retries, NetCastShell::$RETRY_LIMIT), 1, Shell::VERBOSE);
+				} else {
+					$retry_no = $qty_retries==0? __('this will be first attempt'):__('this will be no. %s', $qty_retries+1);
+					$this->out(__("  * getting status for id: %s", $msg['Message']['id']), 1, Shell::VERBOSE);
+					$this->out(__("            transaction_id: %s", $msg['Message']['external_id']), 1, Shell::VERBOSE);
+					$this->out(__("            to: %s", $msg['Message']['to_address']), 1, Shell::VERBOSE);
+					$this->out(__("            retries: %s (%s)", $qty_retries, $retry_no), 1, Shell::VERBOSE);
+					$this->out(__("            %s status: %s", 
+						($this->params['dry-run']? 'current':'old'), $msg['Status']['name']), 1, Shell::VERBOSE);
+					if ($this->params['dry-run']) {
+						continue;
+					}
+					$ret_val = $this->call_netcast_function($netcast, "GETMSGSTATUS", array(
+						$msg['Message']['external_id'], $ms['remote_id'],
+					));
+					$new_status = null;
+					$is_success = true; // let's be optimistic 
+					switch (strtoupper($ret_val)) {
+						case 'RETGMS01':
+							$new_status = Status::$STATUS_SENT_PENDING;
+							break;
+						case 'RETGMS02':
+							$new_status = Status::$STATUS_SENT_OK;
+							break;
+						case 'RETGMS03':
+							$new_status = Status::$STATUS_SENT_FAIL;
+							break;
+						case 'RETGMS04': // no such transaction id
+							$new_status = Status::$STATUS_SENT_UNKNOWN;
+							$is_success = false;
+							break;
+						default:
+							$is_success = false;
+					}
+					if ($new_status) {
+						$this->out(__("            new status: %s", strtoupper($status_lookup[$new_status])), 1, Shell::VERBOSE);
+					}
+					$this->Message->id = $msg['Message']['id'];
+					if ($new_status && $new_status != $msg['Message']['status']) {
+						$msgs_updated++;
+						$this->Message->set('status', $new_status);
+					} elseif (! $is_success){
+						$msgs_failed++;
+						$ret_val = MessageSource::decode_netcast_retval($ret_val);
+						$last_err_msg = __("Gateway error (message id=%s/%s): %s", 
+							$msg['Message']['id'], $msg['Message']['external_id'], $ret_val);
+						$this->Message->set('send_fail_count', $msg['Message']['send_fail_count']+1);
+						$this->Message->set('send_failed_at', time());
+						$this->Message->set('send_fail_reason', "[GETMSGSTATUS]: $ret_val");
+						$this->out($last_err_msg, 1, Shell::NORMAL);
+					} else {
+						$this->out(__("    record unchanged (nothing to update)"), 1, Shell::VERBOSE);
+						continue;
+					}
+					if ($this->Message->save()) {
+						$this->out(__("    record updated OK"), 1, Shell::VERBOSE);
+					} else {
+						$this->error("Save failed", __("Message id=%s failed", $msg['Message']['id']));
+					}
+				}
+			}
+		} 
+		$this->out("", 2, Shell::VERBOSE);
+		$this->out(__("Messages to check: %s, checked: %s, updated: %s, failed: %s, skipped: %s", 
+			$msgs_unknown, $msgs_checked, $msgs_updated, $msgs_failed, $msgs_skipped), 1, Shell::NORMAL);
+		if ($this->params['dry-run']) {
+			$this->print_dry_run_notice();
+		}
+		if ($msgs_failed > 0) {
+			$this->error("GETMSGSTATUS fail", __("Messages failed: %s, last message was: %s", $msgs_failed, $last_err_msg));
+		}
+		$this->out(__("Done"), 1, Shell::VERBOSE);
+	}
+	
 	
 	private function print_dry_run_notice() {
 		$this->out("\n", 1, Shell::QUIET);

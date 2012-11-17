@@ -23,6 +23,7 @@ class Status extends AppModel {
 	public static $STATUS_SENT_PENDING = 7;
 	public static $STATUS_SENT_OK      = 8;
 	public static $STATUS_SENT_FAIL    = 9;
+	public static $STATUS_SENT_UNKNOWN = 10;
 
 	// utility method: don't use it, use the constants above
 	public static function getIdByName($status_name) {

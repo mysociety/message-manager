@@ -1,6 +1,6 @@
 /*
  * css produced from source in app/scss/
- * do: scss --watch /path/app/scss/:/path/app/webroot/css/
+ * do: scss --watch app/scss/:app/webroot/css/
  */
 $back_color:           #633;
 $pale_back_color:      #a99;
@@ -173,6 +173,11 @@ body {
     .status-assigned  {background-color: $color_status_assigned }
     .status-hidden    {background-color: $color_status_hidden }
     .status-pending   {background-color: $color_status_pending }
+    .status-sent,
+    .status-sent_ok,
+    .status-sent_pending,
+    .status-sent_fail,
+    .status-sent_unknown {background-color: $color_status_sent }
     dd {
       padding-left: 4px;
     }
