@@ -47,7 +47,13 @@ class NetcastShell extends AppShell {
 						'boolean' => true,
 						'short' => 'a',
 						'default' => false
-					)
+					),
+					'command' => array(
+						'help' => __('Command to use (Netcast allows retrieval from two different mechanisms).'), 
+						'short' => 'c',
+						'default' => 'getsmart',
+						'choices' => array('getsmart', 'getincoming')
+					),
 				),
 				'arguments' => $source_id_arg_def
 			)
@@ -120,10 +126,11 @@ class NetcastShell extends AppShell {
 	public function get_incoming() {
 		$source = $this->get_message_source($this->args[0]);
 		$ms = $source['MessageSource'];
-		$this->out(__("Getting incoming messages from message source \"%s\"", $ms['name']), 1, Shell::VERBOSE);
+		$command = strtoupper($this->params['command']);
+		$this->out(__("Getting incoming messages from message source \"%s\" with %s", $ms['name'], $command), 1, Shell::VERBOSE);
 		$this->check_url($ms);
 		$netcast = $this->get_netcast_connection($ms);
-		$ret_val = $this->call_netcast_function($netcast, "GETINCOMING", array($ms['remote_id']));
+		$ret_val = $this->call_netcast_function($netcast, $command, array($ms['remote_id']));
 		$msgs_received = count($ret_val);
 		$msgs_skipped = 0;
 		$msgs_saved = 0;
