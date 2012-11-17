@@ -20,6 +20,7 @@ INSERT INTO statuses VALUES(6, 'error',        'message send failed');
 INSERT INTO statuses VALUES(7, 'sent_pending', 'delivered to SMS gateway, pending');
 INSERT INTO statuses VALUES(8, 'sent_ok',      'delivered to SMS gateway, sent OK');
 INSERT INTO statuses VALUES(9, 'sent_fail',    'delivered to SMS gateway, send failed');
+INSERT INTO statuses VALUES(10,'sent_unknown', 'delivered to SMS gateway where status cannot be determined');
 
 INSERT INTO groups VALUES(1, 'administrators', '2012-05-25 00:00:00', '2012-05-25 00:00:00');
 INSERT INTO groups VALUES(2, 'managers', '2012-05-25 00:00:00', '2012-05-25 00:00:00');
