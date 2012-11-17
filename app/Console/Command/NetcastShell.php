@@ -248,7 +248,7 @@ class NetcastShell extends AppShell {
 						$ret_val = MessageSource::decode_netcast_retval($ret_val);
 						$last_err_msg = __("Gateway did not return a transaction id: %s", $ret_val); 
 						$this->Message->set('send_fail_count', $msg['Message']['send_fail_count']+1);
-						$this->Message->set('send_failed_at', time());
+						$this->Message->set('send_failed_at', date('Y-m-d H:i:s', time()));
 						$this->Message->set('send_fail_reason', $ret_val);
 						if ($this->Message->save()) {
 							$this->log_action($msg['Message']['id'], __("failed to send to gateway %s", $ms['name']));
@@ -351,7 +351,7 @@ class NetcastShell extends AppShell {
 						$last_err_msg = __("Gateway error (message id=%s/%s): %s", 
 							$msg['Message']['id'], $msg['Message']['external_id'], $ret_val);
 						$this->Message->set('send_fail_count', $msg['Message']['send_fail_count']+1);
-						$this->Message->set('send_failed_at', time());
+						$this->Message->set('send_failed_at', date('Y-m-d H:i:s', time()));
 						$this->Message->set('send_fail_reason', "[GETMSGSTATUS]: $ret_val");
 						$this->out($last_err_msg, 1, Shell::NORMAL);
 					} else {
