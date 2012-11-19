@@ -416,7 +416,13 @@ class NetcastShell extends AppShell {
 	}
 	
 	private function call_netcast_function($conn, $function_name, $param_array) {
-		return $conn->__soapCall($function_name, $param_array); 
+		try {
+			return $conn->__soapCall($function_name, $param_array); 
+		}
+		catch (Exception $e) {
+			$msg = $e->getMessage();
+			$this->error("SOAP call error", empty($msg)? "Unknown problem (no error message was returned)" : $msg );
+		}
 	}
 	
 	private function check_url($message_source) {
