@@ -69,6 +69,7 @@ CREATE TABLE messages (
   assigned timestamp default null,
   lock_expires timestamp default null,
   status smallint not null default '0',
+  status_prev smallint not null default '0',
   owner_id integer default null,
   session_key varchar(255) default null,
   fms_id integer default null,

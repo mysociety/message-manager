@@ -105,6 +105,10 @@ class Message extends AppModel {
 		} else {
 			$this->data['Message']['tag'] = null;
 		}
+		// if status isn't hidden, make sure status_prev is tracking status
+		if (!empty($this->data['Message']['status']) && $this->data['Message']['status'] != Status::$STATUS_HIDDEN) {
+			$this->data['Message']['status_prev'] = $this->data['Message']['status'];
+		}
 		return true;
 	}
 	
@@ -203,9 +207,13 @@ class Message extends AppModel {
 		}
 	}
 		
-	// if a record is unhidden, its status depends on whether or not it has an FMS_id
+	// if a record is unhidden, revert to it's old (pre-hidden) status
+	// There was some logic here that's a little wonky, but keeping it in in case
+	// status_prev fails: its status possibly depends on whether or not it has an FMS_id
 	private function _revert_status() {
-		if (empty($this->data['Message']['fms_id'])) {
+		if (! empty($this->data['Message']['status_prev']) && $this->data['Message']['status_prev'] != Status::$STATUS_HIDDEN) {
+			$this->data['Message']['status'] = $this->data['Message']['status_prev'];
+		} elseif (empty($this->data['Message']['fms_id'])) {
 			$this->data['Message']['status'] = Status::$STATUS_AVAILABLE;
 		} else {
 			$this->data['Message']['status'] = Status::$STATUS_ASSIGNED;
