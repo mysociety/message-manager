@@ -120,6 +120,7 @@ class MessagesController extends AppController {
 				),
 				'fields'	=> self::_json_fields(),
 				'contain' => array('Source', 'Status', 'Lockkeeper'),
+				'order' => array('Message.created ASC'),
 			));
 			if (! empty($subtree)) {
 				$message['children'] = $subtree[0]['children'];

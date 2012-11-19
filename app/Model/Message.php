@@ -69,6 +69,8 @@ class Message extends AppModel {
 		)
 	);
 	
+	public $order = "Message.created DESC";
+	
 	// beforeSave:
 	// * generate sender_token:
 	//   Save a unique-per-from_address token (sender_token) so FMS users can tell when two messages
