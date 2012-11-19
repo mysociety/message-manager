@@ -62,6 +62,14 @@ class BoilerplateStringsController extends AppController {
 		} else {
 			$this->request->data = $this->BoilerplateString->read(null, $id);
 		}
+		$this->set('all_langs', $this->BoilerplateString->find('list', array(
+				'fields' => 'BoilerplateString.lang', 'group' => 'BoilerplateString.lang'
+			)
+		));
+		$this->set('all_types', $this->BoilerplateString->find('list', array(
+				'fields' => 'BoilerplateString.type', 'group' => 'BoilerplateString.type'
+			)
+		));
 	}
 
 	public function delete($id = null) {
@@ -90,6 +98,14 @@ class BoilerplateStringsController extends AppController {
 				$this->Session->setFlash(__('The string could not be saved. Please, try again.'));
 			}
 		}
+		$this->set('all_langs', $this->BoilerplateString->find('list', array(
+				'fields' => 'BoilerplateString.lang', 'group' => 'BoilerplateString.lang'
+			)
+		));
+		$this->set('all_types', $this->BoilerplateString->find('list', array(
+				'fields' => 'BoilerplateString.type', 'group' => 'BoilerplateString.type'
+			)
+		));
 	}
 
 }
