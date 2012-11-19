@@ -126,7 +126,8 @@ class MessagesController extends AppController {
 			}
 		}
 		$this->set('messages', $messages);	
-		$this->set('allowed_tags', $allowed_tags);	
+		$this->set('allowed_tags', $allowed_tags);
+		$this->helpers[] = 'MessageUtils';
 	}
 
 	public function view($id = null) {

@@ -1,8 +1,12 @@
 <div class="mm-messages">
 	<h2>
-		Available Messages
-		<?php if (! empty($pretty_allowed_tags)) {echo "(tags: $pretty_allowed_tags)";} ?>
+		Available Messages (applying user's tags: 
+		<?php echo $this->MessageUtils->pretty_tag_list_html($allowed_tags); ?>)
 	</h2>
+	<p>
+		Specifically, these are the  messages that would be sent in response to the
+		<tt>messages/available</tt> API call (e.g., in a client).
+	</p>
 	<div class="actions inline-buttons">
 		<?php 	
 	echo $this->Html->link(__('All messages'), array('controller' => 'Messages', 'action' => 'index'));
