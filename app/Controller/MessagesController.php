@@ -636,6 +636,10 @@ class MessagesController extends AppController {
 			'user_id' => $this->Auth->user('id'),
 			'message_id' => $this->Message->id,
 		);
+		if (! Configure::read('log_lock_actions') &&
+			($action_type==ActionType::$ACTION_LOCK || $action_type==ActionType::$ACTION_UNLOCK)) {
+				return; // don't log lock activity unless explicitly configured to do so
+		}
 		if ($action_type==ActionType::$ACTION_NOTE) {
 			$params['note'] = $custom_param_1;			
 		} elseif ($action_type==ActionType::$ACTION_REPLY) {

@@ -57,7 +57,12 @@ class Action extends AppModel {
 	}
 
 	function prevent_blank_notes($check) {
-		// Controller::loadModel('ActionType'); // to access static var
+		try {
+			Controller::loadModel('ActionType'); // to access static var
+		} 
+		catch (Exception $e) {
+			// shell can't use Controller::loadModel here, TODO
+		}
 		if ($this->Message->action_type==ActionType::$ACTION_NOTE) {
 			$note = trim($this->Message->note);
 			return(!empty($note));

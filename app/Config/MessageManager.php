@@ -77,7 +77,14 @@ $config = array(
 	 * Period within which a message can be automatically
 	 * considered as a possible reply to a sent message
 	 *-----------------------------------------------*/
-	'autodetect_reply_period' => '1 week'
+	'autodetect_reply_period' => '1 week',
+
+	/*-----------------------------------------------
+	 * logging every lock request is overkill unless
+	 * you're debughing so this should probably be left
+	 * as false
+	 *-----------------------------------------------*/
+	'log_lock_actions' => false
 	
 );
 
