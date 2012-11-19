@@ -78,6 +78,14 @@ class PagesController extends AppController {
 			$title_for_layout = Inflector::humanize($path[$count - 1]);
 		}
 		$this->set('is_logged_in', $this->Auth->loggedIn());
+		$group_id = $this->Auth->user('group_id');
+		Controller::loadModel('Group');
+		$groups = $this->Group->find('list', array(
+				'fields' => 'name',
+				'conditions' => array('id' => $group_id )
+			));
+		$this->set('group_name', array_key_exists($group_id, $groups)? $groups[$group_id ]:"");
+
 		$this->set(compact('page', 'subpage', 'title_for_layout'));
 		$this->render(implode('/', $path));
 	}

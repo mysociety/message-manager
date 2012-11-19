@@ -204,7 +204,7 @@ body {
       }
     }
   }
-  .home-block {
+  .home-block, .mm-login-type {
     margin: 0 0 1.2em 0;
     padding: 0.5em;
     border:1px solid $weak_text_color;
@@ -214,6 +214,10 @@ body {
     dl {
       width: 100%;
     }
+  }
+  .mm-login-type {
+    background-color: $note_bg_color;
+    p {margin: 1em;}
   }
   .inline-buttons {
     width: auto;

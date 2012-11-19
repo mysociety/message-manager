@@ -150,14 +150,18 @@ body {
     display: block;
     padding: 0 0.5em;
     border-left: 6px solid #fff; }
-#container .home-block {
+#container .home-block, #container .mm-login-type {
   margin: 0 0 1.2em 0;
   padding: 0.5em;
   border: 1px solid #666666; }
-  #container .home-block p {
+  #container .home-block p, #container .mm-login-type p {
     margin: 1em 0; }
-  #container .home-block dl {
+  #container .home-block dl, #container .mm-login-type dl {
     width: 100%; }
+#container .mm-login-type {
+  background-color: #ffcccc; }
+  #container .mm-login-type p {
+    margin: 1em; }
 #container .inline-buttons {
   width: auto; }
 #container #footer a {
