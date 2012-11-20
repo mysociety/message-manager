@@ -57,13 +57,12 @@ class Action extends AppModel {
 	}
 
 	function prevent_blank_notes($check) {
-		try {
-			Controller::loadModel('ActionType'); // to access static var
-		} 
-		catch (Exception $e) {
-			// shell can't use Controller::loadModel here, TODO
-		}
-		if ($this->Message->action_type==ActionType::$ACTION_NOTE) {
+		// ActionType::$ACTION_NOTE -- can't use Controller::loadModel('ActionType') here because the shell can't do that
+		// so for now, hardcode it here. I know. TODO -- better way to load ActionType without loadModel, since all we
+		// want is the static vars anyway.
+		// Controller::loadModel('ActionType'); // to access static var
+		$HARDCODED_ACTION_NOTE = 7;
+		if ($this->Message->action_type==$HARDCODED_ACTION_NOTE) {
 			$note = trim($this->Message->note);
 			return(!empty($note));
 		} else {
