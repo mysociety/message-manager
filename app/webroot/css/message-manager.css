@@ -213,6 +213,7 @@ body {
   -webkit-user-select: none;
   user-select: none; }
 #container div.mm-string-choices {
+  display: none;
   float: right;
   margin-bottom: -2em; }
   #container div.mm-string-choices a {
