@@ -12,6 +12,8 @@
  * Issue with: "cd app & Console/cake netcast gateway_test netcast-gateway"
  * Note that Cake's shells outputs helpful usage info!
  *
+ * Dependency: SOAP calls are made made with nusoap
+ *             http://sourceforge.net/projects/nusoap/
  *----------------------------------------------------------------*/
 class NetcastShell extends AppShell {
 	public $uses = array('MessageSource', 'Message', 'Status', 'Action', 'ActionType');
@@ -53,6 +55,13 @@ class NetcastShell extends AppShell {
 						'short' => 'c',
 						'default' => 'getsmart',
 						'choices' => array('getsmart', 'getincoming')
+					),
+					'x-debug' => array(
+						'help' => __('Debugging: use pretend results instead of calling the gateway (like a dry run, ' .
+										'but this will update the database with a fake message): DO NOT USE IN PRODUCTION!'), 
+						'short' => 'X',
+						'boolean' => true,
+						'default' => false
 					),
 				),
 				'arguments' => $source_id_arg_def
@@ -133,41 +142,80 @@ class NetcastShell extends AppShell {
 		$source = $this->get_message_source($this->args[0]);
 		$ms = $source['MessageSource'];
 		$command = strtoupper($this->params['command']);
-		$this->out(__("Getting incoming messages from message source \"%s\" with %s", $ms['name'], $command), 1, Shell::VERBOSE);
+		if ($this->params['x-debug']) {
+			$this->print_x_debug_notice();
+			$this->out(__("Faking incoming messages from message source \"%s\" with %s (not really connecting)", $ms['name'], $command), 1, Shell::VERBOSE);
+		} else {
+			$this->out(__("Getting incoming messages from message source \"%s\" with %s", $ms['name'], $command), 1, Shell::VERBOSE);
+		}
 		$this->check_url($ms);
-		$netcast = $this->get_netcast_connection($ms);
-		$ret_val = $this->call_netcast_function($netcast, $command, array($ms['remote_id']));
+		if (! $this->params['x-debug']) {
+			$netcast = $this->get_netcast_connection($ms);
+			$ret_val = $this->call_netcast_function($netcast, $command, array($ms['remote_id']));
+		} else {
+			$random_number = rand(1000, 9999);
+			$ret_val = array(
+				0 => array('min' => '55599999', 'msg' => "TEST MESSAGE by NetcastShell: get_incoming --x-debug: $random_number")
+			);
+		}
 		$msgs_received = count($ret_val);
 		$msgs_skipped = 0;
 		$msgs_saved = 0;
 		$msgs_failed = 0;
 		if (is_array($ret_val)) {
 			$this->out(__("Received incoming messages: %s", $msgs_received), 1, Shell::VERBOSE);
-			foreach ($ret_val as $msg) {
-				$this->out(__("Processing message: [%s] %s", $msg['min'], $msg['msg']), 1, Shell::VERBOSE);
-				// checking for existing messages is a wee bit tricky cos the tag might need to be removed *sigh*
-				$conditions = array('Message.from_address' => $msg['min']);
-				$tag_data = Message::separate_out_tags($msg['msg']);
-				foreach ($tag_data as $key => $value) {
-					$conditions["Message.$key"] = $value;
-				}
-				$existing_msg = $this->Message->find('first', array('conditions' => $conditions, 'fields' => array('id')));
-				if (! ($this->params['allow-dups'] || empty($existing_msg))) {
-					$msgs_skipped++;
-					$this->out(__(" * Skipping (message already exists in database with id=%s)", $existing_msg['Message']['id']), 1, Shell::VERBOSE);
-				} else {
-					$this->Message->create();
-					$this->Message->set('from_address', $msg['min']);
-					$this->Message->set('message', $msg['msg']);
-					$this->Message->set('source_id', $ms['id']);
-					$this->Message->set('is_outbound', 0);
-					$this->Message->set('status', Status::$STATUS_AVAILABLE);
-					if ($this->Message->save()) {
-						$msgs_saved++;
-						$this->out(__(" * Saved OK"), 1, Shell::VERBOSE);
+			if ($msgs_received==0) {
+				$this->out(__("Returned array contains no messages"), 1, Shell::VERBOSE);
+			} else {
+				foreach ($ret_val as $key => $msg) {
+					// contrary to the PHP example in Netcast's own docs (grr), $msg is not an array,
+					// it's a stdClass object, i.e., access with $msg->min and $msg->msg
+					if (is_array($msg)) {
+						$message_from = $msg['min'];
+						$message_text = $msg['msg'];
 					} else {
-						$msgs_failed++;
-						$this->out(__(" * Saved FAILED"), 1, Shell::NORMAL);
+						try {
+							$message_from = $msg->min;
+							$message_text = $msg->msg;
+						} 
+						catch (Exception $e) {
+							$err_msg = $e->getMessage();
+							$this->out(__("Unexpected error: returned message was not in expected form (dump follows): %s", $err_msg), 1, Shell::QUIET);
+							print_r($msg);
+							$this->out(__("Can't continue processing this message; skipping..."), 2, Shell::QUIET);
+							continue;
+						}
+					}
+					$this->out(__("Processing message %s: [%s] %s", $key, $message_from, $message_text), 1, Shell::VERBOSE);
+					// NB there's a [timestamp] value in $msg data which wasn't in the Netcast docs, but which may be necessary here?
+					$conditions = array('Message.from_address' => $message_from);
+					// checking for existing messages is a wee bit tricky cos the tag might need to be removed first
+					$tag_data = Message::separate_out_tags($message_text);
+					foreach ($tag_data as $key => $value) {
+						$conditions["Message.$key"] = $value;
+					}
+					$existing_msg = $this->Message->find('first', array('conditions' => $conditions, 'fields' => array('id')));
+					if (! ($this->params['allow-dups'] || empty($existing_msg))) {
+						$msgs_skipped++;
+						$this->out(__(" * Skipping (message already exists in database with id=%s)", $existing_msg['Message']['id']), 1, Shell::VERBOSE);
+					} else {
+						$this->Message->create();
+						$this->Message->set('from_address', $message_from);
+						$this->Message->set('message', $message_text);
+						$this->Message->set('source_id', $ms['id']);
+						$this->Message->set('is_outbound', 0);
+						$this->Message->set('status', Status::$STATUS_AVAILABLE);
+						if ($this->Message->save()) {
+							$msgs_saved++;
+							$this->out(__(" * Saved OK"), 1, Shell::VERBOSE);
+						} else {
+							$msgs_failed++;
+							$this->out(__(" * Saved FAILED"), 1, Shell::NORMAL);
+							// dump this data out because we can't easily retrieve it again, and db fail suggests a crisis
+							$this->out(__(" *    --- dumping message:"), 1, Shell::QUIET);
+							$this->out(__(" *    --- from: %s", $message_from), 1, Shell::QUIET);
+							$this->out(__(" *    --- text: %s", $message_text), 2, Shell::QUIET);
+						}
 					}
 				}
 			}
@@ -177,6 +225,9 @@ class NetcastShell extends AppShell {
 		} else {
 			$ret_val = MessageSource::decode_netcast_retval($ret_val);
 			$this->error("GETINCOMING fail", __("Gateway did not respond with a list: %s", $ret_val));
+		}
+		if ($this->params['x-debug']) {
+			$this->print_x_debug_notice();
 		}
 	}
 	
@@ -397,6 +448,13 @@ class NetcastShell extends AppShell {
 		$this->out(__("***---------------------------------------------------------***"), 2, Shell::QUIET);
 	}
 
+	private function print_x_debug_notice() {
+		$this->out("\n", 1, Shell::QUIET);
+		$this->out(__("***------------------------------------------------------------***"), 1, Shell::QUIET);
+		$this->out(__("*** this is a X-DEBUG RUN: records updated with FAKE MESSAGES! ***"), 1, Shell::QUIET);
+		$this->out(__("***------------------------------------------------------------***"), 2, Shell::QUIET);
+	}
+
 	private function get_message_source($id_or_name) {
 		$source = null;
 		if (preg_match('/^\d+$/', $id_or_name)) {
@@ -412,7 +470,7 @@ class NetcastShell extends AppShell {
 	
 	private function get_netcast_connection($ms) {
 		require_once("nusoap/nusoap.php");
-		return new SoapClient($ms['url']);
+		return new SoapClient($ms['url'], array('features' => SOAP_SINGLE_ELEMENT_ARRAYS));
 	}
 	
 	private function call_netcast_function($conn, $function_name, $param_array) {
@@ -420,8 +478,8 @@ class NetcastShell extends AppShell {
 			return $conn->__soapCall($function_name, $param_array); 
 		}
 		catch (Exception $e) {
-			$msg = $e->getMessage();
-			$this->error("SOAP call error", empty($msg)? "Unknown problem (no error message was returned)" : $msg );
+			$err_msg = $e->getMessage();
+			$this->error("SOAP call error", empty($err_msg)? "Unknown problem (no error message was returned)" : $err_msg );
 		}
 	}
 	
