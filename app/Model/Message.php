@@ -69,7 +69,7 @@ class Message extends AppModel {
 		)
 	);
 	
-	public $order = "Message.created DESC";
+	// public $order = "Message.created DESC";
 	
 	// beforeSave:
 	// * generate sender_token:
