@@ -200,8 +200,13 @@ var message_manager = (function() {
         $login_element.stop().slideDown();
     };
 
-    var say_status = function (msg) {
+    var say_status = function (msg, show_spinner) {
         if ($status_element) {
+            if (show_spinner) {
+                $status_element.addClass('mm-spinner');
+            } else {
+                $status_element.removeClass('mm-spinner');
+            }
             $status_element.stop().show().text(msg);
         }
     };
@@ -310,11 +315,11 @@ var message_manager = (function() {
             var $li = $(this).closest('li');
             var id = $li.attr('id').replace(_msg_prefix, '');
             if ($li.hasClass('msg-is-locked')) {
-                say_status(get_msg(msg_trying_for_lock));
+                say_status(get_msg(msg_trying_for_lock), true);
             } else if ($li.hasClass('msg-is-owned')) {
-                say_status(get_msg(msg_checking_lock));
+                say_status(get_msg(msg_checking_lock), true);
             } else {
-                say_status(get_msg(msg_claiming_lock));
+                say_status(get_msg(msg_claiming_lock), true);
             }
             request_lock(id, options);
         });
@@ -359,6 +364,7 @@ var message_manager = (function() {
         if (_url_root.length === 0) {
             say_status(msg_no_config_err);
         } else {
+            say_status("fetching messages...", true);
             $.ajax({
                 dataType: "json", 
                 type:     "post", 

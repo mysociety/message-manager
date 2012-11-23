@@ -468,11 +468,16 @@ body {
     #mm-status-message-container {
       min-height: 1.4em;
       margin: 0 0 8px 0;
-      padding: 8px 4px;
+      padding: 8px 4px 8px 24px;
       border: 1px solid #a99;
       background-color: #fcfcfc;
       color: #caa;
       font-style: italic;
+      &.mm-spinner {
+        background-image:url(/img/fmb-spinner-16x16.gif);
+        background-repeat: no-repeat;
+        background-position: 4px 8px;
+      }
     }
   }
   
