@@ -27,7 +27,8 @@ $config = array(
 	 * This was necessary for Netcast.
 	 *-----------------------------------------------*/
 	'strip_prefix_tags' => array(
-		'FIXMYBRGY'
+		'FIXMYBRGY',
+		'FMB'
 	),
 
 	/*-----------------------------------------------
