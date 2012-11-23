@@ -5,12 +5,12 @@ $config = array(
 	 * tags:
 	 * if messages come in with these prefixes, 
 	 * store it as the message tag.
+	 * (case independent)
 	 *-----------------------------------------------*/
     'tags' => array(
         'LUZ' => "Barangay Luz",
         'BSN' => "Barangay Basak San Nicolas"
     ),
-
 
 	/*-----------------------------------------------
 	 * If a tag is found, should it be removed from 
@@ -19,6 +19,16 @@ $config = array(
 	 *   1 = yes
 	 *-----------------------------------------------*/
 	'remove_tags_when_matched' => 1,
+
+	/*-----------------------------------------------
+	 * If any of the following prefix tags are found, 
+	 * strip them from the start of the message
+	 * (case independent)
+	 * This was necessary for Netcast.
+	 *-----------------------------------------------*/
+	'strip_prefix_tags' => array(
+		'FIXMYBRGY'
+	),
 
 	/*-----------------------------------------------
 	 * The symbol that is used to explicitly match a 

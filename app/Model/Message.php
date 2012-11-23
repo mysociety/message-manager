@@ -285,8 +285,13 @@ class Message extends AppModel {
 	// )
 	// If there are many tags, better to use a lookup rather than iterate through all $tags
 	public static function separate_out_tags($message_text) {
-		$tags = Configure::read('tags');
+		$prefix_tags = Configure::read('strip_prefix_tags');
+		foreach ($prefix_tags as $p) {
+			$pattern = '/^\s*' . $p . '\s*\b/i';
+			$message_text = preg_replace($pattern, "", $message_text);
+		}
 		$ret_val = array('message' => $message_text);
+		$tags = Configure::read('tags');
 		foreach ($tags as $tag => $desc) {
 			$pattern = '/^\s*' . $tag . '\s*\b/i';
 			if (preg_match($pattern, $message_text)) {
