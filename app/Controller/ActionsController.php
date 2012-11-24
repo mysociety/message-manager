@@ -12,8 +12,38 @@ class ActionsController extends AppController {
 	    $this->Auth->deny('');
 	}
 	
-    public function index() {
+    public function index($type = null) {
+		$type = strtolower($type);
+		Controller::loadModel('ActionType');
+		$action_types_found = $this->ActionType->find(
+			'all', 
+			array('order' => array('ActionType.name ASC'))
+		);
+		$action_type_id = null;
+		$action_types = array();
+		$conditions = array();
+		$title = __("Activity (all types)");
+		$action_type_found = $type == false;
+		$subtitle = "Showing all types of activity.";
+		foreach ($action_types_found as $at) {
+			$action_type = $at['ActionType'];
+			$action_types[$action_type['name']] = $action_type['description'];
+			if ($type && $type == strtolower($action_type['name'])) {
+				$action_type_found = true;
+				$conditions = array('Action.type_id' => $action_type['id']);
+				$title = __("\"%s\" Activity: %s", $type, strtolower($action_type['description']));
+			} 
+		}
+		if ($type && ! $action_type_found) {
+			throw new NotFoundException(__('No such action type (%s)', $type));
+		}
+		$this->paginate = array(
+			'conditions' => $conditions
+		);
+		$this->set('action_types', $action_types);
 		$this->set('actions', $this->paginate());
+		$this->set('title', $title);
+		$this->set('subtitle', $subtitle);
     }
 
     public function view($id = null) {
@@ -33,7 +63,7 @@ class ActionsController extends AppController {
 		}
 		$this->Action->id = $id;
 		if (!$this->Action->exists()) {
-			throw new NotFoundException(__('Invalid user'));
+			throw new NotFoundException(__('No such action'));
 		}
 		if ($this->Action->delete()) {
 			$this->Session->setFlash(__('Action deleted'));

@@ -286,10 +286,8 @@ body {
     }
   }
   
-  div.mm-string-choices {
-    display: none; //  revealed by jquery only if they're enabled
+  div.mm-string-choices, div.mm-action-choices {
     float: right;
-    margin-bottom: -2em; // grotesque bodge
     a {
       display: inline-block;
       padding: 0.2em 0.5em;
@@ -299,7 +297,13 @@ body {
         background-color: $dummy_back_color;
       }
     }
+    margin-bottom: 2em;
   }
+  div.mm-string-choices {
+    display: none; //  revealed by jquery only if they're enabled
+    margin-bottom: -2em; // grotesque bodge
+  }
+  
   
   // dummy client is for testing/playing 
   .dummy-client {

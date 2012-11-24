@@ -1,5 +1,22 @@
 <!-- unusual admin view: normal users only see actions in context of messages -->
-<h2>Activity</h2>
+<h2><?php echo($title); ?></h2>
+<p><strong>
+	<?php if (count($actions)==0) { 
+ 		echo(__("No actions found."));
+	} else {
+		echo(__("Actions found: %s", count($actions)));
+	} ?>
+</strong></p>
+<div class="mm-action-choices">
+	Types available:
+	<?php 
+		echo $this->Html->link(__('all'), array('action' => 'index'), 
+			array('title' => 'activity of all types', 'style' => 'border-width:2px'));
+		foreach ($action_types as $name => $desc) {
+			echo $this->Html->link($name, array('action' => 'index', $name), array('title' => $desc));
+		}
+	?>
+</div>
 <table>
 	<tr>
 		<th><?php echo $this->Paginator->sort('created');?></th>
