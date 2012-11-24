@@ -203,11 +203,12 @@ var message_manager = (function() {
     var say_status = function (msg, show_spinner) {
         if ($status_element) {
             if (show_spinner) {
-                $status_element.addClass('mm-spinner');
+                // slow fade in so that spinner only appears if there's a long delay
+                $status_element.find('#mm-spinner').stop().fadeIn(1200);
             } else {
-                $status_element.removeClass('mm-spinner');
+                $status_element.find('#mm-spinner').stop().hide();
             }
-            $status_element.stop().show().text(msg);
+            $status_element.stop().show().find('p').text(msg);
         }
     };
 
@@ -364,7 +365,7 @@ var message_manager = (function() {
         if (_url_root.length === 0) {
             say_status(msg_no_config_err);
         } else {
-            say_status("fetching messages...", true);
+            say_status("Fetching messages...", true);
             $.ajax({
                 dataType: "json", 
                 type:     "post", 
@@ -375,6 +376,7 @@ var message_manager = (function() {
                 },
                 success:  function(data, textStatus) {
                               show_available_messages(data, anim_duration);
+                              say_status("Fetching messages... done, OK", false); // loaded OK
                               if (typeof(callback) === "function") {
                                   callback.call($(this), data); // execute callback
                               }

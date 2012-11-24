@@ -374,6 +374,7 @@ body {
     #container .dummy-client #assign-fms-container input[type=submit] {
       margin-top: 1em; }
   #container .dummy-client #mm-status-message-container {
+    position: relative;
     min-height: 1.4em;
     margin: 0 0 8px 0;
     padding: 8px 4px 8px 24px;
@@ -381,10 +382,14 @@ body {
     background-color: #fcfcfc;
     color: #caa;
     font-style: italic; }
-    #container .dummy-client #mm-status-message-container.mm-spinner {
-      background-image: url(/img/fmb-spinner-16x16.gif);
-      background-repeat: no-repeat;
-      background-position: 4px 8px; }
+    #container .dummy-client #mm-status-message-container p {
+      margin: 0;
+      padding: 0; }
+    #container .dummy-client #mm-status-message-container #mm-spinner {
+      position: absolute;
+      left: 4px;
+      top: 10px;
+      display: none; }
 
 .cake-sql-log {
   margin-top: 2em;

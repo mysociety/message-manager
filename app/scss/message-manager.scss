@@ -466,6 +466,7 @@ body {
       }
     }
     #mm-status-message-container {
+      position: relative;
       min-height: 1.4em;
       margin: 0 0 8px 0;
       padding: 8px 4px 8px 24px;
@@ -473,10 +474,15 @@ body {
       background-color: #fcfcfc;
       color: #caa;
       font-style: italic;
-      &.mm-spinner {
-        background-image:url(/img/fmb-spinner-16x16.gif);
-        background-repeat: no-repeat;
-        background-position: 4px 8px;
+      p {
+        margin:0;
+        padding:0;
+      }
+      #mm-spinner {
+        position: absolute;
+        left: 4px;
+        top: 10px;
+        display: none;
       }
     }
   }

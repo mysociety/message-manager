@@ -45,7 +45,8 @@ echo $this->Html->script('/js/fancybox/jquery.fancybox-1.3.4.pack.js', false);
 		</p>
 		<h3>Mock FMS Client</h3>
 		<div id="mm-status-message-container">
-			<div id="mm-status-message"></div>
+			<img id="mm-spinner" src="img/fmb-spinner-16x16.gif" alt=""/>
+			<p id="mm-status-message"></p>
 		</div>
 		<div id="mm-message-list" style="min-height:1em;"></div>
 		<?php echo $this->Form->create(array('default' => false)); ?>
