@@ -2,18 +2,31 @@
 
 /*-----------------------------------------------------------------
  * Netcast shell commands:
+ *---------------------------------------------------------------------
+ * These subcommands are available:
  *
  * netcast gateway_list
- * netcast gateway_test [source-name/id]
- * netcast get_incoming [source-name/id]
- * netcast send_sms [source-name/id]
- * netcast get_sms_status [source-name/id]
+ * netcast gateway_test <source-name/id>
+ * netcast get_incoming <source-name/id>
+ * netcast get_sms_status <source-name/id>
+ * netcast send_sms <source-name/id>
+ *---------------------------------------------------------------------
  *
- * Issue with: "cd app & Console/cake netcast gateway_test netcast-gateway"
- * Note that Cake's shells outputs helpful usage info!
+ * Issue with: (e.g.) "cd app & Console/cake netcast gateway_test netcast-gateway"
+ * Note that Cake's shells output helpful usage info!
+ *
+ * If you just want to check that you can run these tasks, start with
+ * gateway_list, since that doesn't try to connect to anything remote; it
+ * simply tells you what message sources are available (you need to issue 
+ * a message source's id or name when you use the other commands).
+ *
+ * See also Console/cakeshell and Config/crontab.ugly for examples of
+ * how to run these tasks as cron jobs.
+ *---------------------------------------------------------------------
  *
  * Dependency: SOAP calls are made made with nusoap
  *             http://sourceforge.net/projects/nusoap/
+ *
  *----------------------------------------------------------------*/
 class NetcastShell extends AppShell {
 	public $uses = array('MessageSource', 'Message', 'Status', 'Action', 'ActionType');
@@ -113,7 +126,6 @@ class NetcastShell extends AppShell {
 				'arguments' => $source_id_arg_def
 			)
 		));
-		
 	    return $parser;
 	}
 	
@@ -440,7 +452,6 @@ class NetcastShell extends AppShell {
 		$this->out(__("Done"), 1, Shell::VERBOSE);
 	}
 	
-	
 	private function print_dry_run_notice() {
 		$this->out("\n", 1, Shell::QUIET);
 		$this->out(__("***---------------------------------------------------------***"), 1, Shell::QUIET);
@@ -470,7 +481,12 @@ class NetcastShell extends AppShell {
 	
 	private function get_netcast_connection($ms) {
 		require_once("nusoap/nusoap.php");
-		return new SoapClient($ms['url'], array('features' => SOAP_SINGLE_ELEMENT_ARRAYS));
+		try {
+			return new SoapClient($ms['url'], array('features' => SOAP_SINGLE_ELEMENT_ARRAYS));
+		}
+		catch (Exception $e) {
+			$this->error(__("*** connection failed, abandoning task: %s", $e->getMessage()));
+		}
 	}
 	
 	private function call_netcast_function($conn, $function_name, $param_array) {
