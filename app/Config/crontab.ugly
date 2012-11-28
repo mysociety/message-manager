@@ -1,0 +1,24 @@
+# crontab.ugly:
+# Timed tasks for FixMyStreet. Template file.
+
+PATH=/usr/local/bin:/usr/bin:/bin
+!!(* if ($vhost eq 'www.fixmybarangay.com') { *)!!
+MAILTO=cron-!!(*= $site *)!!@mysociety.org
+!!(* } else { *)!!
+MAILTO=!!(*= $user *)!!@mysociety.org
+!!(* } *)!!
+
+# cron jobs: 
+#  send pending messages to SMS gateway
+#  get incoming messages from SMS gateway (SMART)
+#  get incoming messages from SMS gateway (all)
+#  get sent sms status
+
+# example of how to run the cakeshell:
+# */5 *   *   *   * /full/path/to/cakeshell myshell myparam -cli /usr/bin -console /cakes/2.x.x/lib/Cake/Console -app /full/path/to/app
+
+# assumes gateway is called netcast-gateway
+
+5,10,15,20,25,30,35,40,45,50,55 * * * * !!(*= $user *)!! /data/vhost/!!(*= $vhost *)!!/message-manager/app/Console/cakeshell netcast get_sms_status -v netcast-gateway -cli /usr/bin -console /data/vhost/!!(*= $vhost *)!!/message-manager/app/Console -app /data/vhost/!!(*= $vhost *)!!/message-manager/app || echo "stalled?"
+
+# Once an hour, consider running tree recovery?
