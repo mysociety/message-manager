@@ -378,7 +378,7 @@ body {
   #container .dummy-client #mm-status-message-container {
     position: relative;
     min-height: 1.4em;
-    margin: 0 0 8px 0;
+    margin: 0 0 8px 0.5em;
     padding: 8px 4px 8px 24px;
     border: 1px solid #a99;
     background-color: #fcfcfc;
