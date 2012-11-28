@@ -197,18 +197,18 @@ var message_manager = (function() {
         if ($htauth_username.size() && ! $htauth_username.val()) {
             $htauth_username.val(suggest_username);
         }
-        $login_element.stop().slideDown();
+        $login_element.stop(true,true).slideDown();
     };
 
     var say_status = function (msg, show_spinner) {
         if ($status_element) {
             if (show_spinner) {
                 // slow fade in so that spinner only appears if there's a long delay
-                $status_element.find('#mm-spinner').stop().fadeIn(1200);
+                $status_element.find('#mm-spinner').stop(true,true).fadeIn(1200);
             } else {
-                $status_element.find('#mm-spinner').stop().hide();
+                $status_element.find('#mm-spinner').stop(true,true).hide();
             }
-            $status_element.stop().show().find('p').text(msg);
+            $status_element.stop(true,true).show().find('p').text(msg);
         }
     };
 
@@ -276,7 +276,7 @@ var message_manager = (function() {
         _username = data.username;
         var $output = $message_list_element;
         if (anim_duration > 0) {
-            $output.stop().fadeOut(anim_duration, function(){
+            $output.stop(true,true).fadeOut(anim_duration, function(){
                 render_available_messages(data, anim_duration);
             });
         } else {
@@ -361,7 +361,7 @@ var message_manager = (function() {
             show_login_form(suggest_username);
             return;
         }
-        $login_element.stop().hide();
+        $login_element.stop(true,true).hide();
         if (_url_root.length === 0) {
             say_status(msg_no_config_err);
         } else {
