@@ -1,5 +1,5 @@
 # crontab.ugly:
-# Timed tasks for FixMyStreet. Template file.
+# Timed tasks for MessageManager. Template file.
 
 PATH=/usr/local/bin:/usr/bin:/bin
 !!(* if ($vhost eq 'www.fixmybarangay.com') { *)!!
@@ -8,17 +8,32 @@ MAILTO=cron-!!(*= $site *)!!@mysociety.org
 MAILTO=!!(*= $user *)!!@mysociety.org
 !!(* } *)!!
 
-# cron jobs: 
-#  send pending messages to SMS gateway
-#  get incoming messages from SMS gateway (SMART)
-#  get incoming messages from SMS gateway (all)
-#  get sent sms status
-
-# example of how to run the cakeshell:
+#------------------------------------------------------------------------
+# MM cron jobs:
+#
+# every 5 minutes:
+#   get sent SMS status (what happened to messages we've sent?)
+#   send pending messages to SMS gateway
+# every 10 minutes:
+#   get incoming messages from SMS gateway (all) <-- GETINCOMING (this is the one we're using below)
+#
+# currently never:
+#   get incoming messages from SMS gateway (SMART) <-- GETSMART (the 391- number... we're not using this below)
+#
+# use -v (or --verbose) for additional reporting on the Message Manager's cakeshells
+#
+# NB currently assumes the gateway is called "netcast-gateway""
+#
+# Example of how to run the cakeshell:
 # */5 *   *   *   * /full/path/to/cakeshell myshell myparam -cli /usr/bin -console /cakes/2.x.x/lib/Cake/Console -app /full/path/to/app
+#
+#------------------------------------------------------------------------
 
-# assumes gateway is called netcast-gateway
+3,8,13,18,23,28,33,38,43,48,52,58 * * * * !!(*= $user *)!! /data/vhost/!!(*= $vhost *)!!/message-manager/app/Console/cakeshell netcast get_sms_status netcast-gateway -cli /usr/bin -console /data/vhost/!!(*= $vhost *)!!/message-manager/app/Console -app /data/vhost/!!(*= $vhost *)!!/message-manager/app || echo "stalled?"
 
-5,10,15,20,25,30,35,40,45,50,55 * * * * !!(*= $user *)!! /data/vhost/!!(*= $vhost *)!!/message-manager/app/Console/cakeshell netcast get_sms_status -v netcast-gateway -cli /usr/bin -console /data/vhost/!!(*= $vhost *)!!/message-manager/app/Console -app /data/vhost/!!(*= $vhost *)!!/message-manager/app || echo "stalled?"
+1,5,10,15,20,25,30,35,40,45,50,55 * * * * !!(*= $user *)!! /data/vhost/!!(*= $vhost *)!!/message-manager/app/Console/cakeshell netcast send_sms -M netcast-gateway -cli /usr/bin -console /data/vhost/!!(*= $vhost *)!!/message-manager/app/Console -app /data/vhost/!!(*= $vhost *)!!/message-manager/app || echo "stalled?"
+
+7,17,27,37,47,57 * * * * !!(*= $user *)!! /data/vhost/!!(*= $vhost *)!!/message-manager/app/Console/cakeshell netcast get_incoming -c getincoming netcast-gateway -cli /usr/bin -console /data/vhost/!!(*= $vhost *)!!/message-manager/app/Console -app /data/vhost/!!(*= $vhost *)!!/message-manager/app || echo "stalled?"
+
 
 # Once an hour, consider running tree recovery?
