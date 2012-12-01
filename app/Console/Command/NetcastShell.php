@@ -319,6 +319,10 @@ class NetcastShell extends AppShell {
 						}
 					} else {
 						$msgs_failed++;
+						if ($ret_val == 'RETVAL03') { // bad mobile number: repeat sending won't help
+							$this->Message->set('status', Status::$STATUS_SENT_FAIL);
+							$this->out(__("    Bad number: trying again won't help, so status set to SENT_FAIL"), 1, Shell::VERBOSE);
+						}
 						$ret_val = MessageSource::decode_netcast_retval($ret_val);
 						$last_err_msg = __("Gateway did not return a transaction id: %s", $ret_val); 
 						$this->Message->set('send_fail_count', $msg['Message']['send_fail_count']+1);

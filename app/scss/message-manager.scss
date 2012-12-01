@@ -21,6 +21,7 @@ $color_status_locked:    #ffdddd;
 $color_status_assigned:  #f8c75e;
 $color_status_hidden:    #ade0ed;
 $color_status_pending:   #f0f066;
+$color_status_pending_2: #eddd9d; // message sent, but gateway still hasn't delivered
 $color_status_sent:      #66cc33;
 $color_status_error:     #ee6666;
 
@@ -173,10 +174,11 @@ body {
     .status-assigned  {background-color: $color_status_assigned }
     .status-hidden    {background-color: $color_status_hidden }
     .status-pending   {background-color: $color_status_pending }
+    .status-sent_pending {background-color: $color_status_pending_2}
+    .status-sent_fail,
+    .status-error     {background-color: $color_status_error }
     .status-sent,
     .status-sent_ok,
-    .status-sent_pending,
-    .status-sent_fail,
     .status-sent_unknown {background-color: $color_status_sent }
     dd {
       padding-left: 4px;

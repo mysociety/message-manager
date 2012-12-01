@@ -109,10 +109,13 @@ body {
   background-color: #ade0ed; }
 #container .mm-messages .status-pending {
   background-color: #f0f066; }
+#container .mm-messages .status-sent_pending {
+  background-color: #eddd9d; }
+#container .mm-messages .status-sent_fail,
+#container .mm-messages .status-error {
+  background-color: #ee6666; }
 #container .mm-messages .status-sent,
 #container .mm-messages .status-sent_ok,
-#container .mm-messages .status-sent_pending,
-#container .mm-messages .status-sent_fail,
 #container .mm-messages .status-sent_unknown {
   background-color: #66cc33; }
 #container .mm-messages dd {
