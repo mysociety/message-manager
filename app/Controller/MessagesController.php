@@ -104,9 +104,12 @@ class MessagesController extends AppController {
 		$messages = $this->Message->find('threaded',
 			array(
 				'conditions' => $conditions,
-				'recursive' => 1,
+				'recursive' => 0,
 				'fields'	=> self::_json_fields(),
-				'contain' => array('Source', 'Status', 'Lockkeeper'),
+				'contain' => array(
+					'Source' => array('fields' => array('id', 'name')), 
+					'Status', 
+					'Lockkeeper'),
 				'order' => array('Message.created ASC'),
 				'limit' => 20 // for now FIXME -- paginate?
 			)
@@ -119,7 +122,10 @@ class MessagesController extends AppController {
 					'Message.status !=' => Status::$STATUS_HIDDEN 
 				),
 				'fields'	=> self::_json_fields(),
-				'contain' => array('Source', 'Status', 'Lockkeeper'),
+				'contain' => array(
+					'Source' => array('fields' => array('id', 'name')), 
+					'Status', 
+					'Lockkeeper'),
 				'order' => array('Message.created ASC'),
 			));
 			if (! empty($subtree)) {
@@ -619,12 +625,14 @@ class MessagesController extends AppController {
 	}
 	
 	// fields that are OK to send with available/lock/etc AJAX calls 
+	// note that 'status', 'source_id' and 'owner_id' and not included because 
+	// Status, Source, and Lockkeeper are sent as well as the message
 	private function _json_fields() {
 		return array(
-			'id', 'source_id', 'external_id', 'message', 'created', 'received',
-			'replied', 'sender_token', 'is_outbound',
-			'lock_expires', 'status', 'owner_id', 'fms_id', 'tag', 'Source.id',
-			'Source.name', 'Status.name', 'Lockkeeper.username',
+			'id', 'external_id', 'message', 'fms_id', 'tag',
+			'created', 'received', 'replied', 
+			'sender_token', 'is_outbound',
+			'lock_expires', 
 			'lft', 'rght', 'parent_id'
 		);
 	}
