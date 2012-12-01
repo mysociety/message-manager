@@ -13,6 +13,7 @@ $note_bg_color:        #ffcccc;
 
 $nav_bg_color:        #500;
 $nav_hover_color:     #900;
+$nav_bg_msg_color:    #3D0000;
 
 // status colours
 $color_status_unknown:   #dddddd; 
@@ -94,13 +95,21 @@ body.cobrand-default {
       text-align: left;
       margin-left:0;
       ul {
-        margin-left: 0;
+        line-height: 2.0em;
+        margin: 8px 0 0 0;
         li {
+          margin: 8px 0 0 0;
           width: auto;
           padding-right: 0px;
           a {
             background-color: $nav_bg_color;
             margin-right:0;
+            &:hover {
+              background-color: $nav_hover_color;
+            }
+          }
+          &.msg-link a {
+            background-color: $nav_bg_msg_color;
             &:hover {
               background-color: $nav_hover_color;
             }

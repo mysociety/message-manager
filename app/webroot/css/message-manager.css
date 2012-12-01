@@ -48,14 +48,20 @@ body.cobrand-default {
     text-align: left;
     margin-left: 0; }
     #container #header #header-nav ul {
-      margin-left: 0; }
+      line-height: 2.0em;
+      margin: 8px 0 0 0; }
       #container #header #header-nav ul li {
+        margin: 8px 0 0 0;
         width: auto;
         padding-right: 0px; }
         #container #header #header-nav ul li a {
           background-color: #550000;
           margin-right: 0; }
           #container #header #header-nav ul li a:hover {
+            background-color: #990000; }
+        #container #header #header-nav ul li.msg-link a {
+          background-color: #3d0000; }
+          #container #header #header-nav ul li.msg-link a:hover {
             background-color: #990000; }
   #container #header a {
     color: #fff;
