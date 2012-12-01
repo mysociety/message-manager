@@ -96,8 +96,8 @@ class NetcastShell extends AppShell {
 						'short' => 'd',
 						'default' => false
 					),
-					'no-mask' => array(
-						'help' => __('Don\'t use the mask when sending (which is currently "%s")', NetCastShell::$NETCAST_MASK), 
+					'mask' => array(
+						'help' => __('Do use the custom mask when sending (which is currently "%s")', NetCastShell::$NETCAST_MASK), 
 						'boolean' => true,
 						'short' => 'M',
 						'default' => false
@@ -254,7 +254,7 @@ class NetcastShell extends AppShell {
 		if ($this->params['dry-run']) {
 			$this->print_dry_run_notice();
 		}
-		$mask_msg = $this->params['no-mask']? "no mask" : __("mask=\"%s\"", NetCastShell::$NETCAST_MASK);
+		$mask_msg = $this->params['mask']? __("mask=\"%s\"", NetCastShell::$NETCAST_MASK) : "no custom mask";
 		$source = $this->get_message_source($this->args[0]);
 		$ms = $source['MessageSource'];
 		$this->out(__('Sending outgoing messages to message source "%s" with %s',
@@ -297,7 +297,7 @@ class NetcastShell extends AppShell {
 						continue;
 					}
 					$params_array = array( $msg['Message']['to_address'], $msg['Message']['message'], $ms['remote_id'] );
-					if (! $this->params['no-mask']) {
+					if ($this->params['mask']) {
 						$params_array[] = $netcast_mask;
 					}
 					$ret_val = $this->call_netcast_function($netcast, "SENDSMS", $params_array);
