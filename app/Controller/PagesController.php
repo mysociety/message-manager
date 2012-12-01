@@ -87,7 +87,7 @@ class PagesController extends AppController {
 		$this->set('group_name', array_key_exists($group_id, $groups)? $groups[$group_id ]:"");
 
 		$welcome_msg = Configure::read('cobrand_welcome');
-		if (empty($welcome)) {
+		if (empty($welcome_msg)) {
 			$welcome_msg = 'Messages for FixMyStreet and similar systems.';
 		}
 		$this->set('welcome_msg', $welcome_msg);
