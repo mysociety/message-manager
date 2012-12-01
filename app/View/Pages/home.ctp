@@ -1,7 +1,7 @@
 <div class="mm-page">
 	<h2>Welcome to the Message Manager</h2>
 	<p>
-		Messages for FixMyStreet and similar systems.
+		<?php echo($welcome_msg); ?>
 	</p>
 	<?php if ($is_logged_in) { ?>
 		<?php $fms_url = Configure::read('fms_site_url'); ?>

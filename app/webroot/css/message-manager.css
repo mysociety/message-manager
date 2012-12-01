@@ -2,13 +2,23 @@
  * css produced from source in app/scss/
  * do: scss --watch app/scss/:app/webroot/css/
  */
-body {
+body,
+body.cobrand-default {
   background-color: #663333;
-  border-top: 3px solid #663333;
+  border-top: 3px solid #3D1F1F;
   line-height: 1.4em; }
-  body.site-local {
-    background-color: #332255;
-    border-top: 3px solid yellow; }
+  body.cobrand-localhost,
+  body.cobrand-default.cobrand-localhost {
+    background-color: #803300;
+    border-top: 3px solid #FF6600; }
+  body.cobrand-production,
+  body.cobrand-default.cobrand-production {
+    background-color: #330000;
+    border-top: 3px solid #cc0000; }
+  body.cobrand-staging,
+  body.cobrand-default.cobrand-staging {
+    background-color: #1F1F5C;
+    border-top: 3px solid #4D4DB8; }
 
 #container h2, #container h3, #container h4 {
   color: #663333; }
@@ -46,14 +56,14 @@ body {
           background-color: #550000;
           margin-right: 0; }
           #container #header #header-nav ul li a:hover {
-            background-color: #aa9999; }
+            background-color: #990000; }
   #container #header a {
     color: #fff;
     margin-right: 0.5em;
     padding: 4px;
     text-decoration: none; }
     #container #header a:hover {
-      background-color: #aa9999; }
+      background-color: #996666; }
 #container a.no-decoration {
   text-decoration: none; }
 #container dl {
@@ -147,7 +157,7 @@ body {
   text-decoration: none;
   color: black; }
   #container .mm-messages a.reply-link:hover {
-    background-color: #aa9999; }
+    background-color: #990000; }
   #container .mm-messages a.reply-link .message-sender {
     float: right;
     display: block;
@@ -173,7 +183,7 @@ body {
   padding: 4px;
   text-decoration: none; }
   #container #footer a:hover {
-    background-color: #aa9999; }
+    background-color: #996666; }
   #container #footer a.mm-link {
     float: left; }
   #container #footer a.cake-link:hover {
@@ -221,7 +231,7 @@ body {
   #container div.mm-string-choices a, #container div.mm-action-choices a {
     display: inline-block;
     padding: 0.2em 0.5em;
-    border: 1px solid #aa9999;
+    border: 1px solid #996666;
     margin: 4px 8px 4px 0; }
     #container div.mm-string-choices a:hover, #container div.mm-action-choices a:hover {
       background-color: #eeeeee; }
@@ -398,6 +408,6 @@ body {
 
 .cake-sql-log {
   margin-top: 2em;
-  background-color: #aa9999; }
+  background-color: #996666; }
   .cake-sql-log caption {
-    color: #aa9999; }
+    color: #996666; }

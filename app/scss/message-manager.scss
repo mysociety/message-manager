@@ -3,7 +3,7 @@
  * do: scss --watch app/scss/:app/webroot/css/
  */
 $back_color:           #633;
-$pale_back_color:      #a99;
+$pale_back_color:      #996666;
 $header_a_color:       #fff;
 $message_border_color: #000;
 $message_bg_color:     #fff4f4;
@@ -12,7 +12,7 @@ $dummy_back_color:     #eee;
 $note_bg_color:        #ffcccc;
 
 $nav_bg_color:        #500;
-$nav_hover_color:     #a99;
+$nav_hover_color:     #900;
 
 // status colours
 $color_status_unknown:   #dddddd; 
@@ -34,19 +34,29 @@ $color_bg_reply_4:       #C9C9C9;
 $color_bg_reply_5:       #BFBFBF;
 $color_bg_reply_6:       #B8B8B8;
 
-// installation-specific colors:
-$color_bg_local:           #325;
+// lazy "cobrands" here for personal use
 
-body {
+body, 
+body.cobrand-default {
   background-color: $back_color;
-  border-top:3px solid $back_color;
+  border-top:3px solid #3D1F1F;
   line-height: 1.4em;
 
-  &.site-local {
-    background-color: $color_bg_local;
-    border-top:3px solid yellow;
+  &.cobrand-localhost {
+    background-color: #803300;
+    border-top:3px solid #FF6600;
   }
 
+  &.cobrand-production {
+    background-color: #330000;
+    border-top:3px solid #cc0000;
+  }
+  
+  &.cobrand-staging {
+    background-color: #1F1F5C;
+    border-top:3px solid #4D4DB8;
+  }
+  
 }
 
 #container {

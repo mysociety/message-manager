@@ -86,6 +86,11 @@ class PagesController extends AppController {
 			));
 		$this->set('group_name', array_key_exists($group_id, $groups)? $groups[$group_id ]:"");
 
+		$welcome_msg = Configure::read('cobrand_welcome');
+		if (empty($welcome)) {
+			$welcome_msg = 'Messages for FixMyStreet and similar systems.';
+		}
+		$this->set('welcome_msg', $welcome_msg);
 		$this->set(compact('page', 'subpage', 'title_for_layout'));
 		$this->render(implode('/', $path));
 	}

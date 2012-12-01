@@ -55,3 +55,7 @@ MESSAGE_MANAGER_FMS_REPORT_PATH: '/report/%s'
 MESSAGE_MANAGER_CORS_ALLOWED: 'http://www.fixmystreet.com'
 MESSAGE_MANAGER_ENABLE_DUMMY_CLIENT: '1'
 MESSAGE_MANAGER_AUTODETECT_REPLY_PERIOD: '1 week'
+
+COBRAND_NAME:    "Message Manager"
+COBRAND_MONIKER: "default"
+COBRAND_WELCOME: "Messages for FixMyStreet and similar systems."

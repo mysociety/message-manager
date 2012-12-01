@@ -2,6 +2,27 @@
 $config = array(
 
 	/*-----------------------------------------------
+	 * cobrand is a simple mechanism for making your
+	 * Message Manager installation look a little bit
+	 * different from anyone else's Message Manager
+	 * installation.
+	 *
+	 *   cobrand_name is the human-readbale name.
+	 *
+	 *   cobrand_moniker is a string id that can be
+	 *      used programmatically to see what cobrand
+	 *      this is... Also sets body css class to
+	 *      "cobrand-<cobrand_moniker>".
+	 *
+	 *   cobrand_welcome is a short message displayed
+	 *      on the home page to identify the site to
+	 *      your visitors.
+	 *-----------------------------------------------*/
+	'cobrand_name'    => "Message Manager",
+	'cobrand_moniker' => "default",
+	'cobrand_welcome' => 'Messages for FixMyStreet and similar systems.',
+
+	/*-----------------------------------------------
 	 * tags:
 	 * if messages come in with these prefixes, 
 	 * store it as the message tag.

@@ -40,7 +40,7 @@ $cakeDescription = __d('cake_dev', 'CakePHP: the rapid development php framework
 <body class="<?php echo($site_css_class); ?>">
 	<div id="container" >
 		<div id="header">
-			<h1><a href="/">Message Manager</a></h1>
+			<h1><a href="/"><?php echo h($cobrand_name); ?></a></h1>
 			<ul class="user-details">
 				<?php
 					if (AuthComponent::user('id')) { ?>

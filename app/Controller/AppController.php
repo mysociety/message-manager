@@ -42,7 +42,7 @@ class AppController extends Controller {
         'Session'
     );
     public $helpers = array('Html', 'Form', 'Session', 'Js' => array('Jquery'));
-
+	
     public function beforeFilter() {
         //Configure AuthComponent
 		
@@ -75,8 +75,20 @@ class AppController extends Controller {
 		User::store($this->Auth->user());
 		
 		// allow easy flagging of (e.g., dev sites) by changing the background color
-		$site_css_class = "site-" . (preg_match("/(message-local|localhost)/i", $_SERVER['SERVER_NAME'])? "local":"default");
-		$this->set("site_css_class", $site_css_class); 
+		$cobrand_name = Configure::read('cobrand_name');
+		if (empty($cobrand_name)) {
+			$cobrand_name = 'Message Manager';
+		}
+		$cobrand_moniker = Configure::read('cobrand_moniker');
+		
+		if (empty($cobrand_moniker)) {
+			$cobrand_moniker = 'default';
+		}
+		$site_css_class = "cobrand-" . strtolower($cobrand_moniker); // one day should use Cake's Themes for this
+		
+		$this->set("cobrand_moniker", $cobrand_moniker); 
+		$this->set("cobrand_name",    $cobrand_name); 
+		$this->set("site_css_class",  $site_css_class); 
 	}
 	
 	public function mm_json_response($success=true, $data, $err_msg = "") {
