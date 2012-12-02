@@ -34,8 +34,12 @@ class NetcastShell extends AppShell {
 	public static $RETRY_LIMIT = 3;
 	public static $NETCAST_MASK = 'FixMyBrgy';  // [sic] note: that's ...Brgy not ...Bgy
 
-	/* suppress output/header message */
+	/* suppress output/header message, and colour */
 	public function startup() {
+		if ($this->params['plain']) {
+			$this->stdout->outputAs(ConsoleOutput::PLAIN); // NB wanted to use ->output-> as in the docs
+			$this->stderr->outputAs(ConsoleOutput::PLAIN); //    but alas, it didn't work
+		}
 		$this->out("Running netcast shell for Message Manager", 2, Shell::VERBOSE);
 	}
 	
@@ -47,15 +51,35 @@ class NetcastShell extends AppShell {
 			)
 		);
 	    $parser = parent::getOptionParser();
-		$parser->addSubcommand('gateway_list', array('help' => __('List available sources.')));
+		
+		$parser->addSubcommand('gateway_list', array(
+			'help' => __('List available sources.'),
+			'parser' => array(
+				'options' => array('plain' => array(
+					'short' => 'p',
+					'help' => __('Plain output (suppresses colour), good for cron jobs.'),
+					'boolean' => true,
+					'default' => false
+				))
+			)
+		));
+		
 		$parser->addSubcommand('gateway_test', array(
 			'help' => __('Test the connection to the gateway (like pinging).'),
-			'parser' => array('arguments' => $source_id_arg_def)
+			'parser' => array(
+				'arguments' => $source_id_arg_def,
+				'options' => array('plain' => array(
+					'short' => 'p',
+					'help' => __('Plain output (suppresses colour), good for cron jobs.'),
+					'boolean' => true,
+					'default' => false
+				))
+			)
 		));
 		$parser->addSubcommand('get_incoming', array(
 			'help' => __('Pull down incoming messages from the gateway and load them into the database.'),
 			'parser' => array(
-			'options' => array(
+				'options' => array(
 					'allow-dups' => array(
 						'help' => __('Save messages even if they already seem to be in the database (defaults to false, ' .
 									'so duplicate messages will be skipped).'), 
@@ -76,6 +100,12 @@ class NetcastShell extends AppShell {
 						'boolean' => true,
 						'default' => false
 					),
+					'plain' => array(
+						'short' => 'p',
+						'help' => __('Plain output (suppresses colour), good for cron jobs.'),
+						'boolean' => true,
+						'default' => false
+					)
 				),
 				'arguments' => $source_id_arg_def
 			)
@@ -102,7 +132,12 @@ class NetcastShell extends AppShell {
 						'short' => 'M',
 						'default' => false
 					),
-				),
+					'plain' => array(
+						'short' => 'p',
+						'help' => __('Plain output (suppresses colour), good for cron jobs.'),
+						'boolean' => true,
+						'default' => false
+					)				),
 				'arguments' => $source_id_arg_def
 			)
 		));
@@ -122,6 +157,12 @@ class NetcastShell extends AppShell {
 						'short' => 'd',
 						'default' => false
 					),
+					'plain' => array(
+						'short' => 'p',
+						'help' => __('Plain output (suppresses colour), good for cron jobs.'),
+						'boolean' => true,
+						'default' => false
+					)
 				),
 				'arguments' => $source_id_arg_def
 			)
@@ -527,6 +568,5 @@ class NetcastShell extends AppShell {
 		$action->create($params);
 		$action->save();
 	}
-	
 }
 
