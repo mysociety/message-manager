@@ -44,7 +44,7 @@ $(document).ready(function() {
 	message_manager.setup_click_listener({callback: dummy_populate_assign_boxes});
 
 	$('#available-submit').click(function(){
-		message_manager.get_available_messages(dummy_populate_username);
+		message_manager.get_available_messages({callback: dummy_populate_username});
 	});
 
 	$('#assign-fms-submit').click(function() {

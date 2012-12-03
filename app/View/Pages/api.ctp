@@ -149,7 +149,7 @@ error: A message from this source with this external ID already exists
 		
 	<h3>API Summary</h3>
 	<ul>
-		<li>GET <code>/messages/available</code></li>
+		<li>GET <code>/messages/available</code>  with optional <code>fms_id=<em>FMS-id</em></code></li>
 		<li>POST <code>/messages/hide/<em>msg-id</em></code> with optional <code>reason_text=<em>reason_text</em></code></li>
 		<li>POST <code>/messages/lock/<em>msg-id</em></code></li>
 		<li>POST <code>/messages/lock_unique/<em>msg-id</em></code></li>
@@ -174,6 +174,28 @@ error: A message from this source with this external ID already exists
             which contains more messages (children are messages received as direct replies to this, the parent message).
             Because replies can have replies, the children may themselves have non-empty <code>children</code>. 
 	</p>
+	<ul>
+		<li><strong>Message</strong>: 
+			the message data
+		</li>
+		<li><strong>Source</strong>: 
+			the source which provided this message (such as the SMS gateway it came from)
+		</li>
+		<li><strong>Status</strong>: 
+			the name of the status of this message (although this will often be status <code>available</code>, other values
+			are possible as replies or archived messages &mdash; in fact the only status you'll never get is <code>hidden</code>). 
+			The name of each status is unique, as you'd expect, but the returned data does also send its underlying <code>id</code>.
+		</li>
+		<li><strong>Lockkeeper</strong>: 
+			the username and id of the current owner of the record lock (which may often be null, if there is no lock).
+			Technically a username  <em>could</em> change (if edited by an administrator), so the underlying <code>owner_id</code> 
+			may be better to use programmatically.
+		</li>
+		<li><strong>children</strong>: 
+			Messages that are direct replies to this one. Since these may also have replies, this is how a message thread is
+			represented.
+		</li>
+	</ul>
 	<p>
 			The <code>sender_token</code> will be a value that is unique for a given user (so two messages with identical
 			tokens will have been sent by the same user). For incoming messages, these are unique
@@ -192,7 +214,6 @@ error: A message from this source with this external ID already exists
 {
   "Message": {
     "id":           "1062",
-    "source_id":    12,
     "external_id":  null,
     "sender_token": "8b1a9953c4611296a827abf8c47804d7",
     "message":      "This is the message text",
@@ -200,8 +221,6 @@ error: A message from this source with this external ID already exists
     "received":     "2012-06-11 02:38:29",
     "replied":     null,
     "lock_expires": "2012-06-11 21:30:48",
-    "status":       "1",
-    "owner_id":     "3",
     "fms_id":       null,
     "tag":          "LUZ",
     "is_outbound":  "0",
@@ -214,9 +233,11 @@ error: A message from this source with this external ID already exists
     "name":         "Hobbiton SMS Gateway"
   },
   "Status": {
+    "id":           1,
     "name":         "available"
   },
   "Lockkeeper": {
+    "id":           16,
     "username":     "bilbo"
   }
   "children": {
@@ -234,7 +255,7 @@ error: A message from this source with this external ID already exists
 			<code>/messages/available</code>
 		</dd>
 		<dt>params</dt>
-		<dd><em>none</em></dd>
+		<dd><code>fms_id=</code><em>id of the current FMS report (see below)</em> (optional)</dd>
 		<dt>method</dt>
 		<dd>GET</dd>
 		<dt>operation</dt>
@@ -248,29 +269,29 @@ error: A message from this source with this external ID already exists
 				Furthermore, only messages with a tag which matches one of the user's <em>allowed_tags</em>
 				will be returned.
 			</p>
+			<p>
+				Note that the from-address (e.g., the sender's phone number) of incoming messages is not included in this data
+				(but an MD5 hash of it is).
+			</p>
+			<p>
+				In addition, this call will also return all the (non-hidden) messages that are associated with
+				the FMS report (if <code>fms_id</code> was provided). Typically this may be a single message (i.e.,
+				the one that was used to generate the report in the first place), and it almost certainly will
+				<em>not</em> be of status <code>available</code> (since it's been assigned to this report). It's
+				possible that there are more than one such message, and that they have replies too. There is a
+				case for making this a separate API call, but to minimise HTTP requests from the client, it's been
+				rolled into a feature of <code>/messages/available</code>.
+			</p>
+			<p>
+				If no <code>fms_id</code> param is provided, or it is invalid, or there are no message associated with
+				that FMS id, then <code>messages_for_this_report</code> will be <code>false</code>.
+			</p>
 		</dd>
 		<dt>returns</dt>
 		<dd>
-			<p> The available call returns an array of objects, each of which contains:
+			<p> The available call returns the available <code>messages</code>, the current user's <code>username</code>, 
+				and any <code>messages_for_this_report</code>. See the description above for the structure of message objects.
 			</p>
-			<ul>
-				<li><strong>Message</strong>: 
-					the message data, including numerical values for status and owner_id which correspond to the equivalent string values (see below)
-				</li>
-				<li><strong>Source</strong>: 
-					the source which provided this message (such as the SMS gateway it came from)
-				</li>
-				<li><strong>Status</strong>: 
-					the name of the status of this message (currently only <code>available</code> messages are provided). This is the pretty name
-					for the <code>status</code> value provided in <code>Message</code>.
-				</li>
-				<li><strong>Lockkeeper</strong>: 
-					the username of the current owner of the record lock, who is represented by the 
-					<code>owner_id</code> value provided in <code>Message</code>. Technically a username 
-					<em>could</em> change (if edited by an administrator), so the underlying <code>owner_id</code> 
-					may be better to use programmatically.
-				</li>
-			</ul>
 		</dd>
 		<dt>example</dt>
 		<dd >
@@ -284,7 +305,18 @@ error: A message from this source with this external ID already exists
       "Lockkeeper":{...}
      },
   ...
-  ]
+  ],
+  "messages_for_this_report":
+  [
+    {
+      "Message":   {...},
+      "Source":    {...},
+      "Status":    {...},
+      "Lockkeeper":{...}
+     },
+  ...
+  ],
+  "username": 6
 }
 </pre>
 		</dd>

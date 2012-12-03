@@ -87,7 +87,13 @@ class MessagesController extends AppController {
 	//		 root-level messages, that is, if they are not replies
 	//		 This might not be what you're expecting since it means not all messages with
 	//		 status='available' are actually available. Hmm.
-
+	// 
+	// If sent with an fms_id, also returns (as messages_for_this_report) a message tree
+	// of messages for this report.
+	// Note that we *could* expect the message manager ID here (since FMS does know it)...
+	// but I _think_ the use-case may be more helpful if this is by fms_id, since in theory
+	// at least that's more likely to be currently true (e.g., may have been changed by an admin?).
+	//
 	public function available() {
 		// note: auth user is cached, so if you edit tags the user concerned (and that's you if
 		//       you edit your own tags) you'll need to log out for changes to take effect
@@ -99,41 +105,26 @@ class MessagesController extends AppController {
 			),
 			Message::get_tag_conditions($allowed_tags)
 		);
-		$this->Message->recursive = 1;
-		$this->Message->Behaviors->attach('Containable');
-		$messages = $this->Message->find('threaded',
-			array(
-				'conditions' => $conditions,
-				'recursive' => 0,
-				'fields'	=> self::_json_fields(),
-				'contain' => array(
-					'Source' => array('fields' => array('id', 'name')), 
-					'Status', 
-					'Lockkeeper'),
-				'order' => array('Message.created ASC'),
-				'limit' => 20 // for now FIXME -- paginate?
-			)
-		);
-		foreach ($messages as &$message) {
-			 $subtree = $this->Message->find('threaded', array(
-				'conditions' => array(
-					'Message.lft >=' => $message['Message']['lft'], 
-					'Message.rght <=' => $message['Message']['rght'],
-					'Message.status !=' => Status::$STATUS_HIDDEN 
-				),
-				'fields'	=> self::_json_fields(),
-				'contain' => array(
-					'Source' => array('fields' => array('id', 'name')), 
-					'Status', 
-					'Lockkeeper'),
-				'order' => array('Message.created ASC'),
-			));
-			if (! empty($subtree)) {
-				$message['children'] = $subtree[0]['children'];
+		
+		$messages = self::_get_message_tree($conditions);
+
+		$archive_root_msg = false;
+		if (array_key_exists('fms_id', $this->request->query)) {
+			$fms_id = $this->request->query['fms_id'];
+			if (preg_match('/^\d+$/', $fms_id)) {
+				// Find the archive of messages for this FMS report.
+				// Actually there *might* be more than one if we're assigned on updates (?)
+				// ...or if there's unexpected data :-|
+				$conditions = array(
+					'Message.status !=' => Status::$STATUS_HIDDEN, 
+					'Message.fms_id' => $fms_id
+				);
+				$archive_root_msg = self::_get_message_tree($conditions);
 			}
 		}
 		$this->set('messages', $messages);	
 		$this->set('allowed_tags', $allowed_tags);
+		$this->set('messages_for_this_report', isset($archive_root_msg)? $archive_root_msg : false); 
 		$this->helpers[] = 'MessageUtils';
 	}
 
@@ -635,6 +626,43 @@ class MessagesController extends AppController {
 			'lock_expires', 
 			'lft', 'rght', 'parent_id'
 		);
+	}
+	
+	private function _get_message_tree($conditions=array()) {
+		$this->Message->recursive = 1;
+		$this->Message->Behaviors->attach('Containable');
+		$messages = $this->Message->find('threaded',
+			array(
+				'conditions' => $conditions,
+				'recursive' => 0,
+				'fields'	=> self::_json_fields(),
+				'contain' => array(
+					'Source' => array('fields' => array('id', 'name')), 
+					'Status', 
+					'Lockkeeper'),
+				'order' => array('Message.created ASC'),
+				'limit' => 20 // for now FIXME -- paginate?
+			)
+		);
+		foreach ($messages as &$message) {
+			 $subtree = $this->Message->find('threaded', array(
+				'conditions' => array(
+					'Message.lft >=' => $message['Message']['lft'], 
+					'Message.rght <=' => $message['Message']['rght'],
+					'Message.status !=' => Status::$STATUS_HIDDEN 
+				),
+				'fields'	=> self::_json_fields(),
+				'contain' => array(
+					'Source' => array('fields' => array('id', 'name')), 
+					'Status', 
+					'Lockkeeper'),
+				'order' => array('Message.created ASC'),
+			));
+			if (! empty($subtree)) {
+				$message['children'] = $subtree[0]['children'];
+			}
+		}
+		return $messages;		
 	}
 	
 	// logging an action creates an Action entry
