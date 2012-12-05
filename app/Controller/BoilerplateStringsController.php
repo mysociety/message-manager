@@ -62,14 +62,7 @@ class BoilerplateStringsController extends AppController {
 		} else {
 			$this->request->data = $this->BoilerplateString->read(null, $id);
 		}
-		$this->set('all_langs', $this->BoilerplateString->find('list', array(
-				'fields' => 'BoilerplateString.lang', 'group' => 'BoilerplateString.lang'
-			)
-		));
-		$this->set('all_types', $this->BoilerplateString->find('list', array(
-				'fields' => 'BoilerplateString.type', 'group' => 'BoilerplateString.type'
-			)
-		));
+		$this->set_all_langs_and_all_types();
 	}
 
 	public function delete($id = null) {
@@ -98,9 +91,13 @@ class BoilerplateStringsController extends AppController {
 				$this->Session->setFlash(__('The string could not be saved. Please, try again.'));
 			}
 		}
-		// NB was using 'group' => 'BoilerplateString.lang' here, but there's a problem with 
-		//    current Cake version SQL that postgres doesn't like, so using array_unique instead
-		
+		$this->set_all_langs_and_all_types();
+	}
+
+	// set all_langs and all_types for the helpful pickers
+	// NB was using 'group' => 'BoilerplateString.lang' here, but there's a problem with 
+	//    current Cake version SQL that postgres doesn't like, so using array_unique instead
+	private function set_all_langs_and_all_types() {		
 		$all_langs = array_unique($this->BoilerplateString->find('list', array(
 			'fields' => 'BoilerplateString.lang' //, 'group' => 'BoilerplateString.lang'
 		)));
@@ -113,5 +110,4 @@ class BoilerplateStringsController extends AppController {
 		sort($all_types);
 		$this->set('all_types', $all_types);
 	}
-
 }
