@@ -31,6 +31,10 @@
  *     tooltips           hash of tooltips: override the items you want, keys are:
  *                        tt_hide, tt_info, tt_reply, tt_radio
  *
+ *     want_radio_btns    normally MM clients show a radio button, but for archive
+ *                        messages this might be unneccessary: default is true, but
+ *                        pass in false to suppress this.
+ *
  *     *_selector         these are the jQuery selects that will be used to find
  *                        the respective elements:
  *
@@ -66,6 +70,7 @@ var message_manager = (function() {
     var _mm_name               = "Message Manager";
     var _use_fancybox          = true; // note: currently *must* have fancybox!
     var _want_nice_msgs        = false;
+    var _want_radio_btns       = true;
 
     var _tooltips = {
         tt_hide  : "Hide message",
@@ -130,6 +135,9 @@ var message_manager = (function() {
             }
             if (typeof settings.want_nice_msgs !== 'undefined') {
                 _want_nice_msgs = settings.want_nice_msgs;
+            }
+            if (typeof settings.want_radio_btns !== 'undefined') {
+                _want_radio_btns = settings.want_radio_btns;
             }
             if (settings.tooltips) {
                 for (var key in settings.tooltips) {
@@ -256,12 +264,15 @@ var message_manager = (function() {
         if (depth === 0) {
             var tag = (!msg.tag || msg.tag === 'null')? '&nbsp;' : msg.tag;
             tag = $('<span class="msg-tag"/>').html(tag);
-            var radio = depth > 0? null : $('<input type="radio"/>').attr({
-                'id': 'mm_text_' + msg.id,
-                'name': 'mm_text',
-                'value': escaped_text,
-                'title': _tooltips.tt_radio
-            }).wrap('<p/>').parent().html();
+            var radio = null;
+            if (_want_radio_btns && depth == 0) {
+                radio = $('<input type="radio"/>').attr({
+                    'id': 'mm_text_' + msg.id,
+                    'name': 'mm_text',
+                    'value': escaped_text,
+                    'title': _tooltips.tt_radio
+                }).wrap('<p/>').parent().html();
+            }
             var label = $('<label />').attr({
                 'class': 'msg-text',
                 'for': 'mm_text_' + msg.id,
