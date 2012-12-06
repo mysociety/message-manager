@@ -9,6 +9,10 @@ class GroupsController extends AppController {
 
 	public function beforeFilter() {
 	    parent::beforeFilter();
+		if (!Configure::read('allow_usergroup_edits') && in_array($this->action, array('edit', 'delete', 'add'))) {
+			$this->Session->setFlash(__('Action cancelled: User group editing has been disabled.'));
+			$this->redirect(array('action' => 'index'));
+		}
 	}
 	
 /**
@@ -96,4 +100,5 @@ class GroupsController extends AppController {
 		$this->Session->setFlash(__('Group was not deleted'));
 		$this->redirect(array('action' => 'index'));
 	}
+	
 }

@@ -112,11 +112,19 @@ $config = array(
 	'autodetect_reply_period' => '1 week',
 
 	/*-----------------------------------------------
-	 * logging every lock request is overkill unless
-	 * you're debughing so this should probably be left
+	 * Logging every lock request is overkill unless
+	 * you're debugging so this should probably be left
 	 * as false
 	 *-----------------------------------------------*/
-	'log_lock_actions' => false
+	'log_lock_actions' => false,
+
+	/*-----------------------------------------------
+	 * Normally, you never want to change user groups
+	 * because the Auth mechanism in use expects them
+	 * to exist. Only set this to true if you're a 
+	 * developer writing new actions.
+	 *-----------------------------------------------*/
+	'allow_usergroup_edits' => false
 	
 );
 
