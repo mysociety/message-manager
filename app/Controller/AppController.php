@@ -44,6 +44,9 @@ class AppController extends Controller {
     public $helpers = array('Html', 'Form', 'Session', 'Js' => array('Jquery'));
 	
     public function beforeFilter() {
+	
+		Configure::write('debug', Configure::read('show_debug_output')? 2 : 0);
+	
         //Configure AuthComponent
 		
 		// username is the default...

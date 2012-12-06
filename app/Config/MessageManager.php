@@ -124,7 +124,17 @@ $config = array(
 	 * to exist. Only set this to true if you're a 
 	 * developer writing new actions.
 	 *-----------------------------------------------*/
-	'allow_usergroup_edits' => false
+	'allow_usergroup_edits' => false,
+
+	/*-----------------------------------------------
+	 * show_debug_output: set to true if this is a 
+	 * staging or dev site (and you want debug output
+	 * on errors), or false for production. 
+	 * This config is here because it's handy for
+	 * mySociety's internal config mechanism to be able
+	 * to toggle debug output in the general.yml file.
+	 *-----------------------------------------------*/
+	'show_debug_output' => false,
 	
 );
 
