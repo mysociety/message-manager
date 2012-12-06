@@ -39,7 +39,9 @@ $(document).ready(function() {
 	//------------------------------------------------------------
 	// message_manager has been declared in clients.js
 
-	message_manager.config({url_root: "/"});
+	message_manager.config({
+	    url_root: "/"
+    });
 
 	message_manager.setup_click_listener({callback: dummy_populate_assign_boxes});
 
@@ -64,7 +66,7 @@ $(document).ready(function() {
 	    e.preventDefault();
 		if (! dummy_busy) {
 			dummy_busy = true;
-			console.log("hiding message: " + $('#reply_to_msg_id').val());
+			// console.log("hiding message: " + $('#reply_to_msg_id').val());
 			message_manager.hide(
 			    $('#hide_msg_id').val(), 
 			    $('#reason_text').val(), 
@@ -87,7 +89,7 @@ $(document).ready(function() {
 		e.preventDefault();
 		if (! dummy_busy) {
 			dummy_busy = true;
-			console.log("sending reply to: " + $('#reply_to_msg_id').val());
+			// console.log("sending reply to: " + $('#reply_to_msg_id').val());
 			message_manager.reply(
 			    $('#reply_to_msg_id').val(), 
 			    $('#reply_text').val(), 

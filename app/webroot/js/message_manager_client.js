@@ -28,6 +28,9 @@
  *
  *     want_nice_msgs     don't use language like "lock granted"
  *
+ *     tooltips           hash of tooltips: override the items you want, keys are:
+ *                        tt_hide, tt_info, tt_reply, tt_radio
+ *
  *     *_selector         these are the jQuery selects that will be used to find
  *                        the respective elements:
  *
@@ -63,7 +66,14 @@ var message_manager = (function() {
     var _mm_name               = "Message Manager";
     var _use_fancybox          = true; // note: currently *must* have fancybox!
     var _want_nice_msgs        = false;
-    
+
+    var _tooltips = {
+        tt_hide  : "Hide message",
+        tt_info  : "Get info",
+        tt_reply : "Send SMS reply",
+        tt_radio : "Select message before clicking on map to create report"
+    };
+
     // cached jQuery elements, populated by the (mandatory) call to config()
     var $message_list_element;
     var $status_element;
@@ -82,12 +92,6 @@ var message_manager = (function() {
     var msg_lock_granted_ok = ["Lock granted OK",    "Checking message... OK"];
     var msg_lock_denied     = ["",                   "Someone is working with that message right now!"];
 
-    // tooltips currently hardcoded, but maybe hide if don't _want_nice_msgs?
-    var tooltip_hide  = "Hide message";
-    var tooltip_info  = "Get info";
-    var tooltip_reply = "Send SMS reply";
-    var tooltip_radio = "Select message before clicking on map to create report";
-    
     function get_msg(msg) {
         return msg[_want_nice_msgs? 1 : 0];
     }
@@ -126,6 +130,13 @@ var message_manager = (function() {
             }
             if (typeof settings.want_nice_msgs !== 'undefined') {
                 _want_nice_msgs = settings.want_nice_msgs;
+            }
+            if (settings.tooltips) {
+                for (var key in settings.tooltips) {
+                    if (settings.tooltips.hasOwnProperty(key)) {
+                        _tooltips[key]=settings.tooltips[key];
+                    }
+                }
             }
         }
         $message_list_element = $(selectors.message_list_selector);
@@ -235,9 +246,9 @@ var message_manager = (function() {
         var lockkeeper = message_root.Lockkeeper.username;
         var escaped_text = $('<div/>').text(msg.message).html();
         var $p = $('<p/>');
-        var $hide_button = $('<a class="mm-msg-action mm-hide" id="mm-hide-' + msg.id + '" href="#hide-form-container" title="' + tooltip_hide + '">X</a>');
-        var $info_button = $('<span class="mm-msg-action mm-info" id="mm-info-' + msg.id + '" title="' + tooltip_info + '">i</span>');
-        var $reply_button = $('<a class="mm-msg-action mm-rep" id="mm-rep-' + msg.id + '" href="#reply-form-container" title="' + tooltip_reply + '">reply</a>');
+        var $hide_button = $('<a class="mm-msg-action mm-hide" id="mm-hide-' + msg.id + '" href="#hide-form-container" title="' + _tooltips.tt_hide + '">X</a>');
+        var $info_button = $('<span class="mm-msg-action mm-info" id="mm-info-' + msg.id + '" title="' + _tooltips.tt_info + '">i</span>');
+        var $reply_button = $('<a class="mm-msg-action mm-rep" id="mm-rep-' + msg.id + '" href="#reply-form-container" title="' + _tooltips.tt_reply + '">reply</a>');
         if (_use_fancybox) {
             $reply_button.fancybox();
             $hide_button.fancybox();
@@ -249,12 +260,12 @@ var message_manager = (function() {
                 'id': 'mm_text_' + msg.id,
                 'name': 'mm_text',
                 'value': escaped_text,
-                'title': tooltip_radio
+                'title': _tooltips.tt_radio
             }).wrap('<p/>').parent().html();
             var label = $('<label />').attr({
                 'class': 'msg-text',
                 'for': 'mm_text_' + msg.id,
-                'title': tooltip_radio
+                'title': _tooltips.tt_radio
             }).text(escaped_text).wrap('<p/>').parent().html();
             $p.append(tag).append(radio).append(label);
         } else {
