@@ -47,6 +47,7 @@
 <div class="actions">
 	<ul>
 		<li><?php echo $this->Html->link(__('Add new string'), array('action' => 'add')); ?></li>
+		<?php echo $this->element('sidebar/strings'); ?>
 	</ul>
 </div>
 

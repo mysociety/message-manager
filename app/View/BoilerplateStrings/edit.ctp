@@ -22,6 +22,6 @@
 			$this->Form->value('BoilerplateString.id')), null, 
 			__('Are you sure you want to delete this string?\n\n"%s"\n', $this->Form->value('BoilerplateString.text_value'))); ?>
 		</li>
-		<li><?php echo $this->Html->link(__('List all strings'), array('action' => 'index'));?></li>
+		<?php echo $this->element('sidebar/strings'); ?>
 	</ul>
 </div>
