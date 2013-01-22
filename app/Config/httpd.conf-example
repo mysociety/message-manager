@@ -1,9 +1,17 @@
 # Apache configuration for Message Manager. (CakePHP)
 #
-LogLevel debug
+
+# If you're running entirely under https, Cake PHP expects to find this:
+#-----------------------------------------------------------------------
+# SetEnv HTTPS 1
+
+# LogLevel debug
+LogLevel warn
 
 RewriteEngine on
 
+# Cake might want this:
+#------------------------------------------
 # RewriteCond %{REQUEST_FILENAME} !-d
 # RewriteCond %{REQUEST_FILENAME} !-f
 # RewriteCond %{REQUEST_URI} !^/?(index\.php|img|js|css|fcgi|robots\.txt)
