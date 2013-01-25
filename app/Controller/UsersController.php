@@ -132,21 +132,24 @@ class UsersController extends AppController {
 	
 	public function change_password() {
 		if ($this->request->is('post') || $this->request->is('put')) {
-			// strip any data except the password fields
 			$new_password = $this->request->data['User']['new_password'];
-			$confirmation = $this->request->data['User']['confirm_password'];
 			if (empty($new_password)) {
 				$this->Session->setFlash(__('Missing password. Please try again.'));
 				$this->redirect(array('action' => 'change_password'));
 			}
-			unset($this->request->data['User']); // clear all data... then put the new password data back
+			$old_password = $this->request->data['User']['old_password'];
+			$confirmation = $this->request->data['User']['confirm_password'];
+			// clear all data (this is *not* edit user, so can't change any other fields)...
+			unset($this->request->data['User']);
+			// ... then put the new password data back
+			$this->request->data['User']['old_password'] = $old_password;
 			$this->request->data['User']['new_password'] = $new_password;
 			$this->request->data['User']['confirm_password'] = $confirmation;
 			if ($this->_save_user(AuthComponent::user('id'), true)) {
 				$this->Session->setFlash(__('Password has been saved.'));
-				$this->redirect(array('action' => 'change_password'));
+				$this->redirect('/');
 			} else {
-				$this->Session->setFlash(__('Password save failed, password not changed.'));
+				$this->Session->setFlash(__('Password save failed: your password was NOT changed.'));
 			}
 		}
 	}
