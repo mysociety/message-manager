@@ -154,6 +154,10 @@ class UsersController extends AppController {
 		}
 		$this->set('groups', $this->User->Group->find('list')); // populate the drop-down
 	}
+	
+	public function change_password($id = null) {
+		//
+	}
 
 /**
  * delete method
@@ -211,6 +215,7 @@ class UsersController extends AppController {
 		$this->Acl->allow($group, 'controllers/MessageSources/view');
 		$this->Acl->allow($group, 'controllers/MessageSources/client');
 		$this->Acl->allow($group, 'controllers/Pages');
+		$this->Acl->allow($group, 'controllers/Users/change_password');
 		$this->Acl->allow($group, 'controllers/Users/logout');
 
 		// allow api-users to only use the JSON API
@@ -227,9 +232,10 @@ class UsersController extends AppController {
 		$this->Acl->allow($group, 'controllers/Messages/unlock_all');
 		$this->Acl->allow($group, 'controllers/MessageSources/client');
 		$this->Acl->allow($group, 'controllers/Pages');
+		$this->Acl->allow($group, 'controllers/Users/change_password');
 		$this->Acl->allow($group, 'controllers/Users/logout');
 
-		// allow message-sources to only use the incoming
+		// allow message-sources to only use the incoming (not even password change)
 		$group->id = Group::$SOURCE_USER_GROUP_ID;
 		$this->Acl->deny($group, 'controllers');
 		$this->Acl->allow($group, 'controllers/Messages/incoming');
