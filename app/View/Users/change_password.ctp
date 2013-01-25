@@ -1,7 +1,7 @@
 <div class="users form">
 <?php echo $this->Form->create('User');?>
 	<fieldset>
-		<legend><?php echo __('Change password for user "%s"', $username); ?></legend>
+		<legend><?php echo __('Change password for user %s', AuthComponent::user('username')); ?></legend>
 	<?php
 		echo $this->Form->input('old_password', array('type'=>'password','label'=>'Old password'));
 	

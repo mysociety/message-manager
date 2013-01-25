@@ -131,7 +131,6 @@ class UsersController extends AppController {
 	}
 	
 	public function change_password() {
-		$this->set('username', AuthComponent::user('username'));
 		if ($this->request->is('post') || $this->request->is('put')) {
 			// strip any data except the password fields
 			$new_password = $this->request->data['User']['new_password'];
