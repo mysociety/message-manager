@@ -272,8 +272,13 @@ class NetcastShell extends AppShell {
 					}
 				}
 			}
-			$this->out(__("Incoming messages received: %s, saved: %s, skipped: %s, failed: %s", 
-				$msgs_received, $msgs_saved, $msgs_skipped, $msgs_failed), 1, Shell::NORMAL);
+			# skip summary unless verbose
+			if ($msgs_received) {
+				$this->out(__("Incoming messages received: %s, saved: %s, skipped: %s, failed: %s", 
+					$msgs_received, $msgs_saved, $msgs_skipped, $msgs_failed), 1, Shell::NORMAL);
+			} else {
+				$this->out(__("Incoming messages received: 0"), 1, Shell::VERBOSE);
+			}
 			$this->out(__("Done"), 1, Shell::VERBOSE);
 		} else {
 			$ret_val = MessageSource::decode_netcast_retval($ret_val);
@@ -380,8 +385,13 @@ class NetcastShell extends AppShell {
 			}
 		} 
 		$this->out("", 2, Shell::VERBOSE);
-		$this->out(__("Outgoing messages in queue: %s, sent: %s, failed: %s, sent-but-not-updated: %s, skipped: %s", 
-			$msgs_queued, $msgs_sent, $msgs_failed, $msgs_sent_unsaved, $msgs_skipped), 1, Shell::NORMAL);
+		# skip summary unless verbose
+		if ($msgs_queued) {
+			$this->out(__("Outgoing messages in queue: %s, sent: %s, failed: %s, sent-but-not-updated: %s, skipped: %s", 
+				$msgs_queued, $msgs_sent, $msgs_failed, $msgs_sent_unsaved, $msgs_skipped), 1, Shell::NORMAL);
+		} else {
+			$this->out(__("Outgoing messages in queue: 0"), 1, Shell::VERBOSE);			
+		}
 		if ($this->params['dry-run']) {
 			$this->print_dry_run_notice();
 		}
@@ -486,8 +496,13 @@ class NetcastShell extends AppShell {
 			}
 		} 
 		$this->out("", 2, Shell::VERBOSE);
-		$this->out(__("Messages to check: %s, checked: %s, updated: %s, failed: %s, skipped: %s", 
-			$msgs_unknown, $msgs_checked, $msgs_updated, $msgs_failed, $msgs_skipped), 1, Shell::NORMAL);
+		# skip summary unless verbose
+		if ($msgs_unknown) {
+			$this->out(__("Messages to check: %s, checked: %s, updated: %s, failed: %s, skipped: %s", 
+				$msgs_unknown, $msgs_checked, $msgs_updated, $msgs_failed, $msgs_skipped), 1, Shell::NORMAL);
+		} else {
+			$this->out(__("Messages to check: 0"), 1, Shell::VERBOSE);			
+		}
 		if ($this->params['dry-run']) {
 			$this->print_dry_run_notice();
 		}
