@@ -3,6 +3,8 @@
 	<fieldset>
 		<legend><?php echo __('Change password for user "%s"', $username); ?></legend>
 	<?php
+		echo $this->Form->input('old_password', array('type'=>'password','label'=>'Old password'));
+	
 		echo $this->Form->input('new_password', array('type'=>'password','label'=>'New password'));
 		echo $this->Form->input('confirm_password', array('type'=>'password','label'=>'Repeat password to confirm'));
 	?>
