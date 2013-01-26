@@ -4,9 +4,7 @@ class MessageSourcesController extends AppController {
 
 	public function beforeFilter() {
 	    parent::beforeFilter();
-		
-	    $this->Auth->allow('client', 'gateway_test'); // allow access to the dummy client for testing Basic Auth
-	    $this->Auth->allow('client', 'gateway_logs'); // allow access to the dummy client for testing Basic Auth
+	    $this->Auth->allow('client'); // allow access to the dummy client for testing Basic Auth
 		Controller::loadModel('Group'); // to access static methods on it
 	}
 	
