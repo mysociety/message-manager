@@ -14,7 +14,7 @@
 <div class="actions">
 	<ul>
 		<li>
-			<li><?php echo $this->Html->link(__('Edit user'), array('action' => 'edit'));?></li>
+			<li><?php echo $this->Html->link(__('Edit user'), array('action' => 'edit',  AuthComponent::user('id')));?></li>
 		</li>
 		<li><?php echo $this->Html->link(__('List Users'), array('action' => 'index'));?></li>
 		<li><?php echo $this->Html->link(__('List Groups'), array('controller' => 'groups', 'action' => 'index'));?></li>
