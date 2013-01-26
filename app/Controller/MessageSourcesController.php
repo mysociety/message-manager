@@ -178,7 +178,7 @@ class MessageSourcesController extends AppController {
 			$this->Session->setFlash(__('Message logs require the nusoap library, which is not installed'));
 			$is_ok = false;
 		}
-		if ($is_ok) {
+		if (! $is_ok) {
 			$this->redirect(array('action' => 'index'));
 		}
 	}
