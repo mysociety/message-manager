@@ -34,13 +34,13 @@ MAILTO=!!(*= $user *)!!@mysociety.org
 
 !!(* if ($vhost eq 'message-manager.fixmybarangay.com') { *)!!
 
-3,8,13,18,23,28,33,38,43,48,52,58 * * * * !!(*= $user *)!! /data/vhost/!!(*= $vhost *)!!/message-manager/app/Console/cakeshell netcast get_sms_status -p netcast-gateway -cli /usr/bin -console /data/vhost/!!(*= $vhost *)!!/message-manager/app/Console -app /data/vhost/!!(*= $vhost *)!!/message-manager/app || echo "stalled?"
+3,8,13,18,23,28,33,38,43,48,52,58 * * * * !!(*= $user *)!! run-with-lockfile -n /data/vhost/!!(*= $vhost *)!!/get-sms-status.lock "/data/vhost/!!(*= $vhost *)!!/message-manager/app/Console/cakeshell netcast get_sms_status -p netcast-gateway -cli /usr/bin -console /data/vhost/!!(*= $vhost *)!!/message-manager/app/Console -app /data/vhost/!!(*= $vhost *)!!/message-manager/app" || echo "stalled?"
 
-1,5,10,15,20,25,30,35,40,45,50,55 * * * * !!(*= $user *)!! /data/vhost/!!(*= $vhost *)!!/message-manager/app/Console/cakeshell netcast send_sms -p netcast-gateway -cli /usr/bin -console /data/vhost/!!(*= $vhost *)!!/message-manager/app/Console -app /data/vhost/!!(*= $vhost *)!!/message-manager/app || echo "stalled?"
+1,5,10,15,20,25,30,35,40,45,50,55 * * * * !!(*= $user *)!! run-with-lockfile -n /data/vhost/!!(*= $vhost *)!!/send-sms.lock "/data/vhost/!!(*= $vhost *)!!/message-manager/app/Console/cakeshell netcast send_sms -p netcast-gateway -cli /usr/bin -console /data/vhost/!!(*= $vhost *)!!/message-manager/app/Console -app /data/vhost/!!(*= $vhost *)!!/message-manager/app" || echo "stalled?"
 
-6,16,26,36,46,56 * * * * !!(*= $user *)!! /data/vhost/!!(*= $vhost *)!!/message-manager/app/Console/cakeshell netcast get_incoming -p -c getsmart netcast-gateway -cli /usr/bin -console /data/vhost/!!(*= $vhost *)!!/message-manager/app/Console -app /data/vhost/!!(*= $vhost *)!!/message-manager/app || echo "stalled?"
+6,16,26,36,46,56 * * * * !!(*= $user *)!! run-with-lockfile -n /data/vhost/!!(*= $vhost *)!!/get-smart.lock "/data/vhost/!!(*= $vhost *)!!/message-manager/app/Console/cakeshell netcast get_incoming -p -c getsmart netcast-gateway -cli /usr/bin -console /data/vhost/!!(*= $vhost *)!!/message-manager/app/Console -app /data/vhost/!!(*= $vhost *)!!/message-manager/app" || echo "stalled?"
 
-7,17,27,37,47,57 * * * * !!(*= $user *)!! /data/vhost/!!(*= $vhost *)!!/message-manager/app/Console/cakeshell netcast get_incoming -p -c getincoming netcast-gateway -cli /usr/bin -console /data/vhost/!!(*= $vhost *)!!/message-manager/app/Console -app /data/vhost/!!(*= $vhost *)!!/message-manager/app || echo "stalled?"
+7,17,27,37,47,57 * * * * !!(*= $user *)!! run-with-lockfile -n /data/vhost/!!(*= $vhost *)!!/get-incoming.lock "/data/vhost/!!(*= $vhost *)!!/message-manager/app/Console/cakeshell netcast get_incoming -p -c getincoming netcast-gateway -cli /usr/bin -console /data/vhost/!!(*= $vhost *)!!/message-manager/app/Console -app /data/vhost/!!(*= $vhost *)!!/message-manager/app" || echo "stalled?"
 
 !!(* } *)!!
 
