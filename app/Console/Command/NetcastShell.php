@@ -167,6 +167,25 @@ class NetcastShell extends AppShell {
 				'arguments' => $source_id_arg_def
 			)
 		));
+		$parser->addSubcommand('get_logs', array(
+			'help' => __('Request logs from the SMS gateway.'),
+			'parser' => array(
+				'options' => array(
+					'plain' => array(
+						'short' => 'p',
+						'help' => __('Plain output (suppresses colour), good for cron jobs.'),
+						'boolean' => true,
+						'default' => false
+					),
+					'date' => array(
+						'help' => __('Date of logs required (example format YYYYMMDD, but is generous)'), 
+						'short' => 'd',
+						'default' => 'today'
+					),
+				),
+				'arguments' => $source_id_arg_def
+			)
+		));
 	    return $parser;
 	}
 	
@@ -189,6 +208,20 @@ class NetcastShell extends AppShell {
 			$this->out(sprintf("%4s %24s  %s", $s['MessageSource']['id'], $s['MessageSource']['name'], $s['MessageSource']['url']), 1, Shell::QUIET);
 		}
 		$this->out(__("Done"), 1, Shell::VERBOSE);
+	}
+
+	public function get_logs() {
+		$source = $this->get_message_source($this->args[0]);
+		$ms = $source['MessageSource'];
+		$date_param =  date('Ymd', strtotime($this->params['date']));
+		$this->out(__("Retreiving transaction logs for date %s from message source \"%s\"", $date_param, $ms['name']), 1, Shell::VERBOSE);
+		$this->check_url($ms);
+		$netcast = $this->get_netcast_connection($ms);
+		$ret_val = $this->call_netcast_function($netcast, "GETLOGS", array($date_param, $ms['remote_id']));
+		if (preg_match("/^RET/", $ret_val)) {
+			$ret_val = MessageSource::decode_netcast_retval($ret_val);
+		}
+		$this->out($ret_val, 1, Shell::QUIET);
 	}
 
 	public function get_incoming() {
