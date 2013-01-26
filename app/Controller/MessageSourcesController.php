@@ -109,10 +109,7 @@ class MessageSourcesController extends AppController {
 		}
 		$source = $this->MessageSource->read();
 		$url = $this->MessageSource->data['MessageSource']['url'];
-		if (! preg_match('/netcast.com/i', $url)) {
-			$this->Session->setFlash(__('Gateway test only available for gateways on the Netcast domain'));
-			$this->redirect(array('action' => 'index'));
-		}
+		$this->_check_gateway_capability($url);
 		$this->set('message_source', $source);
 		$connection_test_result = 'No test was run.';
 		$netcast_id = $this->MessageSource->data['MessageSource']['remote_id'];
@@ -135,10 +132,7 @@ class MessageSourcesController extends AppController {
 		}
 		$source = $this->MessageSource->read();
 		$url = $this->MessageSource->data['MessageSource']['url'];
-		if (! preg_match('/netcast.com/i', $url)) {
-			$this->Session->setFlash(__('Message logs only available for gateways on the Netcast domain'));
-			$this->redirect(array('action' => 'index'));
-		}
+		$this->_check_gateway_capability($url);
 		$gateway_logs = '';
 		$subtitle = '';
 		$date = 'today';
@@ -147,7 +141,6 @@ class MessageSourcesController extends AppController {
 				$date = $this->request->data['date'];
 			}
 			// Try to get the the netcast logs
-			require_once("nusoap/nusoap.php");
 			$netcast_id = $this->MessageSource->data['MessageSource']['remote_id'];
 			if (empty($url)) {
 				$gateway_logs = 'No logs retreived: you need to specify a URL';
@@ -172,6 +165,22 @@ class MessageSourcesController extends AppController {
 		$this->set('subtitle', $subtitle);
 		$this->set('date', $date); // user input (actual param sent is in the subtitle)
 		$this->set('gateway_logs', $gateway_logs);
+	}
+	
+	private function _check_gateway_capability($url) {
+		$is_ok = true;
+		if (! preg_match('/netcast.com/i', $url)) {
+			$this->Session->setFlash(__('Gateway test only available for gateways on the Netcast domain'));
+			$is_ok = false;
+			$this->redirect(array('action' => 'index'));
+		}
+		if (! include_once("nusoap/nusoap.php")) {
+			$this->Session->setFlash(__('Message logs require the nusoap library, which is not installed'));
+			$is_ok = false;
+		}
+		if ($is_ok) {
+			$this->redirect(array('action' => 'index'));
+		}
 	}
 	
 }
