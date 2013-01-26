@@ -6,6 +6,7 @@ class MessageSourcesController extends AppController {
 	    parent::beforeFilter();
 		
 	    $this->Auth->allow('client', 'gateway_test'); // allow access to the dummy client for testing Basic Auth
+	    $this->Auth->allow('client', 'gateway_logs'); // allow access to the dummy client for testing Basic Auth
 		Controller::loadModel('Group'); // to access static methods on it
 	}
 	
@@ -127,6 +128,53 @@ class MessageSourcesController extends AppController {
 			}
 		}
 		$this->set('connection_test_result', $connection_test_result);
+	}
+
+	public function gateway_logs($id = null) {
+        $this->MessageSource->id = $id;
+		if (!$this->MessageSource->exists()) {
+			throw new NotFoundException(__('Message source with id="%s" not found', $id));
+		}
+		$source = $this->MessageSource->read();
+		if (! preg_match('/netcast.com/i', $this->MessageSource->data['MessageSource']['url'])) {
+			$this->Session->setFlash(__('Message logs only available for gateways on the Netcast domain'));
+			$this->redirect(array('action' => 'index'));
+		}
+        $this->set('message_source', $source);
+		$gateway_logs = '';
+		$subtitle = '';
+		$date = 'today';
+		if ($this->request->is('post')) {
+			if (isset($this->request->data['date'])) {
+				$date = $this->request->data['date'];
+			}
+			// Try to get the the netcast logs
+			require_once("nusoap/nusoap.php");
+			$netcast_id = $this->MessageSource->data['MessageSource']['remote_id'];
+			$url = $this->MessageSource->data['MessageSource']['url'];
+			if (empty($url)) {
+				$gateway_logs = 'No logs retreived: you need to specify a URL';
+			} elseif (! preg_match('/^https?:\/\//', $url)) {
+				$gateway_logs = 'No logs retreived: URL must start with protocol (http or https)';
+			} else {
+				$date_param = strtotime($date);
+				if (! $date_param) {
+					$this->Session->setFlash(__("Can't parse date: %s", $date));
+					$this->redirect(array('action' => 'gateway_logs', $id));
+				}
+				$date_param =  date('Ymd', $date_param);
+				$subtitle = __("Transaction log for date %s from message source \"%s\"", 
+					$date_param, $this->MessageSource->data['MessageSource']['name']);
+				$netcast = new SoapClient($url);
+				$gateway_logs = $netcast->__soapCall("GETLOGS", array($date_param, $netcast_id)); 
+				if (preg_match("/^RET/", $gateway_logs)) { // netcast return values specifically look like "RET..."
+					$gateway_logs = MessageSource::decode_netcast_retval($gateway_logs);
+				}
+			}
+		}
+		$this->set('subtitle', $subtitle);
+		$this->set('date', $date); // user input (actual param sent is in the subtitle)
+		$this->set('gateway_logs', $gateway_logs);
 	}
 	
 }
