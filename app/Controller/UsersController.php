@@ -251,6 +251,8 @@ class UsersController extends AppController {
 		$this->Acl->allow($group, 'controllers/MessageSources/edit'); // NB edit is restricted to certain fields within the code
 		$this->Acl->allow($group, 'controllers/MessageSources/view');
 		$this->Acl->allow($group, 'controllers/MessageSources/client');
+		$this->Acl->allow($group, 'controllers/MessageSources/gateway_logs');
+		$this->Acl->allow($group, 'controllers/MessageSources/gateway_test');
 		$this->Acl->allow($group, 'controllers/Pages');
 		$this->Acl->allow($group, 'controllers/Users/change_password');
 		$this->Acl->allow($group, 'controllers/Users/logout');
