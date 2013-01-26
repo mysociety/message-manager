@@ -208,7 +208,29 @@ class Message extends AppModel {
 			return $expiry_time - time();
 		}
 	}
-		
+
+	// find the likely parent of this (presumably incoming, as yet unadopted) message
+	// Note that, inefficiently, this is called after the (new) record has been saved
+	// as that's a lazy way of being sure that there are no tags.
+	// Also this is for incoming messages only: but it doesn't check here because
+	// it's assumed autodetect_parent is only being called when incoming messages are
+	// received. With a little more care this *could* be automatically including in
+	// record creation... perhaps.
+	public function autodetect_parent() {
+		if (empty($this->data['Message']['tag'])) {
+			$suggested_parent = Message::find('first', array(
+				'conditions' =>	 array(
+					'Message.to_address' => $this->data['Message']['from_address'],
+					'Message.created >=' => date('Y-m-d', strtotime('-' . Configure::read('autodetect_reply_period')))
+				),
+				'order' => array('Message.created' => 'desc')
+			));
+			if (! empty($suggested_parent)) {
+				return $suggested_parent['Message'];
+			}
+		}
+	}
+
 	// if a record is unhidden, revert to it's old (pre-hidden) status
 	// There was some logic here that's a little wonky, but keeping it in in case
 	// status_prev fails: its status possibly depends on whether or not it has an FMS_id
