@@ -110,37 +110,37 @@ class MessageSourcesController extends AppController {
 			throw new NotFoundException(__('Message source with id="%s" not found', $id));
 		}
 		$source = $this->MessageSource->read();
-        $this->set('message_source', $source);
+		$url = $this->MessageSource->data['MessageSource']['url'];
+		if (! preg_match('/netcast.com/i', $url)) {
+			$this->Session->setFlash(__('Gateway test only available for gateways on the Netcast domain'));
+			$this->redirect(array('action' => 'index'));
+		}
+		$this->set('message_source', $source);
 		$connection_test_result = 'No test was run.';
-		// Test the netcast connection
-		if (preg_match('/netcast/i', $this->MessageSource->data['MessageSource']['name'])) {
-			require_once("nusoap/nusoap.php");
-			$netcast_id = $this->MessageSource->data['MessageSource']['remote_id'];
-			$url = $this->MessageSource->data['MessageSource']['url'];
-			if (empty($url)) {
-				$connection_test_result = 'No test was run: you need to specify a URL';
-			} elseif (! preg_match('/^https?:\/\//', $url)) {
-				$connection_test_result = 'No test was run: URL must start with protocol (http or https)';
-			} else {
-				$netcast = new SoapClient($url);
-				$connection_test_result = $netcast->__soapCall("GETCONNECT", array($netcast_id)); 
-				$connection_test_result = MessageSource::decode_netcast_retval($connection_test_result);
-			}
+		$netcast_id = $this->MessageSource->data['MessageSource']['remote_id'];
+		if (empty($url)) {
+			$connection_test_result = 'No test was run: you need to specify a URL';
+		} elseif (! preg_match('/^https?:\/\//', $url)) {
+			$connection_test_result = 'No test was run: URL must start with protocol (http or https)';
+		} else {
+			$netcast = new SoapClient($url);
+			$connection_test_result = $netcast->__soapCall("GETCONNECT", array($netcast_id)); 
+			$connection_test_result = MessageSource::decode_netcast_retval($connection_test_result);
 		}
 		$this->set('connection_test_result', $connection_test_result);
 	}
 
 	public function gateway_logs($id = null) {
-        $this->MessageSource->id = $id;
+ 		$this->MessageSource->id = $id;
 		if (!$this->MessageSource->exists()) {
 			throw new NotFoundException(__('Message source with id="%s" not found', $id));
 		}
 		$source = $this->MessageSource->read();
-		if (! preg_match('/netcast.com/i', $this->MessageSource->data['MessageSource']['url'])) {
+		$url = $this->MessageSource->data['MessageSource']['url'];
+		if (! preg_match('/netcast.com/i', $url)) {
 			$this->Session->setFlash(__('Message logs only available for gateways on the Netcast domain'));
 			$this->redirect(array('action' => 'index'));
 		}
-        $this->set('message_source', $source);
 		$gateway_logs = '';
 		$subtitle = '';
 		$date = 'today';
@@ -151,7 +151,6 @@ class MessageSourcesController extends AppController {
 			// Try to get the the netcast logs
 			require_once("nusoap/nusoap.php");
 			$netcast_id = $this->MessageSource->data['MessageSource']['remote_id'];
-			$url = $this->MessageSource->data['MessageSource']['url'];
 			if (empty($url)) {
 				$gateway_logs = 'No logs retreived: you need to specify a URL';
 			} elseif (! preg_match('/^https?:\/\//', $url)) {

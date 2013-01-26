@@ -1,12 +1,16 @@
 <div class="mm-messagesources view">
 <h2><?php  echo __('Message sources: client test');?></h2>
-<p>
+<h3>
 	Gateway test for message source <b><?php echo h($message_source['MessageSource']['name']); ?></b>.
-</p>
+</h3>
 <!-- not showing url and remote_id, because this page is not currently restricted by auth -->
 <p>
-	Connection test result: <b><?php echo h($connection_test_result); ?></b>
+	Connection test result:
 </p>
+<?php if (! empty($connection_test_result)) { ?>
+	<pre style="margin:3em 0;"><?php echo h($connection_test_result); ?></pre>
+<?php } ?>
+
 	
 
 </div>
