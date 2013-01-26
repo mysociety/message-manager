@@ -3,7 +3,6 @@
 <h3>
 	Gateway test for message source <b><?php echo h($message_source['MessageSource']['name']); ?></b>.
 </h3>
-<!-- not showing url and remote_id, because this page is not currently restricted by auth -->
 <p>
 	Connection test result:
 </p>
