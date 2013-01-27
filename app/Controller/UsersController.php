@@ -168,6 +168,10 @@ class UsersController extends AppController {
 		if (!$this->User->exists()) {
 			throw new NotFoundException(__('Invalid user'));
 		}
+		if ($this->Auth->user('id') == $id) {
+			$this->Session->setFlash(__("Can't delete yourself -- use another admin account to do this."));
+			$this->redirect(array('action' => 'index'));
+		}
 		if ($this->User->delete()) {
 			$this->Session->setFlash(__('User deleted'));
 			$this->redirect(array('action' => 'index'));
