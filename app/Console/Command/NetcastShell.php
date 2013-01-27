@@ -293,7 +293,16 @@ class NetcastShell extends AppShell {
 						$this->Message->set('status', Status::$STATUS_AVAILABLE);
 						if ($this->Message->save()) {
 							$msgs_saved++;
-							$this->out(__(" * Saved OK"), 1, Shell::VERBOSE);
+							$parent_message = "";
+							self::_load_record($this->Message->id); // important and a wee bit sloppy: save and load the record to get the tags
+							$parent_message = $this->Message->autodetect_parent();
+							if (! empty($parent_message)) {
+								$this->Message->set('parent_id', $parent_message['id']);
+								if ($this->Message->save()) {
+									$parent_message = __(" (assumed to be a reply to message id=%s)", $parent_message['id']);
+								} // else... fail silently: the initial message was saved, but its reply-status was not; not a crisis
+							}
+							$this->out(__(" * Saved OK%s", $parent_message), 1, Shell::VERBOSE);
 						} else {
 							$msgs_failed++;
 							$this->out(__(" * Saved FAILED"), 1, Shell::NORMAL);
