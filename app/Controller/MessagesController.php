@@ -479,16 +479,25 @@ class MessagesController extends AppController {
 	public function mark_as_not_a_reply($id = null) {
 		self::_load_record($id);
 		if ($this->Message->data['Message']['parent_id'] == null) {
-			$this->Session->setFlash(__("No action taken: message wasn't marked as a reply anyway"));
+			$msg = __("No action taken: message wasn't marked as a reply anyway");
 		} else {
 			$this->Message->mark_as_not_a_reply();
 			if ($this->Message->save()) {
 				// self::_logAction(ActionType::$ACTION_UNHIDE);
-				$this->Session->setFlash(__('Message is no longer marked as a reply'));
+				$msg = __('Message is no longer marked as a reply');
+				if ($this->RequestHandler->accepts('json')) {
+					$this->response->body( json_encode(self::mm_json_response(true, null)) );
+					return $this->response;
+				}
 			} else {
-				$this->Session->setFlash(__('Failed to mark message as "not a reply"'));
+				$msg = __('Failed to mark message as "not a reply"');
 			}
 		}
+		if ($this->RequestHandler->accepts('json')) {
+			$this->response->body( json_encode(self::mm_json_response(false, null, $msg)) );
+			return $this->response;
+		}
+		$this->Session->setFlash($msg);
 		$this->redirect(array('action' => 'view', $id));
 	}		
 	
