@@ -346,13 +346,15 @@ body.cobrand-default {
             background-color: black; }
         #container .dummy-client #mm-message-list ul li .mm-hide, #container .dummy-client #mm-message-list ul ul.mm-reply-thread li .mm-hide {
           right: 0px;
-          background-color: red; }
+          background-color: red;
+          text-decoration: none; }
         #container .dummy-client #mm-message-list ul li .mm-info, #container .dummy-client #mm-message-list ul ul.mm-reply-thread li .mm-info {
           right: 1.5em;
           background-color: blue; }
         #container .dummy-client #mm-message-list ul li .mm-rep, #container .dummy-client #mm-message-list ul ul.mm-reply-thread li .mm-rep {
           right: 2.6em;
-          background-color: green; }
+          background-color: green;
+          text-decoration: none; }
         #container .dummy-client #mm-message-list ul li .mm-detach, #container .dummy-client #mm-message-list ul ul.mm-reply-thread li .mm-detach {
           right: 6.0em;
           background-color: orange; }
