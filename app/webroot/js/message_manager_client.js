@@ -263,11 +263,12 @@ var message_manager = (function() {
         var $hide_button = $('<a class="mm-msg-action mm-hide" id="mm-hide-' + msg.id + '" href="#hide-form-container" title="' + _tooltips.tt_hide + '">X</a>');
         var $info_button = $('<span class="mm-msg-action mm-info" id="mm-info-' + msg.id + '" title="' + _tooltips.tt_info + '">i</span>');
         var $reply_button = $('<a class="mm-msg-action mm-rep" id="mm-rep-' + msg.id + '" href="#reply-form-container" title="' + _tooltips.tt_reply + '">reply</a>');
-        var $detach_button = $('<span class="mm-msg-action mm-detach" id="mm-rep-' + msg.id + '" href="#reply-form-container" title="' + _tooltips.tt_detach + '">detach</span>');
+        var $detach_button = $('<a class="mm-msg-action mm-detach" id="mm-rep-' + msg.id + '" href="#detach-form-container" title="' + _tooltips.tt_detach + '">detach</a>');
         var is_radio_btn = _want_radio_btns && depth === 0 && ! is_archive;
         if (_use_fancybox) {
             $reply_button.fancybox();
             $hide_button.fancybox();
+            $detach_button.fancybox();
         }
         if (depth === 0) {
             var tag = (!msg.tag || msg.tag === 'null')? '&nbsp;' : msg.tag;
@@ -388,6 +389,10 @@ var message_manager = (function() {
         $message_list_element.on('click', '.mm-hide', function(event) {
             $('#hide_msg_id').val($(this).closest('li').attr('id').replace(_msg_prefix, ''));
             // $('#hide-form-message-text').val(TODO);
+        });
+        // clicking the detach button loads the id into the (modal/fancybox) detach form
+        $message_list_element.on('click', '.mm-detach', function(event) {
+            $('#detach_msg_id').val($(this).closest('li').attr('id').replace(_msg_prefix, ''));
         });
     };
 

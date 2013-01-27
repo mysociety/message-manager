@@ -437,11 +437,11 @@ body.cobrand-default {
 					.mm-detach {
 						right:6.0em;
 						background-color: orange;
+						text-decoration: none;
 					}
   			}
   		}
   	}
-  	
     #mm-login-container {
       display: none; // only shown onafter a 403
       border: 1px solid $weak_text_color;
@@ -460,11 +460,10 @@ body.cobrand-default {
 	      display: none;
 	    }
     }
-    #hide-form-container {
-      display:none;
-      p {
-        color: #000;
-      }
+    #hide-form-container, #detach-form-container {
+      display: none;
+    }
+    #hide-form-container  {
       #hide-form{
         margin-top: 2em;
         border: 1px solid $weak_text_color;
@@ -517,7 +516,12 @@ body.cobrand-default {
       }
     }
   }
-  
+}
+.fancybox-popup {
+  color: black;
+  p {
+    margin: 1em 2em;
+  }
 }
 
 .cake-sql-log {
