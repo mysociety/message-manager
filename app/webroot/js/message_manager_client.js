@@ -226,7 +226,7 @@ var message_manager = (function() {
         $login_element.stop(true,true).slideDown();
     };
 
-    var say_status = function (msg, show_spinner) {
+    var say_status = function (msg, show_spinner, allow_html) {
         if ($status_element) {
             if (show_spinner) {
                 // slow fade in so that spinner only appears if there's a long delay
@@ -234,22 +234,27 @@ var message_manager = (function() {
             } else {
                 $status_element.find('#mm-spinner').stop(true,true).hide();
             }
-            $status_element.stop(true,true).show().find('p').text(msg);
+            $status_element.stop(true,true).show();
+            if (allow_html) {
+                $status_element.find('p').html(msg);
+            } else {
+                $status_element.find('p').text(msg);                
+            }
         }
     };
 
-    var extract_replies = function(replies, depth) {
+    var extract_replies = function(replies, depth, is_archive) {
         var $ul = "";
         if (replies && replies.length > 0) {
             $ul = $('<ul class="mm-reply-thread"/>');
             for (var i=0; i<replies.length; i++) {
-                $ul.append(get_message_li(replies[i], depth));
+                $ul.append(get_message_li(replies[i], depth, is_archive));
             }
         }
         return $ul;
     };
     
-    var get_message_li = function(message_root, depth) {
+    var get_message_li = function(message_root, depth, is_archive) {
         var msg = message_root.Message; // or use label value
         var lockkeeper = message_root.Lockkeeper.username;
         var escaped_text = $('<div/>').text(msg.message).html();
@@ -257,6 +262,7 @@ var message_manager = (function() {
         var $hide_button = $('<a class="mm-msg-action mm-hide" id="mm-hide-' + msg.id + '" href="#hide-form-container" title="' + _tooltips.tt_hide + '">X</a>');
         var $info_button = $('<span class="mm-msg-action mm-info" id="mm-info-' + msg.id + '" title="' + _tooltips.tt_info + '">i</span>');
         var $reply_button = $('<a class="mm-msg-action mm-rep" id="mm-rep-' + msg.id + '" href="#reply-form-container" title="' + _tooltips.tt_reply + '">reply</a>');
+        var is_radio_btn = _want_radio_btns && depth === 0 && ! is_archive;
         if (_use_fancybox) {
             $reply_button.fancybox();
             $hide_button.fancybox();
@@ -265,18 +271,20 @@ var message_manager = (function() {
             var tag = (!msg.tag || msg.tag === 'null')? '&nbsp;' : msg.tag;
             tag = $('<span class="msg-tag"/>').html(tag);
             var radio = null;
-            if (_want_radio_btns && depth == 0) {
+            if (is_radio_btn) {
                 radio = $('<input type="radio"/>').attr({
                     'id': 'mm_text_' + msg.id,
                     'name': 'mm_text',
                     'value': escaped_text,
-                    'title': _tooltips.tt_radio
+                    'title': is_radio_btn? _tooltips.tt_radio : ""
                 }).wrap('<p/>').parent().html();
+            } else {
+                radio = $("<p>&ndash;</p>").addClass('mm-radio-filler');
             }
             var label = $('<label />').attr({
                 'class': 'msg-text',
                 'for': 'mm_text_' + msg.id,
-                'title': _tooltips.tt_radio
+                'title': is_radio_btn? _tooltips.tt_radio : ""
             }).text(escaped_text).wrap('<p/>').parent().html();
             $p.append(tag).append(radio).append(label);
         } else {
@@ -297,7 +305,7 @@ var message_manager = (function() {
         }
         $p.append('<div class="msg-info-box" id="msg-info-box-' + msg.id + '">' + info_text + '</div>');
         if (message_root.children) {
-            $litem.append(extract_replies(message_root.children, depth+1));
+            $litem.append(extract_replies(message_root.children, depth+1, is_archive));
         }
         return $litem;
     };
@@ -325,7 +333,7 @@ var message_manager = (function() {
         if (archive instanceof Array) {
             var $arch_ul = $('<ul class="mm-root mm-archive"/>');
             for(i=0; i< archive.length; i++) {
-                litem = get_message_li(archive[i], 0);
+                litem = get_message_li(archive[i], 0, true);
                 $arch_ul.append(litem);
             }
             $output.append($arch_ul);
@@ -338,7 +346,7 @@ var message_manager = (function() {
                 $output.append('<p class="mm-empty">No messages available.</p>');
             } else {
                 for(i=0; i< messages.length; i++) {
-                    litem = get_message_li(messages[i], 0);
+                    litem = get_message_li(messages[i], 0, false);
                     $ul.append(litem);
                 }
             }
@@ -437,7 +445,8 @@ var message_manager = (function() {
                               }
                           }, 
                 error:    function(jqXHR, textStatus, errorThrown) {
-                            var st = jqXHR.status; 
+                            var st = jqXHR.status;
+                            var msg_is_html = false;
                             if (st == 401 || st == 403) {
                                 var msg = (st == 401 ? "Invalid username or password for" : "Access denied: please log in to") + " " + _mm_name;
                                 say_status(msg);
@@ -445,11 +454,17 @@ var message_manager = (function() {
                             } else {
                                 var err_msg = "Unable to load messages: ";
                                 if (st === 0 && textStatus === 'error') { // x-domain hard to detect, sometimes intermittent?
-                                    err_msg += "maybe try refreshing page?";
+                                    if (_url_root.indexOf('https')===0 && ! location.protocol != 'https:') {
+                                        var surl = location.href.replace(/^http:/, 'https:');
+                                        err_msg += 'this is an insecure URL.<br/><a href="' + surl + '">Try from HTTPS instead?</a>';
+                                        msg_is_html = true;
+                                    } else {
+                                        err_msg += "maybe try refreshing page?";
+                                    }
                                 } else {
                                     err_msg += textStatus + " (" + st + ")";
                                 }
-                                say_status(err_msg);
+                                say_status(err_msg, false, msg_is_html);
                             }
                           }
             });
