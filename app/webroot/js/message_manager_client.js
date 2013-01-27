@@ -699,6 +699,56 @@ var message_manager = (function() {
         }
     };
     
+    var mark_as_not_a_reply = function(msg_id, options) {
+        if (_use_fancybox){
+            $.fancybox.close();
+        }
+        var callback = null;
+        var check_li_exists = false;
+        if (options) {
+            if (typeof(options.callback) === 'function') {
+                callback = options.callback;
+            }
+            if (typeof(options.check_li_exists) !== undefined && options.check_li_exists !== undefined) {
+                check_li_exists = true; // MM dummy
+            }
+        }
+        var $li = $('#' + _msg_prefix + msg_id);
+        if (check_li_exists) {
+            if ($li.size() === 0) {
+                say_status("Couldn't find message with ID " + msg_id);
+                return;
+            }
+        }
+        $li.addClass('msg-is-busy');
+        $.ajax({
+            dataType:"json", 
+            type:"post", 
+            data: {},
+            url: _url_root +"messages/mark_as_not_a_reply/" + msg_id + ".json",
+            beforeSend: function (xhr){
+                xhr.setRequestHeader('Authorization', get_current_auth_credentials());
+                xhr.withCredentials = true;
+            },
+            success:function(data, textStatus) {
+                if (data.success) {
+                    $li.removeClass('msg-is-busy msg-is-locked').addClass('msg-is-owned').fadeOut('slow'); // no longer available
+                    say_status("Message no longer marked as a reply");
+                    if (typeof(callback) === "function") {
+                        callback.call($(this), data.data); 
+                    }
+                } else {
+                    $li.removeClass('msg-is-busy').addClass('msg-is-locked');
+                    say_status("Hide failed: " + data.error);
+                }
+            }, 
+            error: function(jqXHR, textStatus, errorThrown) {
+                say_status("Detach error: " + textStatus + ": " + errorThrown);
+                $li.removeClass('msg-is-busy');
+            }
+        });
+    };
+    
     // if boilerplate is not already in local storage, make ajax call and load them
     // otherwise, populate the boilerplate select lists: these are currently the
     // reasons for hiding a message, and pre-loaded replies.message-manager.dev.mysociety.org
@@ -794,6 +844,7 @@ var message_manager = (function() {
        show_info: show_info,
        sign_out: sign_out,
        populate_boilerplate_strings: populate_boilerplate_strings,
-       say_status: say_status
+       say_status: say_status,
+       mark_as_not_a_reply: mark_as_not_a_reply
      };
 })();
