@@ -270,6 +270,7 @@ class UsersController extends AppController {
 		$this->Acl->allow($group, 'controllers/Messages/available');
 		$this->Acl->allow($group, 'controllers/Messages/lock');
 		$this->Acl->allow($group, 'controllers/Messages/lock_unique');
+		$this->Acl->allow($group, 'controllers/Messages/mark_as_not_a_reply');
 		$this->Acl->allow($group, 'controllers/Messages/reply');
 		$this->Acl->allow($group, 'controllers/Messages/unlock');
 		$this->Acl->allow($group, 'controllers/Messages/unlock_all');
