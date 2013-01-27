@@ -324,7 +324,7 @@ class NetcastShell extends AppShell {
 			$this->out(__("Done"), 1, Shell::VERBOSE);
 		} else {
 			$ret_val = MessageSource::decode_netcast_retval($ret_val);
-			$this->error("GETINCOMING fail", __("Gateway did not respond with a list: %s", $ret_val));
+			$this->error("$command fail", __("Gateway did not respond with a list: %s", $ret_val));
 		}
 		if ($this->params['x-debug']) {
 			$this->print_x_debug_notice();
