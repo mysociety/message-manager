@@ -197,6 +197,17 @@ class Message extends AppModel {
 			$this->data['Message']['status'] = Status::$STATUS_AVAILABLE; 
 		}
 	}
+
+	// mark this message as not being a reply
+	// This is useful because the autodetect reply magic must often get it 
+	// wrong, so it's handy to be able to mark a message as not-a-reply.
+	public function mark_as_not_a_reply() {
+		if (!$this->id && empty($this->data)) {
+			return "missing id/data";
+		} else {
+			$this->data['Message']['parent_id'] = null; 
+		}
+	}
 		
 	// returns number of seconds until lock expires
 	// negative number indicates the expiry has passed

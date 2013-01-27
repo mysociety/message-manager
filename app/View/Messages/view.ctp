@@ -293,6 +293,12 @@
 			 		array('action' => 'reply', $message['Message']['id'])); ?>
 			</li>
 		<?php } ?>
+		<?php if ($message['Message']['parent_id']) { ?>
+			<li>
+				<?php echo $this->Html->link(__('Not a reply'),
+			 		array('action' => 'mark_as_not_a_reply', $message['Message']['id'])); ?>
+			</li>
+		<?php } ?>
 		<li>
 			<?php echo $this->Form->postLink(__('Delete'),
 		 		array('action' => 'delete', $message['Message']['id']), null, 

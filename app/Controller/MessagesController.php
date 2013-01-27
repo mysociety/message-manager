@@ -14,6 +14,7 @@ class MessagesController extends AppController {
 	
 	public function beforeFilter() {
 		parent::beforeFilter();
+
 		// these are the API methods for which Basic HTTP Auth is enabled
 		$api_methods = array(
 			'assign_fms_id',
@@ -24,6 +25,7 @@ class MessagesController extends AppController {
 			'reply',
 			'unlock',
 			'unlock_all',
+			'mark_as_not_a_reply',
 			);
 
 		// would prefer to try Form first, because Basic logins stick in htauth
@@ -473,6 +475,22 @@ class MessagesController extends AppController {
 		}
 		$this->redirect(array('action' => 'view', $id));
 	}
+
+	public function mark_as_not_a_reply($id = null) {
+		self::_load_record($id);
+		if ($this->Message->data['Message']['parent_id'] == null) {
+			$this->Session->setFlash(__("No action taken: message wasn't marked as a reply anyway"));
+		} else {
+			$this->Message->mark_as_not_a_reply();
+			if ($this->Message->save()) {
+				// self::_logAction(ActionType::$ACTION_UNHIDE);
+				$this->Session->setFlash(__('Message is no longer marked as a reply'));
+			} else {
+				$this->Session->setFlash(__('Failed to mark message as "not a reply"'));
+			}
+		}
+		$this->redirect(array('action' => 'view', $id));
+	}		
 	
 	/**
 	 * delete method
