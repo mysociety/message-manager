@@ -22,6 +22,14 @@ AJAX call does match what's been configured in the CORS setup __exactly__.
 In particular, check those subdomains. CORS is (correctly) unforgiving if you
 are not precise.
 
+## AJAX/CORS failing because of a 302 redirect
+
+If there's anything wrong with the ACO/ARO tables then you can get a "302: Found"
+response from Cake, which might not be what you're expecting. The `Location` returned
+*is* the referrer, which doesn't help. So if you get this behaviour, delete everything
+from the `aros`, `acos` and `aros_acos` tables and re-populate them with the 
+contents of `db/initial_auth.sql`.
+
 ## Reply message (SMS) threads not working? Try rebuilding the tree.
 
 The threads (i.e., which message is a reply to which message) is implemented
