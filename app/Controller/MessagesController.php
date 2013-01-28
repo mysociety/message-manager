@@ -483,7 +483,7 @@ class MessagesController extends AppController {
 		} else {
 			$this->Message->mark_as_not_a_reply();
 			if ($this->Message->save()) {
-				// self::_logAction(ActionType::$ACTION_UNHIDE);
+				self::_logAction(ActionType::$ACTION_DETACH);
 				$msg = __('Message is no longer marked as a reply');
 				if ($this->RequestHandler->accepts('json')) {
 					$this->response->body( json_encode(self::mm_json_response(true, null)) );
