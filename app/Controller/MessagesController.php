@@ -478,12 +478,13 @@ class MessagesController extends AppController {
 
 	public function mark_as_not_a_reply($id = null) {
 		self::_load_record($id);
-		if ($this->Message->data['Message']['parent_id'] == null) {
+		$parent_id = $this->Message->data['Message']['parent_id'];
+		if ($parent_id == null) {
 			$msg = __("No action taken: message wasn't marked as a reply anyway");
 		} else {
 			$this->Message->mark_as_not_a_reply();
 			if ($this->Message->save()) {
-				self::_logAction(ActionType::$ACTION_DETACH);
+				self::_logAction(ActionType::$ACTION_DETACH, $parent_id);
 				$msg = __('Message is no longer marked as a reply');
 				if ($this->RequestHandler->accepts('json')) {
 					$this->response->body( json_encode(self::mm_json_response(true, null)) );
@@ -706,6 +707,9 @@ class MessagesController extends AppController {
 			$params['item_id'] = intval($custom_param_1);
 		} elseif ($action_type==ActionType::$ACTION_HIDE) {
 			$params['note'] = $custom_param_1;
+		} elseif ($action_type==ActionType::$ACTION_DETACH) {
+			$params['note'] = "detached from parent";
+			$params['item_id'] = intval($custom_param_1);
 		}
 		$action->create($params);
 		$action->save();
