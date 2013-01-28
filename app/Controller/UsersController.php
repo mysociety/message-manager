@@ -268,6 +268,7 @@ class UsersController extends AppController {
 		$this->Acl->allow($group, 'controllers/BoilerplateStrings/index');
 		$this->Acl->allow($group, 'controllers/Messages/assign_fms_id');
 		$this->Acl->allow($group, 'controllers/Messages/available');
+		$this->Acl->allow($group, 'controllers/Messages/hide');
 		$this->Acl->allow($group, 'controllers/Messages/lock');
 		$this->Acl->allow($group, 'controllers/Messages/lock_unique');
 		$this->Acl->allow($group, 'controllers/Messages/mark_as_not_a_reply');
