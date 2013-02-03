@@ -23,6 +23,9 @@ The Message Manager is a PHP application in the Cake framework. It needs to
 run under a webserver (Apache is ideal) and connect to a database (such as
 mySql or Postgres).
 
+If you're using the Netcast SMS gateway (as mySociety does for the FixMyStreet project),
+you'll need the PHP `nusoap` library.
+
 The example implementation of the JSON API (see Dummy Client, below) uses
 jQuery.
 
