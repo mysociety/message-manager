@@ -23,8 +23,8 @@ The Message Manager is a PHP application in the Cake framework. It needs to
 run under a webserver (Apache is ideal) and connect to a database (such as
 mySql or Postgres).
 
-If you're using the Netcast SMS gateway (as mySociety does for the FixMyStreet project),
-you'll need the PHP `nusoap` library.
+If you're using the Netcast SMS gateway (as mySociety does for the FixMyStreet
+project), you'll need the PHP `nusoap` library.
 
 The example implementation of the JSON API (see Dummy Client, below) uses
 jQuery.
@@ -68,9 +68,9 @@ Database config is in `app/Config/database.php`.
 
 You can edit this file directly if you want, or you can drop your config in to
 `app/Config/general.yml` as a YAML file. (This particular mechanism is in
-place because mySociety's own environment favours YAML configuration files
--- see the notes below about `general.yml`, which you may prefer because it
-means all your config is in a single file, outside of the git repository).
+place because mySociety's own environment favours YAML configuration files --
+see the notes below about `general.yml`, which you may prefer because it means
+all your config is in a single file, outside of the git repository).
 
 
 ### Populate it with initial data (not optional!)
@@ -252,7 +252,8 @@ from within another website's pages (such as FixMyStreet).
 
 ### config setting: `autodetect_reply_period`
 
-Message Manager tries to detect when an incoming message might actually be a reply (rather than a new report) by seeing if there were any outbound messages
+Message Manager tries to detect when an incoming message might actually be a reply 
+(rather than a new report) by seeing if there were any outbound messages
 sent to this number within a certain period. By default this is `1 week` but
 if you find that's not long enough you can change it here (e.g., `2 days`, 
 `2 weeks`, `1 year`).
@@ -300,11 +301,10 @@ you've actually enabled/configured the SMS sending, so it's probably safe to
 play). This demo implements the JSON API with `message_manager_client.js`,
 which is intended to serve as a working example if you're attempting an
 implementation of your own. See the code in
-`app/View/MessageSources/client.ctp` 
-to see how this is used (in particular the javascript at the bottom of that
-file which is applying the methods from `message_manager_client.js`). You
-should be able to drop the `.js` file into your own client without needing to
-modify it.
+`app/View/MessageSources/client.ctp` to see how this is used (in particular
+the javascript at the bottom of that file which is applying the methods from
+`message_manager_client.js`). You should be able to drop the `.js` file into
+your own client without needing to modify it.
 
 If you're logged in as an administrator (or a message-source) you'll also see
 a form for submitting incoming messages "as if" they were coming in from an

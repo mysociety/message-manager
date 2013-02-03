@@ -1,40 +1,46 @@
 # Message Manager JSON API
 
-FixMyStreet communicates with the Message Manager with AJAX calls sending JSON.
+FixMyStreet communicates with the Message Manager with AJAX calls sending
+JSON.
 
-The Message Manager doesn't make all its data available over the API. For example,
-FMS users don't normally need phone numbers and activity details, so those
-are not sent. If your users do need to access that kind of detail, then grant them 
-login access to the Message Manager admin (probably as a user
-in the `managers` group).
+The Message Manager doesn't make all its data available over the API. For
+example, FMS users don't normally need phone numbers and activity details, so
+those are not sent. If your users do need to access that kind of detail, then
+grant them login access to the Message Manager admin (probably as a user in
+the `managers` group).
 
 ## Full working example and `message_manager_client.js`
 
-This Message Manager includes a dummy client (which by default is running at `/client`
--- although that might be disabled if you're looking at this on a production server) which uses this API to do all the things
-that a FixMyStreet integration needs. In the codebase, look inside 
-`/js/message_manager_client.js` to see the API being used.
-The dummy client makes its (custom) calls from 
-`dummy_client.js`
+This Message Manager includes a dummy client (which by default is running at
+`/client` -- although that might be disabled if you're looking at this on a
+production server) which uses this API to do all the things that a FixMyStreet
+integration needs. In the codebase, look inside
+`/js/message_manager_client.js` to see the API being used. The dummy client
+makes its (custom) calls from `dummy_client.js`
 
-In fact, the `message_manager_client.js` file currently is *identical* to the one used in the FixMyStreet
-application -- or, if it is isn't, it should be :-) So if you want to build your own code for talking to the 
-Message Manager you'll probably want to drop that file into your own application as it is, and make your 
-JavaScript calls via the `message_manager` object it creates. 
+In fact, the `message_manager_client.js` file currently is *identical* to the
+one used in the FixMyStreet application -- or, if it is isn't, it should be
+:-) So if you want to build your own code for talking to the Message Manager
+you'll probably want to drop that file into your own application as it is, and
+make your JavaScript calls via the `message_manager` object it creates.
 
-Note that the functions on that object allow you to specific options, including callback functions to run after the
-calls have been completed, so you should be able to write custom code quickly. If you need to change the behaviour of
-`message_manager_client.js`'s `message_manager`, please let us know because it may be something
-that we can add back to the codebase for everyone's benefit.
+Note that the functions on that object allow you to specific options,
+including callback functions to run after the calls have been completed, so
+you should be able to write custom code quickly. If you need to change the
+behaviour of `message_manager_client.js`'s `message_manager`, please let us
+know because it may be something that we can add back to the codebase for
+everyone's benefit.
 
-The `message_manager_client.js` also makes some pretty stern decisions about the HTML it produces and expects
-to find. This is not properly documented (hopefully it will be later), but be aware that currently the code
-does make strong assumptions about the HTML it's working with (especially the id's and classes used... but there's
-also an implicit dependency on FancyBox too, hmm).
+The `message_manager_client.js` also makes some pretty stern decisions about
+the HTML it produces and expects to find. This is not properly documented
+(hopefully it will be later), but be aware that currently the code does make
+strong assumptions about the HTML it's working with (especially the id's and
+classes used... but there's also an implicit dependency on FancyBox too, hmm).
 
-> Summary: the rest of this document describes the JSON API, but it's probably much easier to use
->`message_manager_client.js` to create a `message_manager` object (which has the API calls in it),  
-> and call the equivalent methods on that.
+> Summary: the rest of this document describes the JSON API, but it's
+> probably much easier to use `message_manager_client.js` to create a
+>`message_manager` object (which has the API calls in it), and call the
+> equivalent methods on that.
 		
 ## API Summary
 
@@ -53,15 +59,16 @@ Access to the API is either by login (user session) or HTTP Basic Auth by supply
 
 ## 404 errors for message not found
 
-Calls with a message id in the URL which cannot be found return HTTP error code 404, rather than
-`success=false`. If you're implementing responses, remember to check the returned
-error code first!
+Calls with a message id in the URL which cannot be found return HTTP error
+code 404, rather than `success=false`. If you're implementing responses,
+remember to check the returned error code first!
 
 ## Message data
-	 
-The calls that return message data do so with the following structure. Note the `children` entry 
-which contains more messages (children are messages received as direct replies to this, the parent message).
-Because replies can have replies, the children may themselves have non-empty `children`. 
+
+The calls that return message data do so with the following structure. Note
+the `children` entry which contains more messages (children are messages
+received as direct replies to this, the parent message). Because replies can
+have replies, the children may themselves have non-empty `children`.
 
 *   **Message**: 
 
@@ -69,41 +76,47 @@ Because replies can have replies, the children may themselves have non-empty `ch
     
     *   **sender_token**
 
-        The `sender_token` will be a value that is unique for a given user (so two messages with identical
-        tokens will have been sent by the same user). For incoming messages, these are unique
-        hashes not actual addresses because the JSPN API doesn't expose the actual from-address 
-        (i.e., the senders' phone numbers/MSIDNs). However, note that for outgoing messages (that is, 
-        where `is_outbound=='1'`), the `sender_token` is the Message Manager username 
-        of the staff member who sent the reply. 
+        The `sender_token` will be a value that is unique for a given user (so
+        two messages with identical tokens will have been sent by the same
+        user). For incoming messages, these are unique hashes not actual
+        addresses because the JSPN API doesn't expose the actual from-address
+        (i.e., the senders' phone numbers/MSIDNs). However, note that for
+        outgoing messages (that is, where `is_outbound=='1'`), the
+        `sender_token` is the Message Manager username of the staff member who
+        sent the reply.
 
     *   **parent_id**, **lft**, **rght**
 
-        The `parent_id` is the ID of the message (if any) to which *this* message is a reply. Since the
-        tree-like structure of the messages and their replies is represented by the nested `children` entry,
-        you probably don't need to use this. Similarly, the `lft` and `rght` entries are part of 
-        the tree structure and can usually be ignored.
-    
+        The `parent_id` is the ID of the message (if any) to which *this*
+        message is a reply. Since the tree-like structure of the messages and
+        their replies is represented by the nested `children` entry, you
+        probably don't need to use this. Similarly, the `lft` and `rght`
+        entries are part of the tree structure and can usually be ignored.
 
 *   **Source**: 
 
-    the source which provided this message (such as the SMS gateway it came from)
+    the source which provided this message (such as the SMS gateway it came
+    from)
 
 *   **Status**: 
 
-    the name of the status of this message (although this will often be status `available`, other values
-    are possible as replies or archived messages -- in fact the only status you'll never get is `hidden`). 
-    The name of each status is unique, as you'd expect, but the returned data does also send its underlying `id`.
+    the name of the status of this message (although this will often be status
+    `available`, other values are possible as replies or archived messages --
+    in fact the only status you'll never get is `hidden`). The name of each
+    status is unique, as you'd expect, but the returned data does also send
+    its underlying `id`.
 
 *   **Lockkeeper**: 
 
-    the username and id of the current owner of the record lock (which may often be null, if there is no lock).
-    Technically a username  *could* change (if edited by an administrator), so the underlying `owner_id` 
-    may be better to use programmatically.
+    the username and id of the current owner of the record lock (which may
+    often be null, if there is no lock). Technically a username *could* change
+    (if edited by an administrator), so the underlying `owner_id` may be
+    better to use programmatically.
 
 *   **children**: 
 
-    Messages that are direct replies to this one. Since these may also have replies, this is how a message thread is
-    represented.
+    Messages that are direct replies to this one. Since these may also have
+    replies, this is how a message thread is represented.
 
 
 Example:
@@ -157,31 +170,33 @@ GET from `/messages/available`
 #### Operation
 
 Get list of available messages for populating selection list: this *only*
-includes messages which are candidates for assignment (so, message that are 
+includes messages which are candidates for assignment (so, message that are
 hidden or which have already been assigned to an FMS report are not included).
 
-Furthermore, only messages with a tag which matches one of the user's *allowed_tags*
-will be returned.
+Furthermore, only messages with a tag which matches one of the user's
+*allowed_tags* will be returned.
 
-Note that the from-address (e.g., the sender's phone number) of incoming messages is not included in this data
-(but an MD5 hash of it is).
+Note that the from-address (e.g., the sender's phone number) of incoming
+messages is not included in this data (but an MD5 hash of it is).
 
-In addition, this call will also return all the (non-hidden) messages that are associated with
-the FMS report (if `fms_id` was provided). Typically this may be a single message (i.e.,
-the one that was used to generate the report in the first place), and it almost certainly will
-*not* be of status `available` (since it's been assigned to this report). It's
-possible that there are more than one such message, and that they have replies too. There is a
-case for making this a separate API call, but to minimise HTTP requests from the client, it's been
-rolled into a feature of `/messages/available`.
+In addition, this call will also return all the (non-hidden) messages that are
+associated with the FMS report (if `fms_id` was provided). Typically this may
+be a single message (i.e., the one that was used to generate the report in the
+first place), and it almost certainly will *not* be of status `available`
+(since it's been assigned to this report). It's possible that there are more
+than one such message, and that they have replies too. There is a case for
+making this a separate API call, but to minimise HTTP requests from the
+client, it's been rolled into a feature of `/messages/available`.
 
-If no `fms_id` param is provided, or it is invalid, or there are no message associated with
-that FMS id, then `messages_for_this_report` will be `false`.
+If no `fms_id` param is provided, or it is invalid, or there are no message
+associated with that FMS id, then `messages_for_this_report` will be `false`.
 
 
 #### Return value
 
-The available call returns the available `messages`, the current user's `username`, 
-and any `messages_for_this_report`. See the description above for the structure of message objects.
+The available call returns the available `messages`, the current user's
+`username`, and any `messages_for_this_report`. See the description above for
+the structure of message objects.
 
 #### Example
 
@@ -221,19 +236,21 @@ POST to `/messages/hide/id`
 
 #### Operation
 
-Hides a message by setting its status to *hidden*. Hidden messages are not included in the 
-messages returned by a call to `/available` so hiding a message
-effectively removes it from the pool of available messages (and their replies).
+Hides a message by setting its status to *hidden*. Hidden messages are not
+included in the messages returned by a call to `/available` so hiding a
+message effectively removes it from the pool of available messages (and their
+replies).
 
 The optional parameter `reason_text` may contain a string that explains why
 the message was hidden.
 
-Hidden messages are not actually deleted, but remain in the Message Manager database.
-They can be inspected (and potentially unhidden) by a manager or admin
-user within the Message Manager application.
+Hidden messages are not actually deleted, but remain in the Message Manager
+database. They can be inspected (and potentially unhidden) by a manager or
+admin user within the Message Manager application.
 
-Currently, the reverse of this operation, `unhide` is not implemented as a JSON
-call because clients generally don't have the ID of a hidden message with which to make it.
+Currently, the reverse of this operation, `unhide` is not implemented as a
+JSON call because clients generally don't have the ID of a hidden message with
+which to make it.
 
 
 #### Return value
@@ -259,14 +276,17 @@ POST to `/messages/lock/id`
 
 #### Operation
 
-Grants a lock on the message with id=id. The lock is needed in order to assign it to an FMS report.
+Grants a lock on the message with id=id. The lock is needed in order to assign
+it to an FMS report.
 
-See also `/message/lock_unique/` below, which is the preferred way to acquire a lock.
+See also `/message/lock_unique/` below, which is the preferred way to acquire
+a lock.
 
 
 #### Return value
 
-Identical to `/message/lock_unique/` below, which is the preferred way to acquire a lock.
+Identical to `/message/lock_unique/` below, which is the preferred way to
+acquire a lock.
 
 
 ### Lock message and relinquish all other locks
@@ -281,10 +301,11 @@ POST to `/messages/lock_unique/id`
 
 #### Operation
 
-Grants a lock on the message with id=id. The lock is needed in order to assign it to an FMS report.
+Grants a lock on the message with id=id. The lock is needed in order to assign
+it to an FMS report.
 
-This call is identical to the `/messages/lock/` operation, except that all other locks currently
-owned by this user will be relinquished.
+This call is identical to the `/messages/lock/` operation, except that all
+other locks currently owned by this user will be relinquished.
 
 This is the recommended way to acquire locks.
 
@@ -296,9 +317,10 @@ The `lock_unique` call returns an array of three objects:
 *   **success**: 
     which is `true` or `false`
 
-*  **data**: 
-	currently, successful locks also return the message data, which is a `message` object with the same fields
-	as an entry from the `available` JSON call, above.
+* **data**: 
+    currently, successful locks also return the message data, which is a
+    `message` object with the same fields as an entry from the `available`
+    JSON call, above.
 
 * **error** (only on failure):
     a message describing the fault
@@ -318,8 +340,9 @@ If the lock is granted, `success==true`, and the data is also returned:
       }
     }
 
-If the lock was not granted, `success==false` and the response will provide an `error` message.
-Currently, the message's data is *not* returned on failure, as shown here:
+If the lock was not granted, `success==false` and the response will provide an
+`error` message. Currently, the message's data is *not* returned on failure,
+as shown here:
 
     {
       "success":  false,
@@ -343,10 +366,11 @@ POST to `/messages/unlock/id`
 
 Relinquishes a lock on the message with id=id.
 
-See also `/message/unlock_all/` below, which releases *all* locks held by this user.
+See also `/message/unlock_all/` below, which releases *all* locks held by this
+user.
 
-Calling `unlock` on a message which is not locked, or which is not owned by the user,
-is not an error: it succeeds with no effect upon the message.
+Calling `unlock` on a message which is not locked, or which is not owned by
+the user, is not an error: it succeeds with no effect upon the message.
 
 #### Return value
 
@@ -368,11 +392,13 @@ If the lock is relinquished, `success==true`
       "data":        null 
     }
 
-Because attempting to unlock a message that was not locked, or that is locked by another
-user, is not reported as failure, a `false` response does not occur. However, 
-other failures return an explicit HTTP response code (such as 404 for message not found) .
+Because attempting to unlock a message that was not locked, or that is locked
+by another user, is not reported as failure, a `false` response does not
+occur. However, other failures return an explicit HTTP response code (such as
+404 for message not found) .
 
-You cannot use the result of `unlock` to determine whether or not a message is now unlocked.
+You cannot use the result of `unlock` to determine whether or not a message is
+now unlocked.
 
 
 ### Relinquish lock on all messages
@@ -387,9 +413,10 @@ POST to `/messages/unlock_all`
 
 #### Operation
 
-This is the same as `messages/unlock` except that it applies to all messages with a
-lock owned by this user. Like `unlock` described above, this fails silently for
-unchanged locks. Specifically, if there are no locks, the call still succeeds.
+This is the same as `messages/unlock` except that it applies to all messages
+with a lock owned by this user. Like `unlock` described above, this fails
+silently for unchanged locks. Specifically, if there are no locks, the call
+still succeeds.
 
 Nonetheless, check the returned HTTP status code to be sure the operation succeeded.
 
@@ -408,16 +435,17 @@ POST to `/messages/reply/id`
 
 Sends a reply, via the message source, to the original sender.
 
-Note that the user must have the *can_send* privilege in order to do this, 
+Note that the user must have the *can_send* privilege in order to do this,
 otherwise the reply will fail.
 
 Furthermore, `success=true` does not imply that the reply has been sent
-through to the message source (although it might, this is not guaranteed). Instead,
-success indicates that the reply has been queued for delivery.
+through to the message source (although it might, this is not guaranteed).
+Instead, success indicates that the reply has been queued for delivery.
 
-You cannot inspect the progress of replies with the JSON API. A user in the managers
-or administrators groups can log into the Message Manager and view replies explicitly
-(they are listed as activity under the appropriate message).
+You cannot inspect the progress of replies with the JSON API. A user in the
+managers or administrators groups can log into the Message Manager and view
+replies explicitly (they are listed as activity under the appropriate
+message).
 
 
 #### Return value
@@ -428,12 +456,14 @@ The available call returns an array of three objects:
     which is `true` or `false`
 
 * **data**: 
-    currently, successful locks also return the message data, which is a `message` object with the same fields
-    as an entry from the `available` JSON call, above.
+    currently, successful locks also return the message data, which is a
+    `message` object with the same fields as an entry from the `available`
+    JSON call, above.
 
-* **error** (only on failure): 
-    the name of the status of this message (currently only `available` messages are provided). This is the pretty name
-    for the `status` value provided in `Message`.
+* **error** (only on failure):
+    the name of the status of this message (currently only `available`
+    messages are provided). This is the pretty name for the `status` value
+    provided in `Message`.
 
 
 #### Example
@@ -482,7 +512,8 @@ The available call returns an array of three objects:
     currently, no data is returned.
 
 *   **error** (only on failure):
-    if the FMS ID could not be assigned, a message describing the problem is returned.
+    if the FMS ID could not be assigned, a message describing the problem is
+    returned.
 
 
 #### Example
