@@ -179,8 +179,13 @@ class UsersController extends AppController {
 	
 	public function initDB() {
 		//-------------------------------------------------------------------------------------
-		// safety! only run this once, if you need to!
-		// see comments at the top of db/initial_auth.sql to understand why you might need to.
+		// Safety! only run this once, if you need to!
+		// See...
+		// 
+		//          documentation/authorisation_how_to.md
+		//
+		// ...to understand why you might need to.
+		
 		$ENABLE_INIT_DB = false; // <-- should be false unless you're sure you need to run it
 		//--------------------------------------------------------------------------------------
 		
