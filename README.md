@@ -13,6 +13,9 @@ platform is available as Open Source to power similar projects worldwide.
 [1]: http://code.fixmystreet.com/  "the FixMyStreet platform"
 [2]: http://code.fixmystreet.com/  "FixMyStreet.com running in the UK"
 
+## Don't panic
+
+There's a collection of most-likely problems and fixes in documentation/TROUBLESHOOTING.md
 
 ## Required technology
 
