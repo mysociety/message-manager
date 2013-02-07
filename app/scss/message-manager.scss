@@ -158,6 +158,31 @@ body.cobrand-default {
     td {
       line-height: 1.4em;
     }
+    
+    //--------- help nav
+    ul.mm-help {
+        position: relative;
+        background-color: $dummy_back_color;
+        font-size:100%;
+        list-style: none;
+        padding: 0;
+        margin: -1em 0 2em 0;
+        li {
+          padding: 0.5em;
+          a {
+            text-decoration: none;
+            &:hover {
+              text-decoration: underline;
+            }
+            span {
+              color: $weak_text_color;
+            }
+          }
+        }
+        .mm-help-prev { text-align:left; position:absolute; top:0; left:0;}
+        .mm-help-contents { text-align:center;}
+        .mm-help-next { text-align:right; position: absolute; top:0; right:0;}
+    }
   }
   .message-text, .note-text {
     border:1px solid $message_border_color;

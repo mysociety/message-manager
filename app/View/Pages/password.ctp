@@ -1,8 +1,44 @@
 <div class="mm-page">
 
-    <ul class="mm-help">
-        <li><?php echo $this->Html->link(__('Contents'), array('action' => 'help')); ?></li>
-    </ul>
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<ul class="mm-help">
+  <!-- nav for: password -->
+  <li class="mm-help-prev"><?php echo $this->Html->link('<span>' . __('&laquo;previous') . '</span><br/>' . __('User groups'), array('action' => 'groups'), array('escape' => false)); ?>
+</li>
+  <li class="mm-help-contents"><?php echo $this->Html->link(__('Help') . '<br/>' . __('Contents'), array('action' => 'help'), array('escape' => false)); ?></li>
+  <li class="mm-help-next"><?php echo $this->Html->link('<span>' . __('next&raquo;') . '</span><br/>' . __('Boilerplate strings'), array('action' => 'strings'), array('escape' => false)); ?>
+</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 	<h2>
         Changing your password

@@ -1,8 +1,44 @@
 <div class="mm-page">
 
-    <ul class="mm-help">
-        <li><?php echo $this->Html->link(__('Contents'), array('action' => 'help')); ?></li>
-    </ul>
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<ul class="mm-help">
+  <!-- nav for: overview -->
+  <li class="mm-help-prev">&nbsp;
+</li>
+  <li class="mm-help-contents"><?php echo $this->Html->link(__('Help') . '<br/>' . __('Contents'), array('action' => 'help'), array('escape' => false)); ?></li>
+  <li class="mm-help-next"><?php echo $this->Html->link('<span>' . __('next&raquo;') . '</span><br/>' . __('Messages'), array('action' => 'messages'), array('escape' => false)); ?>
+</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 	<h2>
         Message Manager overview

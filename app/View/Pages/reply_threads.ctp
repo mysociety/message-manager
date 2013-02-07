@@ -1,8 +1,44 @@
 <div class="mm-page">
 
-    <ul class="mm-help">
-        <li><?php echo $this->Html->link(__('Contents'), array('action' => 'help')); ?></li>
-    </ul>
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<ul class="mm-help">
+  <!-- nav for: reply_threads -->
+  <li class="mm-help-prev"><?php echo $this->Html->link('<span>' . __('&laquo;previous') . '</span><br/>' . __('Deleting'), array('action' => 'deleting'), array('escape' => false)); ?>
+</li>
+  <li class="mm-help-contents"><?php echo $this->Html->link(__('Help') . '<br/>' . __('Contents'), array('action' => 'help'), array('escape' => false)); ?></li>
+  <li class="mm-help-next"><?php echo $this->Html->link('<span>' . __('next&raquo;') . '</span><br/>' . __('Message sources'), array('action' => 'sources'), array('escape' => false)); ?>
+</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 	<h2>
         Reply threads

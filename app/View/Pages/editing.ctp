@@ -1,8 +1,44 @@
 <div class="mm-page">
 
-    <ul class="mm-help">
-        <li><?php echo $this->Html->link(__('Contents'), array('action' => 'help')); ?></li>
-    </ul>
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<ul class="mm-help">
+  <!-- nav for: editing -->
+  <li class="mm-help-prev"><?php echo $this->Html->link('<span>' . __('&laquo;previous') . '</span><br/>' . __('Assigning FMS'), array('action' => 'assigning_fms'), array('escape' => false)); ?>
+</li>
+  <li class="mm-help-contents"><?php echo $this->Html->link(__('Help') . '<br/>' . __('Contents'), array('action' => 'help'), array('escape' => false)); ?></li>
+  <li class="mm-help-next"><?php echo $this->Html->link('<span>' . __('next&raquo;') . '</span><br/>' . __('Replying'), array('action' => 'replying'), array('escape' => false)); ?>
+</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 	<h2>
         Editing messages
