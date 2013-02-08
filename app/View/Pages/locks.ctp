@@ -1,46 +1,17 @@
 <div class="mm-page">
-
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<ul class="mm-help">
-  <!-- nav for: locks -->
-  <li class="mm-help-prev"><?php echo $this->Html->link('<span>' . __('&laquo;previous') . '</span><br/>' . __('Tags'), array('action' => 'tags'), array('escape' => false)); ?>
-</li>
-  <li class="mm-help-contents"><?php echo $this->Html->link(__('Help') . '<br/>' . __('Contents'), array('action' => 'help'), array('escape' => false)); ?></li>
-  <li class="mm-help-next"><?php echo $this->Html->link('<span>' . __('next&raquo;') . '</span><br/>' . __('Hiding'), array('action' => 'hiding'), array('escape' => false)); ?>
-</li>
-</ul>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-	<h2>
+    <ul class="mm-help">
+    <!-- nav for: locks -->
+        <li class="mm-help-prev">
+            <?php echo $this->Html->link('<span>' . __('&laquo;previous') . '</span><br/>' . __('Tags'), array('action' => 'tags'), array('escape' => false)); ?>
+        </li>
+        <li class="mm-help-contents">
+            <?php echo $this->Html->link(__('Help') . '<br/>' . __('Contents'), array('action' => 'help'), array('escape' => false)); ?>
+        </li>
+        <li class="mm-help-next">
+            <?php echo $this->Html->link('<span>' . __('next&raquo;') . '</span><br/>' . __('Hiding'), array('action' => 'hiding'), array('escape' => false)); ?>
+        </li>
+    </ul>
+    <h2>
         Message locks
     </h2>
 
@@ -102,10 +73,4 @@
 	<p>
 		 It may possible to purge expired locks automatically on a regular basis using a cron job.	
 	</p>
-</div>    
-
-
-
-
-
-
+</div>
