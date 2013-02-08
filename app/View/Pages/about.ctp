@@ -20,12 +20,4 @@
 		And that's it. There is some message-locking going on, to discourage FMS users from
 		colliding. 
 	</p>
-
-	<h3>JSON API</h3>
-	<p>
-		FMS communicates with the Message Manager with AJAX calls sending JSON &mdash; see the 
-		<?php echo $this->Html->link(__('Message Manager JSON API'), array('action' => 'api')); ?>
-		for details and examples.
-	</p>	
-		
 </div>
