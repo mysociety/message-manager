@@ -14,6 +14,27 @@
         Message Manager overview
     </h2>
     <p>
-        Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor.
+        
+    <p>
+        Message Manager connects one or message sources with a service such as FixMyStreet.
+        It acts as an in-between layer, allowing incoming messages to be offered to staff using
+        the web-based FixMyStreet interface. They can then use these messages to create new problem 
+        reports. This effectively means users can submit problems to FixMyStreet via non-web methods 
+        &mdash; such as SMS messages.
     </p>
+    <p>
+        In addition to receiving messages and assigning them to problem reports, Message Manager also
+        allows staff to send replies, hide, and manipulate the messages.
+    </p>
+    <img src="/img/system-overview.png" alt="diagram showing MM system"/>
+    <p>
+        Messages are typically received or sent to the Message Manager as regular (cron) batched jobs.
+        The Message Manager provides a JSON API that lets FixMyStreet use AJAX calls to embed the 
+        messages within the FixMyStreet web interface.
+    </p>
+    <p>
+        The server software is written in PHP (Cake framework), and the client-side code, embedded in 
+        FixMyStreet, is in Javascript (using JQuery).
+    </p>
+    
 </div>
