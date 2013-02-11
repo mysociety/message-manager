@@ -15,10 +15,10 @@ MAILTO=!!(*= $user *)!!@mysociety.org
 #   get sent SMS status (what happened to messages we've sent?)
 #   send pending messages to SMS gateway
 # every 10 minutes:
-#   get incoming messages from SMS gateway (all) <-- GETINCOMING (this is the one we're using below)
+#   get incoming messages from SMS gateway (all) <-- GETINCOMING (this gets messages to the "long" number)
 #
 # currently never:
-#   get incoming messages from SMS gateway (SMART) <-- GETSMART (the 391- number... we're not using this below)
+#   get incoming messages from SMS gateway (SMART) <-- GETSMART (the 391- number... the "short-code" for SMART subscribers)
 #
 # use -v (or --verbose) for additional reporting on the Message Manager's cakeshells
 #
@@ -29,11 +29,20 @@ MAILTO=!!(*= $user *)!!@mysociety.org
 #
 #------------------------------------------------------------------------
 
-3,8,13,18,23,28,33,38,43,48,52,58 * * * * !!(*= $user *)!! /data/vhost/!!(*= $vhost *)!!/message-manager/app/Console/cakeshell netcast get_sms_status -p netcast-gateway -cli /usr/bin -console /data/vhost/!!(*= $vhost *)!!/message-manager/app/Console -app /data/vhost/!!(*= $vhost *)!!/message-manager/app || echo "stalled?"
 
-1,5,10,15,20,25,30,35,40,45,50,55 * * * * !!(*= $user *)!! /data/vhost/!!(*= $vhost *)!!/message-manager/app/Console/cakeshell netcast send_sms -p netcast-gateway -cli /usr/bin -console /data/vhost/!!(*= $vhost *)!!/message-manager/app/Console -app /data/vhost/!!(*= $vhost *)!!/message-manager/app || echo "stalled?"
+# as this is hitting live SMS gateway now, make all these conditional on being on production:
 
-7,17,27,37,47,57 * * * * !!(*= $user *)!! /data/vhost/!!(*= $vhost *)!!/message-manager/app/Console/cakeshell netcast get_incoming -p -c getincoming netcast-gateway -cli /usr/bin -console /data/vhost/!!(*= $vhost *)!!/message-manager/app/Console -app /data/vhost/!!(*= $vhost *)!!/message-manager/app || echo "stalled?"
+!!(* if ($vhost eq 'message-manager.fixmybarangay.com') { *)!!
+
+3,8,13,18,23,28,33,38,43,48,52,58 * * * * !!(*= $user *)!! run-with-lockfile -n /data/vhost/!!(*= $vhost *)!!/get-sms-status.lock "/data/vhost/!!(*= $vhost *)!!/message-manager/app/Console/cakeshell netcast get_sms_status -p netcast-gateway -cli /usr/bin -console /data/vhost/!!(*= $vhost *)!!/message-manager/app/Console -app /data/vhost/!!(*= $vhost *)!!/message-manager/app" || echo "stalled?"
+
+1,5,10,15,20,25,30,35,40,45,50,55 * * * * !!(*= $user *)!! run-with-lockfile -n /data/vhost/!!(*= $vhost *)!!/send-sms.lock "/data/vhost/!!(*= $vhost *)!!/message-manager/app/Console/cakeshell netcast send_sms -p netcast-gateway -cli /usr/bin -console /data/vhost/!!(*= $vhost *)!!/message-manager/app/Console -app /data/vhost/!!(*= $vhost *)!!/message-manager/app" || echo "stalled?"
+
+6,16,26,36,46,56 * * * * !!(*= $user *)!! run-with-lockfile -n /data/vhost/!!(*= $vhost *)!!/get-smart.lock "/data/vhost/!!(*= $vhost *)!!/message-manager/app/Console/cakeshell netcast get_incoming -p -c getsmart netcast-gateway -cli /usr/bin -console /data/vhost/!!(*= $vhost *)!!/message-manager/app/Console -app /data/vhost/!!(*= $vhost *)!!/message-manager/app" || echo "stalled?"
+
+7,17,27,37,47,57 * * * * !!(*= $user *)!! run-with-lockfile -n /data/vhost/!!(*= $vhost *)!!/get-incoming.lock "/data/vhost/!!(*= $vhost *)!!/message-manager/app/Console/cakeshell netcast get_incoming -p -c getincoming netcast-gateway -cli /usr/bin -console /data/vhost/!!(*= $vhost *)!!/message-manager/app/Console -app /data/vhost/!!(*= $vhost *)!!/message-manager/app" || echo "stalled?"
+
+!!(* } *)!!
 
 
 # Once an hour, consider running tree recovery?

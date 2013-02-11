@@ -14,6 +14,7 @@ class MessagesController extends AppController {
 	
 	public function beforeFilter() {
 		parent::beforeFilter();
+
 		// these are the API methods for which Basic HTTP Auth is enabled
 		$api_methods = array(
 			'assign_fms_id',
@@ -24,6 +25,7 @@ class MessagesController extends AppController {
 			'reply',
 			'unlock',
 			'unlock_all',
+			'mark_as_not_a_reply',
 			);
 
 		// would prefer to try Form first, because Basic logins stick in htauth
@@ -473,6 +475,32 @@ class MessagesController extends AppController {
 		}
 		$this->redirect(array('action' => 'view', $id));
 	}
+
+	public function mark_as_not_a_reply($id = null) {
+		self::_load_record($id);
+		$parent_id = $this->Message->data['Message']['parent_id'];
+		if ($parent_id == null) {
+			$msg = __("No action taken: message wasn't marked as a reply anyway");
+		} else {
+			$this->Message->mark_as_not_a_reply();
+			if ($this->Message->save()) {
+				self::_logAction(ActionType::$ACTION_DETACH, $parent_id);
+				$msg = __('Message is no longer marked as a reply');
+				if ($this->RequestHandler->accepts('json')) {
+					$this->response->body( json_encode(self::mm_json_response(true, null)) );
+					return $this->response;
+				}
+			} else {
+				$msg = __('Failed to mark message as "not a reply"');
+			}
+		}
+		if ($this->RequestHandler->accepts('json')) {
+			$this->response->body( json_encode(self::mm_json_response(false, null, $msg)) );
+			return $this->response;
+		}
+		$this->Session->setFlash($msg);
+		$this->redirect(array('action' => 'view', $id));
+	}		
 	
 	/**
 	 * delete method
@@ -562,21 +590,13 @@ class MessagesController extends AppController {
 				// check to see if this looks like a reply: 
 				//	  -- has no tag (easiest to detect *after* the save, but not beautiful)
 				//	  -- sent with a from_address that was the to_address of a message sent out in the last N days
-				self::_load_record($this->Message->id);
-				if (empty($this->Message->data['Message']['tag'])) {
-					$response = $this->Message->find('first', array(
-						'conditions' =>	 array(
-							'Message.to_address' => $this->Message->data['Message']['from_address'],
-							'Message.created >=' => date('Y-m-d', strtotime('-' . Configure::read('autodetect_reply_period')))
-						),
-						'order' => array('Message.created' => 'desc')
-					));
-					if ($response) {
-						$this->Message->set('parent_id', $response['Message']['id']);
-						if ($this->Message->save()) {
-							$response_text .=  "\n" . __("Assumed to be a reply to message id=%s", $response['Message']['id']);
-						} // fail silently: the initial message was saved, but its reply-status was not; not a crisis
-					}
+				self::_load_record($this->Message->id); // important and a wee bit sloppy: save and load the record to get the tags
+				$parent_message = $this->Message->autodetect_parent();
+				if (! empty($parent_message)) {
+					$this->Message->set('parent_id', $parent_message['id']);
+					if ($this->Message->save()) {
+						$response_text .=  "\n" . __("Assumed to be a reply to message id=%s", $parent_message['id']);
+					} // else... fail silently: the initial message was saved, but its reply-status was not; not a crisis
 				}
 			} else {
 				$return_code = 500;
@@ -687,6 +707,9 @@ class MessagesController extends AppController {
 			$params['item_id'] = intval($custom_param_1);
 		} elseif ($action_type==ActionType::$ACTION_HIDE) {
 			$params['note'] = $custom_param_1;
+		} elseif ($action_type==ActionType::$ACTION_DETACH) {
+			$params['note'] = "detached from parent";
+			$params['item_id'] = intval($custom_param_1);
 		}
 		$action->create($params);
 		$action->save();

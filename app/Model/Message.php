@@ -197,6 +197,17 @@ class Message extends AppModel {
 			$this->data['Message']['status'] = Status::$STATUS_AVAILABLE; 
 		}
 	}
+
+	// mark this message as not being a reply
+	// This is useful because the autodetect reply magic must often get it 
+	// wrong, so it's handy to be able to mark a message as not-a-reply.
+	public function mark_as_not_a_reply() {
+		if (!$this->id && empty($this->data)) {
+			return "missing id/data";
+		} else {
+			$this->data['Message']['parent_id'] = null; 
+		}
+	}
 		
 	// returns number of seconds until lock expires
 	// negative number indicates the expiry has passed
@@ -208,7 +219,29 @@ class Message extends AppModel {
 			return $expiry_time - time();
 		}
 	}
-		
+
+	// find the likely parent of this (presumably incoming, as yet unadopted) message
+	// Note that, inefficiently, this is called after the (new) record has been saved
+	// as that's a lazy way of being sure that there are no tags.
+	// Also this is for incoming messages only: but it doesn't check here because
+	// it's assumed autodetect_parent is only being called when incoming messages are
+	// received. With a little more care this *could* be automatically including in
+	// record creation... perhaps.
+	public function autodetect_parent() {
+		if (empty($this->data['Message']['tag'])) {
+			$suggested_parent = Message::find('first', array(
+				'conditions' =>	 array(
+					'Message.to_address' => $this->data['Message']['from_address'],
+					'Message.created >=' => date('Y-m-d', strtotime('-' . Configure::read('autodetect_reply_period')))
+				),
+				'order' => array('Message.created' => 'desc')
+			));
+			if (! empty($suggested_parent)) {
+				return $suggested_parent['Message'];
+			}
+		}
+	}
+
 	// if a record is unhidden, revert to it's old (pre-hidden) status
 	// There was some logic here that's a little wonky, but keeping it in in case
 	// status_prev fails: its status possibly depends on whether or not it has an FMS_id

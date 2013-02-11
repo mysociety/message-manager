@@ -31,6 +31,10 @@ $(document).ready(function() {
 		$('#reason_text').val('');
 		dummy_busy = false;
 	}
+
+	var dummy_detach_cleanup = function(data) {
+		dummy_busy = false;
+	}
 	
 	function sanitise_id(css_id) {
 	    return css_id.replace(/\D/g, "");
@@ -73,7 +77,7 @@ $(document).ready(function() {
 			    {callback:dummy_hide_cleanup});
 		}
 	});
-		
+
 	$('#mm-message-list').on('click', '.mm-info', function(e){
 		message_manager.show_info(sanitise_id($(this).parent().attr('id')));
 	});
@@ -94,6 +98,16 @@ $(document).ready(function() {
 			    $('#reply_to_msg_id').val(), 
 			    $('#reply_text').val(), 
 			    {callback:dummy_reply_cleanup});
+		}
+	});
+
+	$('#detach-submit').click(function(e) {
+		e.preventDefault();
+		if (! dummy_busy) {
+			dummy_busy = true;
+			message_manager.mark_as_not_a_reply(
+			    $('#detach_msg_id').val(), 
+			    {callback:dummy_detach_cleanup});
 		}
 	});
 

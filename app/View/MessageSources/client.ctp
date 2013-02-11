@@ -60,7 +60,7 @@ echo $this->Html->script('/js/fancybox/jquery.fancybox-1.3.4.pack.js', false);
 			echo $this->Form->submit('Get available messages', array('id' => 'available-submit'));
 			echo $this->Form->end();
 		?>
-    	<div id="reply-form-container">
+    	<div id="reply-form-container" class="fancybox-popup">
     	    	<?php 
     				echo $this->Form->create(array('id' => 'reply-form','default'=>false));
 				?>
@@ -77,7 +77,7 @@ echo $this->Html->script('/js/fancybox/jquery.fancybox-1.3.4.pack.js', false);
     				echo $this->Form->end();
     			?>
     	</div>
-		<div id="assign-fms-container">
+		<div id="assign-fms-container" class="fancybox-popup">
 			<?php 
 				echo $this->Form->create(array('id' => 'assign-fms-form','default'=>false));
 				echo $this->Form->input('message_id', array('label'=>'Message ID', 'type'=>'text', 'name'=>'message_id', 'id'=>'message_id'));
@@ -89,7 +89,7 @@ echo $this->Html->script('/js/fancybox/jquery.fancybox-1.3.4.pack.js', false);
 				<input name="random-fms-id" id="random-fms-id" type="checkbox"><label for="random-fms-id">randomize FMS ID integers</label>
 			</p>
 		</div>
-		<div id="hide-form-container">
+		<div id="hide-form-container" class="fancybox-popup">
 			<p style="color:#000">Hiding message: <span id="hide-form-message-text"></span></p>
 	    	<?php 
 				echo $this->Form->create(array('id' => 'hide-form','default'=>false));
@@ -104,6 +104,24 @@ echo $this->Html->script('/js/fancybox/jquery.fancybox-1.3.4.pack.js', false);
 				echo $this->Form->input('reason_text', array('label'=>'Reason for hiding message', 'type'=>'textarea', 'name'=>'reason_text', 'id'=>'reason_text'));
 				echo $this->Form->input('msg_id', array('type'=>'hidden', 'name'=>'msg_id', 'id'=>'hide_msg_id'));
 				echo $this->Form->submit(__('Hide Message'), array('id' => 'hide-submit'));
+				echo $this->Form->end();
+			?>
+		</div>
+		<div id="detach-form-container" class="fancybox-popup">
+			<p>
+				Are you sure you want to detach this message?
+			</p>
+			<p>
+				Message Manager probably thinks this message is a reply because
+				it came in from a number to which we'd recently sent an outward reply.
+			</p>
+			<p>
+				If you detach the message, it will appear as a new, available message (instead of being a reply).
+			</p>
+			<?php
+				echo $this->Form->create(array('id' => 'detach-form','default'=>false));
+				echo $this->Form->input('msg_id', array('type'=>'hidden', 'name'=>'msg_id', 'id'=>'detach_msg_id'));
+				echo $this->Form->submit(__('Detach Message'), array('id' => 'detach-submit'));
 				echo $this->Form->end();
 			?>
 		</div>

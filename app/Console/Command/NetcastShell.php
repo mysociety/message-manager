@@ -167,6 +167,25 @@ class NetcastShell extends AppShell {
 				'arguments' => $source_id_arg_def
 			)
 		));
+		$parser->addSubcommand('get_logs', array(
+			'help' => __('Request logs from the SMS gateway.'),
+			'parser' => array(
+				'options' => array(
+					'plain' => array(
+						'short' => 'p',
+						'help' => __('Plain output (suppresses colour), good for cron jobs.'),
+						'boolean' => true,
+						'default' => false
+					),
+					'date' => array(
+						'help' => __('Date of logs required (example format YYYYMMDD, but is generous)'), 
+						'short' => 'd',
+						'default' => 'today'
+					),
+				),
+				'arguments' => $source_id_arg_def
+			)
+		));
 	    return $parser;
 	}
 	
@@ -189,6 +208,20 @@ class NetcastShell extends AppShell {
 			$this->out(sprintf("%4s %24s  %s", $s['MessageSource']['id'], $s['MessageSource']['name'], $s['MessageSource']['url']), 1, Shell::QUIET);
 		}
 		$this->out(__("Done"), 1, Shell::VERBOSE);
+	}
+
+	public function get_logs() {
+		$source = $this->get_message_source($this->args[0]);
+		$ms = $source['MessageSource'];
+		$date_param =  date('Ymd', strtotime($this->params['date']));
+		$this->out(__("Retreiving transaction logs for date %s from message source \"%s\"", $date_param, $ms['name']), 1, Shell::VERBOSE);
+		$this->check_url($ms);
+		$netcast = $this->get_netcast_connection($ms);
+		$ret_val = $this->call_netcast_function($netcast, "GETLOGS", array($date_param, $ms['remote_id']));
+		if (preg_match("/^RET/", $ret_val)) {
+			$ret_val = MessageSource::decode_netcast_retval($ret_val);
+		}
+		$this->out($ret_val, 1, Shell::QUIET);
 	}
 
 	public function get_incoming() {
@@ -260,7 +293,16 @@ class NetcastShell extends AppShell {
 						$this->Message->set('status', Status::$STATUS_AVAILABLE);
 						if ($this->Message->save()) {
 							$msgs_saved++;
-							$this->out(__(" * Saved OK"), 1, Shell::VERBOSE);
+							$parent_message = "";
+							$this->Message->read(null, $this->Message->id); // important and a wee bit sloppy: save and load the record to get the tags
+							$parent_message = $this->Message->autodetect_parent();
+							if (! empty($parent_message)) {
+								$this->Message->set('parent_id', $parent_message['id']);
+								if ($this->Message->save()) {
+									$parent_message = __(" (assumed to be a reply to message id=%s)", $parent_message['id']);
+								} // else... fail silently: the initial message was saved, but its reply-status was not; not a crisis
+							}
+							$this->out(__(" * Saved OK" . $parent_message), 1, Shell::VERBOSE);
 						} else {
 							$msgs_failed++;
 							$this->out(__(" * Saved FAILED"), 1, Shell::NORMAL);
@@ -282,7 +324,7 @@ class NetcastShell extends AppShell {
 			$this->out(__("Done"), 1, Shell::VERBOSE);
 		} else {
 			$ret_val = MessageSource::decode_netcast_retval($ret_val);
-			$this->error("GETINCOMING fail", __("Gateway did not respond with a list: %s", $ret_val));
+			$this->error("$command fail", __("Gateway did not respond with a list: %s", $ret_val));
 		}
 		if ($this->params['x-debug']) {
 			$this->print_x_debug_notice();

@@ -13,6 +13,7 @@ class ActionType extends AppModel {
 	public static $ACTION_NOTE      = 7;
 	public static $ACTION_REPLY     = 8;
 	public static $ACTION_GATEWAY   = 9;
+	public static $ACTION_DETACH    = 10;
 
 	// utility method: don't use it, use the constants above
 	public static function getIdByName($type_name) {

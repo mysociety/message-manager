@@ -76,7 +76,8 @@ var message_manager = (function() {
         tt_hide  : "Hide message",
         tt_info  : "Get info",
         tt_reply : "Send SMS reply",
-        tt_radio : "Select message before clicking on map to create report"
+        tt_radio : "Select message before clicking on map to create report",
+        tt_detach: "Detach this message because it is not a reply"
     };
 
     // cached jQuery elements, populated by the (mandatory) call to config()
@@ -226,7 +227,7 @@ var message_manager = (function() {
         $login_element.stop(true,true).slideDown();
     };
 
-    var say_status = function (msg, show_spinner) {
+    var say_status = function (msg, show_spinner, allow_html) {
         if ($status_element) {
             if (show_spinner) {
                 // slow fade in so that spinner only appears if there's a long delay
@@ -234,22 +235,27 @@ var message_manager = (function() {
             } else {
                 $status_element.find('#mm-spinner').stop(true,true).hide();
             }
-            $status_element.stop(true,true).show().find('p').text(msg);
+            $status_element.stop(true,true).show();
+            if (allow_html) {
+                $status_element.find('p').html(msg);
+            } else {
+                $status_element.find('p').text(msg);                
+            }
         }
     };
 
-    var extract_replies = function(replies, depth) {
+    var extract_replies = function(replies, depth, is_archive) {
         var $ul = "";
         if (replies && replies.length > 0) {
             $ul = $('<ul class="mm-reply-thread"/>');
             for (var i=0; i<replies.length; i++) {
-                $ul.append(get_message_li(replies[i], depth));
+                $ul.append(get_message_li(replies[i], depth, is_archive));
             }
         }
         return $ul;
     };
     
-    var get_message_li = function(message_root, depth) {
+    var get_message_li = function(message_root, depth, is_archive) {
         var msg = message_root.Message; // or use label value
         var lockkeeper = message_root.Lockkeeper.username;
         var escaped_text = $('<div/>').text(msg.message).html();
@@ -257,32 +263,40 @@ var message_manager = (function() {
         var $hide_button = $('<a class="mm-msg-action mm-hide" id="mm-hide-' + msg.id + '" href="#hide-form-container" title="' + _tooltips.tt_hide + '">X</a>');
         var $info_button = $('<span class="mm-msg-action mm-info" id="mm-info-' + msg.id + '" title="' + _tooltips.tt_info + '">i</span>');
         var $reply_button = $('<a class="mm-msg-action mm-rep" id="mm-rep-' + msg.id + '" href="#reply-form-container" title="' + _tooltips.tt_reply + '">reply</a>');
+        var $detach_button = $('<a class="mm-msg-action mm-detach" id="mm-rep-' + msg.id + '" href="#detach-form-container" title="' + _tooltips.tt_detach + '">detach</a>');
+        var is_radio_btn = _want_radio_btns && depth === 0 && ! is_archive;
         if (_use_fancybox) {
             $reply_button.fancybox();
             $hide_button.fancybox();
+            $detach_button.fancybox();
         }
         if (depth === 0) {
             var tag = (!msg.tag || msg.tag === 'null')? '&nbsp;' : msg.tag;
             tag = $('<span class="msg-tag"/>').html(tag);
             var radio = null;
-            if (_want_radio_btns && depth == 0) {
+            if (is_radio_btn) {
                 radio = $('<input type="radio"/>').attr({
                     'id': 'mm_text_' + msg.id,
                     'name': 'mm_text',
                     'value': escaped_text,
-                    'title': _tooltips.tt_radio
+                    'title': is_radio_btn? _tooltips.tt_radio : ""
                 }).wrap('<p/>').parent().html();
+            } else {
+                radio = $("<p>&ndash;</p>").addClass('mm-radio-filler');
             }
             var label = $('<label />').attr({
                 'class': 'msg-text',
                 'for': 'mm_text_' + msg.id,
-                'title': _tooltips.tt_radio
+                'title': is_radio_btn? _tooltips.tt_radio : ""
             }).text(escaped_text).wrap('<p/>').parent().html();
             $p.append(tag).append(radio).append(label);
         } else {
             $p.text(escaped_text).addClass('mm-reply mm-reply-' + depth);
         }
         var $litem = $('<li id="' + _msg_prefix + msg.id + '" class="mm-msg">').append($p).append($hide_button).append($info_button);
+        if (depth > 0 && depth % 2 === 0) { // only even-numbered depths are incoming replies that can be detached
+            $litem.append($detach_button);
+        }
         if (msg.is_outbound != 1) {
           $litem.append($reply_button);
         }
@@ -297,7 +311,7 @@ var message_manager = (function() {
         }
         $p.append('<div class="msg-info-box" id="msg-info-box-' + msg.id + '">' + info_text + '</div>');
         if (message_root.children) {
-            $litem.append(extract_replies(message_root.children, depth+1));
+            $litem.append(extract_replies(message_root.children, depth+1, is_archive));
         }
         return $litem;
     };
@@ -325,7 +339,7 @@ var message_manager = (function() {
         if (archive instanceof Array) {
             var $arch_ul = $('<ul class="mm-root mm-archive"/>');
             for(i=0; i< archive.length; i++) {
-                litem = get_message_li(archive[i], 0);
+                litem = get_message_li(archive[i], 0, true);
                 $arch_ul.append(litem);
             }
             $output.append($arch_ul);
@@ -338,7 +352,7 @@ var message_manager = (function() {
                 $output.append('<p class="mm-empty">No messages available.</p>');
             } else {
                 for(i=0; i< messages.length; i++) {
-                    litem = get_message_li(messages[i], 0);
+                    litem = get_message_li(messages[i], 0, false);
                     $ul.append(litem);
                 }
             }
@@ -375,6 +389,10 @@ var message_manager = (function() {
         $message_list_element.on('click', '.mm-hide', function(event) {
             $('#hide_msg_id').val($(this).closest('li').attr('id').replace(_msg_prefix, ''));
             // $('#hide-form-message-text').val(TODO);
+        });
+        // clicking the detach button loads the id into the (modal/fancybox) detach form
+        $message_list_element.on('click', '.mm-detach', function(event) {
+            $('#detach_msg_id').val($(this).closest('li').attr('id').replace(_msg_prefix, ''));
         });
     };
 
@@ -437,7 +455,8 @@ var message_manager = (function() {
                               }
                           }, 
                 error:    function(jqXHR, textStatus, errorThrown) {
-                            var st = jqXHR.status; 
+                            var st = jqXHR.status;
+                            var msg_is_html = false;
                             if (st == 401 || st == 403) {
                                 var msg = (st == 401 ? "Invalid username or password for" : "Access denied: please log in to") + " " + _mm_name;
                                 say_status(msg);
@@ -445,11 +464,17 @@ var message_manager = (function() {
                             } else {
                                 var err_msg = "Unable to load messages: ";
                                 if (st === 0 && textStatus === 'error') { // x-domain hard to detect, sometimes intermittent?
-                                    err_msg += "maybe try refreshing page?";
+                                    if (_url_root.indexOf('https')===0 && ! location.protocol != 'https:') {
+                                        var surl = location.href.replace(/^http:/, 'https:');
+                                        err_msg += 'this is an insecure URL.<br/><a href="' + surl + '">Try from HTTPS instead?</a>';
+                                        msg_is_html = true;
+                                    } else {
+                                        err_msg += "maybe try refreshing page?";
+                                    }
                                 } else {
                                     err_msg += textStatus + " (" + st + ")";
                                 }
-                                say_status(err_msg);
+                                say_status(err_msg, false, msg_is_html);
                             }
                           }
             });
@@ -674,6 +699,56 @@ var message_manager = (function() {
         }
     };
     
+    var mark_as_not_a_reply = function(msg_id, options) {
+        if (_use_fancybox){
+            $.fancybox.close();
+        }
+        var callback = null;
+        var check_li_exists = false;
+        if (options) {
+            if (typeof(options.callback) === 'function') {
+                callback = options.callback;
+            }
+            if (typeof(options.check_li_exists) !== undefined && options.check_li_exists !== undefined) {
+                check_li_exists = true; // MM dummy
+            }
+        }
+        var $li = $('#' + _msg_prefix + msg_id);
+        if (check_li_exists) {
+            if ($li.size() === 0) {
+                say_status("Couldn't find message with ID " + msg_id);
+                return;
+            }
+        }
+        $li.addClass('msg-is-busy');
+        $.ajax({
+            dataType:"json", 
+            type:"post", 
+            data: {},
+            url: _url_root +"messages/mark_as_not_a_reply/" + msg_id + ".json",
+            beforeSend: function (xhr){
+                xhr.setRequestHeader('Authorization', get_current_auth_credentials());
+                xhr.withCredentials = true;
+            },
+            success:function(data, textStatus) {
+                if (data.success) {
+                    $li.removeClass('msg-is-busy msg-is-locked').addClass('msg-is-owned').fadeOut('slow'); // no longer available
+                    say_status("Message no longer marked as a reply");
+                    if (typeof(callback) === "function") {
+                        callback.call($(this), data.data); 
+                    }
+                } else {
+                    $li.removeClass('msg-is-busy').addClass('msg-is-locked');
+                    say_status("Hide failed: " + data.error);
+                }
+            }, 
+            error: function(jqXHR, textStatus, errorThrown) {
+                say_status("Detach error: " + textStatus + ": " + errorThrown);
+                $li.removeClass('msg-is-busy');
+            }
+        });
+    };
+    
     // if boilerplate is not already in local storage, make ajax call and load them
     // otherwise, populate the boilerplate select lists: these are currently the
     // reasons for hiding a message, and pre-loaded replies.message-manager.dev.mysociety.org
@@ -769,6 +844,7 @@ var message_manager = (function() {
        show_info: show_info,
        sign_out: sign_out,
        populate_boilerplate_strings: populate_boilerplate_strings,
-       say_status: say_status
+       say_status: say_status,
+       mark_as_not_a_reply: mark_as_not_a_reply
      };
 })();

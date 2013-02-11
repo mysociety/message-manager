@@ -67,6 +67,16 @@ class User extends AppModel {
 				'message' => 'This email address is already associated with another username',
 			),
 		),
+		'old_password' => array(
+			'notempty' => array(
+				'rule' => array('notempty'),
+				'message' => "You must enter your current password",
+			),
+			'old_password_match' => array(
+				'rule' => array('old_password_match'),
+				'message' => "You got current password wrong",
+			),
+		),
 		'new_password' => array(
 			'minLength' => array(
 				'rule' => array('minLength', 6),
@@ -107,6 +117,15 @@ class User extends AppModel {
 	//---------------------------------------------------
 	public function password_match($check) {
 		return $check['confirm_password'] == $this->data['User']['new_password'];
+	}
+	
+	public function old_password_match($check) {
+		$current_user = $this->findById($this->data['User']['id']);
+		if ($current_user) {
+			return AuthComponent::password($check['old_password']) == $current_user['User']['password'];
+		} else {
+			return true;  // no user? old_password_match makes no sense for new users, so validates OK
+		}
 	}
 
 	public function group_exists($check) {

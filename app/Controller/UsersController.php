@@ -117,42 +117,41 @@ class UsersController extends AppController {
 		if (!$this->User->exists()) {
 			throw new NotFoundException(__('Invalid user'));
 		}
-		//$this->User->read(null, $id);
 		if ($this->request->is('post') || $this->request->is('put')) {
-
-			// if there's no attempt to change the password, remove the variables to bypass validation
-			if (empty($this->request->data['User']['new_password']) && 
-					empty($this->request->data['User']['confirm_password'])) {
-				unset($this->request->data['User']['new_password']);
-				unset($this->request->data['User']['confirm_password']);
-				$this->User->read(null, $id);
-			}
-			try {
-				if ($this->User->save($this->request->data)) {
-					$this->Session->setFlash(__('The user has been saved'));
-					$this->redirect(array('action' => 'index'));
-				} else {
-					$this->Session->setFlash(__('The user could not be saved. Please, try again.'));
-				}
-			} catch (Exception $e) {
-				// There's a problem (bug?) when editing User records with the current group-based AROs:
-				// only admins can edit User records (which is right) but an exception is thrown
-				// looking for the User entry -- there isn't one, because all the AROs are Groups.
-				// We're explicitly checking group here just to be sure this isn't exposing anything, but
-				// if this user is an admin, it's safe to ignore exceptions triggered by missing user AROs.
-				// Still, ugh.
-				$is_admin_group = ($this->Auth->user('group_id') == Group::$ADMIN_GROUP_ID)? 1 : 0;
-				if ($is_admin_group && preg_match("/Couldn't find Aro node identified by/", $e->getMessage())) {
-					$this->Session->setFlash(__('The user has been saved'));
-					$this->redirect(array('action' => 'index'));
-				} else {
-					throw $e;
-				}
+			if ($this->_save_user($id)) {
+				$this->Session->setFlash(__('The user has been saved.'));
+				$this->redirect(array('action' => 'index'));
+			} else {
+				$this->Session->setFlash(__('The user could not be saved. Please, try again.'));
 			}
 		} else {
 			$this->request->data = $this->User->read(null, $id);
 		}
 		$this->set('groups', $this->User->Group->find('list')); // populate the drop-down
+	}
+	
+	public function change_password() {
+		if ($this->request->is('post') || $this->request->is('put')) {
+			$new_password = $this->request->data['User']['new_password'];
+			if (empty($new_password)) {
+				$this->Session->setFlash(__('Missing password. Please try again.'));
+				$this->redirect(array('action' => 'change_password'));
+			}
+			$old_password = $this->request->data['User']['old_password'];
+			$confirmation = $this->request->data['User']['confirm_password'];
+			// clear all data (this is *not* edit user, so can't change any other fields)...
+			unset($this->request->data['User']);
+			// ... then put the new password data back
+			$this->request->data['User']['old_password'] = $old_password;
+			$this->request->data['User']['new_password'] = $new_password;
+			$this->request->data['User']['confirm_password'] = $confirmation;
+			if ($this->_save_user(AuthComponent::user('id'), true)) {
+				$this->Session->setFlash(__('Password has been saved.'));
+				$this->redirect('/');
+			} else {
+				$this->Session->setFlash(__('Password save failed: your password was NOT changed.'));
+			}
+		}
 	}
 
 /**
@@ -169,6 +168,10 @@ class UsersController extends AppController {
 		if (!$this->User->exists()) {
 			throw new NotFoundException(__('Invalid user'));
 		}
+		if ($this->Auth->user('id') == $id) {
+			$this->Session->setFlash(__("Can't delete yourself -- use another admin account to do this."));
+			$this->redirect(array('action' => 'index'));
+		}
 		if ($this->User->delete()) {
 			$this->Session->setFlash(__('User deleted'));
 			$this->redirect(array('action' => 'index'));
@@ -177,6 +180,48 @@ class UsersController extends AppController {
 		$this->redirect(array('action' => 'index'));
 	}
 	
+	// DRY: _save_user broken out here because edit and change_password both use this.
+	// If $change_password is true then this *must* be the logged-in user. Of course, admin users 
+	// can change other users' passwords, but using the "edit" (not "change_password") action.
+	// returns true if save was OK
+	private function _save_user($id, $change_password_only = false) {
+		if ($change_password_only) {
+			if ($this->Auth->user('id') != $id) {
+				return false; // don't save: can only change logged-in user's password
+			}
+		}
+		// if there's no attempt to change the password, remove the variables to bypass validation
+		if (empty($this->request->data['User']['new_password']) && 
+				empty($this->request->data['User']['confirm_password'])) {
+			unset($this->request->data['User']['new_password']);
+			unset($this->request->data['User']['confirm_password']);
+		}
+		$this->User->read(null, $id);
+		try {
+			if ($this->User->save($this->request->data)) {
+				return true;
+			} else {
+				return false;
+			}
+		} catch (Exception $e) {
+			// There's a problem (bug?) when editing User records with the current group-based AROs:
+			// only admins can edit User records (which is right) but an exception is thrown
+			// looking for the User entry -- there isn't one, because all the AROs are Groups.
+			// We're explicitly checking group here just to be sure this isn't exposing anything, but
+			// if this user is an admin, it's safe to ignore exceptions triggered by missing user AROs.
+			// Still, ugh.
+			if (preg_match("/Couldn't find Aro node identified by/", $e->getMessage())) {
+				if ($this->Auth->user('group_id') == Group::$ADMIN_GROUP_ID) {
+					return true; // OK because this is admin
+				} else if ($change_password_only) {
+					return true; // OK because was updating own password
+				} else {
+					throw $e; // OK so the save, uh, probably didn't work
+				}
+			}
+		}
+	}
+
 	public function initDB() {
 		//-------------------------------------------------------------------------------------
 		// Safety! only run this once, if you need to!
@@ -215,7 +260,10 @@ class UsersController extends AppController {
 		$this->Acl->allow($group, 'controllers/MessageSources/edit'); // NB edit is restricted to certain fields within the code
 		$this->Acl->allow($group, 'controllers/MessageSources/view');
 		$this->Acl->allow($group, 'controllers/MessageSources/client');
+		$this->Acl->allow($group, 'controllers/MessageSources/gateway_logs');
+		$this->Acl->allow($group, 'controllers/MessageSources/gateway_test');
 		$this->Acl->allow($group, 'controllers/Pages');
+		$this->Acl->allow($group, 'controllers/Users/change_password');
 		$this->Acl->allow($group, 'controllers/Users/logout');
 
 		// allow api-users to only use the JSON API
@@ -225,16 +273,19 @@ class UsersController extends AppController {
 		$this->Acl->allow($group, 'controllers/BoilerplateStrings/index');
 		$this->Acl->allow($group, 'controllers/Messages/assign_fms_id');
 		$this->Acl->allow($group, 'controllers/Messages/available');
+		$this->Acl->allow($group, 'controllers/Messages/hide');
 		$this->Acl->allow($group, 'controllers/Messages/lock');
 		$this->Acl->allow($group, 'controllers/Messages/lock_unique');
+		$this->Acl->allow($group, 'controllers/Messages/mark_as_not_a_reply');
 		$this->Acl->allow($group, 'controllers/Messages/reply');
 		$this->Acl->allow($group, 'controllers/Messages/unlock');
 		$this->Acl->allow($group, 'controllers/Messages/unlock_all');
 		$this->Acl->allow($group, 'controllers/MessageSources/client');
 		$this->Acl->allow($group, 'controllers/Pages');
+		$this->Acl->allow($group, 'controllers/Users/change_password');
 		$this->Acl->allow($group, 'controllers/Users/logout');
 
-		// allow message-sources to only use the incoming
+		// allow message-sources to only use the incoming (not even password change)
 		$group->id = Group::$SOURCE_USER_GROUP_ID;
 		$this->Acl->deny($group, 'controllers');
 		$this->Acl->allow($group, 'controllers/Messages/incoming');

@@ -1,10 +1,12 @@
 .DS_Store
 /app/Config/general.yml
+/app/Config/general.yml.deployed
+/app/Config/httpd.conf
+/app/Config/httpd.conf.deployed
 /lib/Cake/Console/Templates/skel/tmp
 /app/tmp/*
 
 .sass-cache/
-/app/Config/general.yml.deployed
 
 
 
