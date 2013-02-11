@@ -15,7 +15,16 @@
         Changing your password
     </h2>
     <p>
-        Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor.
+        You can change your own password by logging into the Message Manager
+        and clicking <strong>password</strong> on the top right of the page.
     </p>
+    <p>
+        You need to enter your current password as well. If you've forgotten
+        your password, ask an administrator to reset it for you.
+    </p>
+    <p>
+        If you are logged in with an administrator's account, you can change
+        any user's password by choosing <strong>users</strong> and then 
+        <strong>Edit</strong>.
 </div>
 

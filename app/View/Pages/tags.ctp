@@ -59,6 +59,34 @@
     <p>
         The tags will be left in the message text unless the configuration setting <code>remove_tags_when_matched</code> is true (currently set to <code><?php echo Configure::read('remove_tags_when_matched'); ?></code>).
     </p>
+    <h3>Filtering messages by tag: no-tag</h3>
+    <p>
+        Each user account (login) has tags associated with it. These are used
+        to filter the messages that are delivered by the <em>available</em> API
+        call (in effect this means the messages that they can see within
+        FixMyStreet).
+    </p>
+    <p>
+        A user with no tags will be shown <em>all</em> incoming messages in
+        response to the <code>available</code> API call.        
+    </p>
+    <p>
+        In addition to nominating one or more tags which <em>must</em> match
+        in order for the message to be shown, you can also specify a
+        <code>NO-TAG</code> which applies to any message which was received
+        without any tag.
+    </p>
+    <p>
+        This is useful if you want staff to be able to access messages that
+        are explicitly intended for them (i.e., have their tag) but also those
+        that have been received without them. This is a little different from 
+        a user with no tags at all specified. A use with tags <code>FOO</code>
+        and <code>NO-TAG</code> specified will see messages with the
+        <code>FOO</code> tag or no tag at all, but will <em>not</em> be shown
+        messages tagged with <code>BAR</code>.
+    </p>
+    
+    
     <h3>
         Gateway tags
     </h3>
@@ -77,6 +105,8 @@
     </p>
     <p>
         Don't confuse gateway tags with message tags. Unlike message tags, gateway tags are stripped <em>and discarded</em> when the message is received.
+        Messages are never filtered by gateway tag because by the time they
+        are stored in the Message Manager, those tags have been removed.
     </p>
-        
+
 </div>

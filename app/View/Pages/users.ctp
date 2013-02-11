@@ -15,6 +15,17 @@
         Users
     </h2>
     <p>
-        Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor.
+        Each user account has a username and (optionally) a unique email address. Either can be used to log into the Message Manager, although the
+        current implementation of the FixMyStreet client (using HTTP auth)
+        only allows username.
+    </p>
+    <p>
+        Users can belong to one of four 
+        <?php echo $this->Html->link('user groups', array('action' => 'groups')); ?>
+        which affect what they can access and which actions they can perform.
+    </p>
+    <p>
+        Administrator users can create, edit or delete users &mdash; click on
+        <strong>Users</strong> on the top menu bar.
     </p>
 </div>
