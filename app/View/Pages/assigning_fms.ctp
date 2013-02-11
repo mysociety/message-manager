@@ -15,6 +15,17 @@
         Assigning a message to an FMS id
     </h2>
     <p>
-        Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor.
+        Within FMS, assigning an FMS id is handled automatically (in fact, it's initiated by an AJAX call when the problem report is created).
+    </p>
+    <p>
+        However, you can also allocate an FMS ID manually within the Message Manger. Navigate directly to the message, enter the FMS ID and press <strong>Assign FMS</strong>. Note that no check is made to ensure that this is a valid ID. If you want to check that it's the message you intended, 
+        click on the link to the FMS record that is shown when you
+        <?php echo $this->Html->link('view the message', array('action' => 'viewing')); ?>.
+        
+    </p>
+    <p>
+        The FixMyStreet instance on which this ID applies is implied by the
+        config setting <code>fms_site_url</code> 
+        (which is currently set to <code><?php echo Configure::read('fms_site_url'); ?></code>).
     </p>
 </div>

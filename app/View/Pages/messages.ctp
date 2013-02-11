@@ -15,7 +15,32 @@
         About messages
     </h2>
     <p>
-        Messages are received from <em>message sources</em> — for a simple set-up this might be a single SMS gateway. Message have the following fields:
+        Messages are received from 
+        <?php echo $this->Html->link('message sources', array('action' => 'sources')); ?>
+        — for a simple set-up this might be a single SMS gateway. 
+    </p>
+    <h3>What can happen to a message</h3>
+    <p>
+        By way of an example, these are the sort of actions that can apply 
+        to a message. Some of these operations can happen through the API,
+        that is, from within the FMS interface &mdash; otherwise they are
+        performed by logging directly into the Message Manager with an admin
+        or manager account.
+    </p>
+	<ul>
+		<li>incoming message received from message source (message created)</li>
+		<li>message offered to nominated FMS users (e.g., staff accounts)</li>
+		<li>FMS user assigns message to FMS report</li>
+		<li>FMS user replies to incoming message (creating a new one)</li>
+		<li>message hidden (no longer accessible via API)</li>
+		<li>message tags edit</li>
+		<li>message threads reorganised (e.g., if a message is incorrectly placed in the wrong thread)</li>
+	</ul>
+	<h3>
+	    Message fields
+	</h3>
+	<p>
+        Message have the following fields:
     </p>
     <dl>
         <dt>
@@ -47,13 +72,14 @@
         </dt>
         <dd>
             <p>
-                The current status of the message. See <?php echo $this->Html->link(__('statuses'), array('action' => 'statuses')); ?>
+                The current status of the message. See <?php echo $this->Html->link('statuses', array('action' => 'statuses')); ?>
             </p>
         </dd>
         <dt>
             Lock
         </dt>
         <dd>
+            <p>See <?php echo $this->Html->link('locks', array('message locks' => 'locks')); ?> for details.
             <p>
                 A message is locked by an FMS user when they select it before using it to create or update an FMS problem report. The Message Manager shows the owner (in the API, this user is called the Lockkeeper) and the expiry time.
             </p>
@@ -132,6 +158,9 @@
             Tag
         </dt>
         <dd>
+            <p>See 
+            <?php echo $this->Html->link('tags', array('action' => 'tags')); ?> for details.
+            </p>
             <p>
                 The tag, if any, that was found in the incoming message text. This is typically used to identify areas or jurisdictions that the messages relate to, and is the first word in the message.
             </p>
@@ -156,6 +185,9 @@
             History/activity
         </dt>
         <dd>
+            <p>See 
+            <?php echo $this->Html->link('activity (logs)', array('action' => 'activity')); ?> for details.
+            </p>
             <p>
                 Most events that cause a change in a message's status or data are recorded and added to the message's activities. These are useful if you need to know what happened to a message after it was accepted from the message source, and which users processed it.
             </p>

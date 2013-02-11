@@ -15,6 +15,20 @@
         Hiding messages
     </h2>
     <p>
-        Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor.
+        Hiding a message means it will never be included in the response to 
+        an <code>available</code> API call. This effectively means it does not
+        appear in FixMyStreet.
+    </p>
+    <p>
+        Messages can be hidden by an API-user from within FixMyStreet. Alternatively, an admin or manager user can directly hide a message within
+        Message Manger by
+        <?php echo $this->Html->link('viewing the message', array('action' => 'viewing')); ?>
+        and clicking <strong>Hide</strong>.
+    </p>
+    <h3>Revealing (un-hiding)</h3>
+    <p>
+        There's no way to un-hide a message from within the FMS interface &mdash; this is to be expected because hidden messages basically never appear there. However, and admin or manager account can log into Message Manager 
+        directly, <?php echo $this->Html->link('view the message', array('action' => 'viewing')); ?>
+        and click <strong>Reveal/un-hide</strong>.
     </p>
 </div>
