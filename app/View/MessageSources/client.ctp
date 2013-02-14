@@ -71,7 +71,7 @@ echo $this->Html->script('/js/fancybox/jquery.fancybox-1.3.4.pack.js', false);
 					</select>
 				</div>
 				<?php
-    				echo $this->Form->input('reply_text', array('label'=>'Reply text', 'type'=>'text', 'name'=>'reply_text', 'id'=>'reply_text'));
+    				echo $this->Form->input('reply_text', array('label'=>'Reply text', 'type'=>'textarea', 'name'=>'reply_text', 'id'=>'reply_text'));
     				echo $this->Form->input('reply_to_msg_id', array('type'=>'hidden', 'name'=>'message_id', 'id'=>'reply_to_msg_id'));
     				echo $this->Form->submit(__('Send Reply'), array('id' => 'reply-submit'));
     				echo $this->Form->end();
