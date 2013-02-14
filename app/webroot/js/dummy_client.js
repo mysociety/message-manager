@@ -85,8 +85,11 @@ $(document).ready(function() {
 	$('#mm-hide-reasons').change(function(e){
 	    $('#reason_text').val($(this).val()); // load reason_text with boilerplate reason
 	});
+	
 	$('#mm-boilerplate-replies').change(function(e){
-	    $('#reply_text').val($(this).val()); // load reason_text with boilerplate reason
+	    var old_txt = $('#reply_text').val();
+	    var new_txt = $(this).val().replace(/(^\.\.\.|\.\.\.$)/, old_txt);
+	    $('#reply_text').val(new_txt); // load reason_text with boilerplate reason
 	});
 	
 	$('#reply-submit').click(function(e) {
