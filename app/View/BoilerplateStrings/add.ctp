@@ -10,6 +10,7 @@
 			echo $this->element('boilerplate_choices', array("choices" => $all_types, "name" => "type"));
 			echo $this->Form->input('type');
 			echo $this->Form->input('text_value');
+			echo $this->element('boilerplate_ellipsis');
 			echo $this->Form->input('sort_order', array('label' => 'Sort index (used to determine display order in drop-down menu)'));
 		?>
 	</fieldset>
