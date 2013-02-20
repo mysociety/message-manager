@@ -79,8 +79,6 @@ $cakeDescription = __d('cake_dev', 'CakePHP: the rapid development php framework
 		<div id="footer">			
 			<?php echo $this->Html->link(__('about'), "/about", array('class'=>'mm-link')); ?>
 			<?php echo $this->Html->link(__('help'), "/help", array('class'=>'mm-link')); ?>
-			<?php echo $this->Html->link(__('API'), array('controller' => 'pages', 'action' => 'api'), array('class'=>'mm-link')); ?>
-			
 			<?php echo $this->Html->link(__('mySociety'), "http://www.mysociety.org"); ?>
 			
 			<?php echo $this->Html->link(

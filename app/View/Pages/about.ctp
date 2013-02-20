@@ -4,28 +4,15 @@
 		Messages for FixMyStreet and similar systems.
 	</strong></p>
 	<p>
-		The Message Manager sits between a message source (such as an SMS gateway) and a 
-		<a href="http://code.fixmystreet.com/">FixMyStreet-like application</a>.
-		It accepts incoming messages, and makes them available to nominated users on the
-		FMS system.
+	    The Message Manager lets users submit problem reports to FixMyStreet (or systems
+	    like it) from one or message sources (such as SMS gateways). See 
+	    <?php echo $this->Html->link(__('this overview'), array('action' => 'overview')); ?>
+	    for more information about what it does.
 	</p>
-	<h3>Simple life cycle of a message</h3>
-	<ul>
-		<li>incoming message received from message source, </li>
-		<li>message offered to nominated (e.g., admin) FMS users</li>
-		<li>FMS user assigns message to FMS report</li>
-		<li><em>FMS user replies to user</em></li>
-	</ul>
 	<p>
-		And that's it. There is some message-locking going on, to discourage FMS users from
-		colliding. 
+        <a href="http://www.mysociety.org">mySociety</a>'s Message Manager was created as an addition to 
+        the FixMyStreet platform as part of a project funded by the World Bank. See
+        <a href="http://code.fixmystreet.com">code.fixmystreet.com</a> for more information about the
+        platform.
 	</p>
-
-	<h3>JSON API</h3>
-	<p>
-		FMS communicates with the Message Manager with AJAX calls sending JSON &mdash; see the 
-		<?php echo $this->Html->link(__('Message Manager JSON API'), array('action' => 'api')); ?>
-		for details and examples.
-	</p>	
-		
 </div>

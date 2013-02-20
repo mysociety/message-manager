@@ -7,27 +7,15 @@
 -- the ARO-ACO mapping controls who is allowed to do those things, and who is not
 
 -- ========================================================================
--- Don't try to edit these by hand! No, really!
--- But if you need to rebuid them:
--- -----------------------------------------------------------------------
--- If you create a new group *within the Message Manager admin* the ARO
--- table will automatically add it.
+-- Don't try to edit these by hand! 
+-- No, really!
+-- But if you need to change them:
 --
--- But if you add a new action to a controller, you'll need to add it to
--- the ACOS table. Add it to the apprpriate user groups in 
--- apps/Controllers/User.php's initDB action. 
--- Then the safest approach is probably to rebuilt it all:
---
--- first delete all records from aco and aros_acos then...
--- ...rebuild the aco table with:
--- Console/cake AclExtras.AclExtras aco_sync
--- ...and then (you'll need to edit the PHP to remove the redirect that
---    prevents this usually running) in browser hit:
--- /users/initdb
--- ...to repopulate the ARO-ACO mappings
--- When that's done, remember to edit apps/Controllers/User.php and
--- set initDB's redirect back on since for now that's the simplest way
--- to stop anyone running this when they don't mean to.
+--         ***                                            ***
+--         *** see documentation/authorisation_how_to.md  ***
+--         ***                                            ***
+-- 
+-- ...for essential information on how to rebuild them
 -- -----------------------------------------------------------------------
 
 

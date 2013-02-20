@@ -91,6 +91,33 @@ body.cobrand-default {
     margin-bottom: 1.2em; }
   #container .mm-page td {
     line-height: 1.4em; }
+  #container .mm-page ul.mm-help {
+    position: relative;
+    background-color: #eeeeee;
+    font-size: 100%;
+    list-style: none;
+    padding: 0;
+    margin: -1em 0 2em 0; }
+    #container .mm-page ul.mm-help li {
+      padding: 0.5em; }
+      #container .mm-page ul.mm-help li a {
+        text-decoration: none; }
+        #container .mm-page ul.mm-help li a:hover {
+          text-decoration: underline; }
+        #container .mm-page ul.mm-help li a span {
+          color: #666666; }
+    #container .mm-page ul.mm-help .mm-help-prev {
+      text-align: left;
+      position: absolute;
+      top: 0;
+      left: 0; }
+    #container .mm-page ul.mm-help .mm-help-contents {
+      text-align: center; }
+    #container .mm-page ul.mm-help .mm-help-next {
+      text-align: right;
+      position: absolute;
+      top: 0;
+      right: 0; }
 #container .message-text, #container .note-text {
   border: 1px solid black;
   padding: 1em;
