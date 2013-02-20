@@ -15,6 +15,28 @@
         Activity (logs)
     </h2>
     <p>
-        Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor.
+        The activity logs record key activity affecting each message. These records are stored in the database and are 
+        displayed when you <?php echo $this->Html->link(__('view a message'), array('action' => 'viewing')); ?>.
     </p>
+    <p>
+        You can also see the activity records directly by clicking on the <strong>Activity</strong> in the 
+        navigation menu.
+    </p>
+    <h3>
+        Action types currently supported
+    </h3>
+    <dl style="margin:1em;">
+    <?php
+        foreach ($action_types as $name => $desc) {
+		    echo "<dt>$name</dt><dd>$desc</dd>\n";
+	    }
+    ?>
+    </dl>
+    <p>
+        Because lock activity is so common, <code>lock</code> and <code>unlock</code> 
+        actions are only logged if the config setting
+        <code>log_lock_actions</code> is set. Currently this setting is
+        <code><?php echo(Configure::read('log_lock_actions')?"true":"false"); ?></code>.
+    </p>
+    
 </div>

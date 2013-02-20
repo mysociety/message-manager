@@ -17,6 +17,13 @@
     <p>
         You can view an individual message by clicking on <strong>View</strong> in any message listing.
     </p>
+    <p>
+        The fields that are shown are described in detail on the 
+        <?php echo $this->Html->link(__('message'), array('action' => 'messages')); ?>
+        page. The 
+        <?php echo $this->Html->link(__('activity log'), array('action' => 'activity')); ?>
+        for the individual message is also displayed.
+    </p>
     <h3>Listing Messages</h3>
     <p>
         Click on one of the links in the top navigation menu to list the messages. The possibilities are:

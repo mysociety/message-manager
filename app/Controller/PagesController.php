@@ -92,6 +92,19 @@ class PagesController extends AppController {
 		}
 		$this->set('welcome_msg', $welcome_msg);
 		$this->set(compact('page', 'subpage', 'title_for_layout'));
+		if ($page == 'activity') {
+			Controller::loadModel('ActionType');
+			$action_types_found = $this->ActionType->find(
+				'all', 
+				array('order' => array('ActionType.name ASC'))
+			);
+			$action_type = array();
+			foreach ($action_types_found as $at) {
+				$action_type = $at['ActionType'];
+				$action_types[$action_type['name']] = $action_type['description'];
+			}
+			$this->set('action_types', $action_types);
+		}
 		$this->render(implode('/', $path));
 	}
 	
