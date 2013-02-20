@@ -15,6 +15,13 @@
         Deleting a message
     </h2>
     <p>
-        Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor.
+        If you're logged in with an admin or manager account, you can delete a message. Deleting is an 
+        irreversible action, and under normal circumstances you don't need to do this. You should consider
+        <?php echo $this->Html->link(__('hiding a message'), array('action' => 'hiding')); ?> rather than
+        deleting it -- hiding a message effectively means you `api-user` users will never see it.
+    </p>
+    <p>
+        To delete a message, first <?php echo $this->Html->link(__('view the message'), array('action' => 'viewing')); ?>
+        and then click on <strong>Delete</strong>.
     </p>
 </div>
