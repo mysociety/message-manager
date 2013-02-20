@@ -28,4 +28,11 @@
         Administrator users can create, edit or delete users &mdash; click on
         <strong>Users</strong> on the top menu bar.
     </p>
+    <h3>
+        Enabling users to send messages
+    </h3>
+    <p>
+        A user can only send messages (that is, can only reply to incoming messages) if the account has 
+        <em>Can send replies?</em> set. To change this setting, edit the user.
+    </p>
 </div>
