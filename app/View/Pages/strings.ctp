@@ -30,6 +30,7 @@
     <p>
         You need to be logged in with an admin or manager account in order to add or edit a string. View the strings and either click on
         <strong>Add a new string</strong> or <strong>Edit</strong>.
+        Editing a string won't affect any existing messages &mdash; this only updates how it appears in the drop-down menus for future use.
     </p> 
     </p>
         Make sure you choose one of the existing string types. If you don't, then your string won't be included in either of the drop-down menus,
@@ -47,8 +48,8 @@
         Deleting a string
     </h3>
     <p>
-        You need to be logged in with an admin or manager account in order to add or edit a string. Find the string and click on
-        <strong>Delete</strong>.
+        You need to be logged in with an admin or manager account in order to delete a string. Find the string and click on
+        <strong>Delete</strong>. Deleting a string won't affect any existing messages &mdash; this only removes it from the drop-down menus.
     </p>
     <h3>
         Note about caching boilerplate strings
