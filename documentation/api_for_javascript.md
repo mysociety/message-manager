@@ -44,10 +44,12 @@ classes used... but there's also an implicit dependency on FancyBox too, hmm).
 		
 ## API Summary
 
+* GET `/boilerplate_strings/index/[string-type]`
 * GET `/messages/available`  with optional `fms_id=FMS-id`
 * POST `/messages/hide/msg-id` with optional `reason_text=reason_text`
 * POST `/messages/lock/msg-id`
 * POST `/messages/lock_unique/msg-id`
+* POST `/messages/mark_as_not_a_reply/msg-id`
 * POST `/messages/unlock/msg-id`
 * POST `/messages/unlock_all`
 * POST `/messages/reply/msg-id` with `reply_text=reply text`
@@ -156,7 +158,78 @@ Example:
     }
 	
 ## Operations
-	
+
+### Get boilerplate strings
+
+#### Method & address
+
+GET from `/boilerplate_strings/index/[string-type]`
+
+#### Parameters
+
+None -- but note *[string-type]* may currently be either `reply` or
+`hide-reason` (or nothing at all, for all strings).
+
+The types available depend on the strings in the database (that is, this is not a restriction within the code). Currently:
+
+   * **reply**: boilerplate strings for use as outgoing replies to incoming
+     messages
+
+   * **hide-reason**: boilerplate strings for use as reasons why a message is
+     being hidden
+
+#### Operation
+
+The boilerplate strings are provided as a handy way for staff to populate common strings. See this being used by `message_manager_client.js` to populate the drop-down menu for replying.
+
+#### Return value
+
+The `boilerplate_strings/index` call returns `success`, together with `data`
+that groups the messages by language code. The messages themselves are keyed
+by unique ID (Dev note: probably should just be an array (in display order) of
+strings since the ID is not used; this may change in the future). For
+convenience, the language codes for the languages returned are provided as an
+array in `langs`.
+
+Be sure to check you're using the string type you intend. If you ask for a
+string type that Message Manager doesn't know about, you'll get a `success`
+response with no data in it (that is `data` will contain `langs:[]`). This is
+not an error -- you're really asking for strings keyed on that value. This is
+the same behaviour as asking for valid key which has no strings associated
+with it.
+
+The call for boilerplate strings returns an object containing the following:
+
+*   **success**: 
+    which is `true` or `false`
+
+*   **data**
+    an array keyed on language code, each of which contains an object which is itself a list of strings keyed on string ID. .
+    
+    One key is special: if (and only if) there are any language codes in the data, `langs` will itself contain an array of the language codes used as keys.
+    
+* **error** (only on failure):
+    a message describing the fault
+
+
+### Example
+
+    {
+       "success": true,
+       "data": {
+         "en": {
+           "6": "... Thank you.",
+           "3": "Sorry, outside the scope of this service."
+         },
+         "de": {
+           "8": "Entschuldigung: außerhalb des Umfangs dieser Dienstleistung."
+         },
+         "langs": ["de","en"]
+       },
+       "username":"6"
+    }
+
+
 ### Get available messages
 
 #### Method & address
@@ -263,7 +336,7 @@ The `hide` call returns an array of one or two objects:
 * **error** (only on failure):
     a message describing the fault
 
-	
+
 ### Lock message
 	
 #### Method & address
@@ -533,3 +606,69 @@ Currently, the message's data is not returned on failure:
       "data":     null,
       "error":    "failed: Not assigned: locked by another user"
     }
+
+
+==========
+/messages/mark_as_not_a_reply/msg-id
+
+### Mark as not-a-reply (detach message from thread)
+	
+#### Method & address
+
+POST to `/messages/mark_as_not_a_reply/id`
+
+#### Parameters
+
+None.
+
+#### Operation
+
+Detaches the message with id=`id` from its parent message (if any). If it is currently shown as a reply to a message, after making this call it will no longer be a reply. Instead it will be a standalone "new" message.
+
+Note that any replies to *this* message (and indeed all subsequent reply threads, that is, replies to those replies, and so on) will remain attached to this message. All this call does is detach the message from its parent.
+
+If the message is not currently marked as a reply, the call will fail.
+
+This call is exposed as an API call because it's likely that the Message
+Manager's autodetection of replies will sometimes be wrong (most commonly if a
+user who is in one reply thread then submits a new message). It's currently
+not possible to reassign a parent (that is, to attach a message to a
+*different* parent message) through the API: you'll have to log into Message
+Manager directly to manipulate messages (using **Edit message**).
+
+Note that you almost certainly only want to do this to *incoming* messages,
+because Message Manager doesn't expect message threads to begin with an
+outgoing message.
+
+#### Return value
+
+The `mark_as_not_a_reply` call returns the following 
+
+*   **success**: 
+    which is `true` or `false`
+
+*   **data**: 
+    currently, no data is returned.
+
+*   **error** (only on failure):
+    if the message could not be detached, a message describing the problem is
+    returned.
+
+
+#### Examples
+
+If the message was detached, `success==true`:
+
+    {
+      "success":     true,
+      "data":        null
+    }
+
+If the message was not detached because it does not currently have a parent message:
+
+    {
+      "success":     false,
+      "data":        "No action taken: message wasn't marked as a reply anyway"
+    }
+
+
