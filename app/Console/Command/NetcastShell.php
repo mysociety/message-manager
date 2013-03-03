@@ -315,7 +315,7 @@ class NetcastShell extends AppShell {
 				}
 			}
 			# skip summary unless verbose
-			if ($msgs_received) {
+			if ($msgs_received || $this->params['verbose']) {
 				$something_to_report = $msgs_received;
 				// annoyingly, Netcast GETINCOMING returns all messages ever recieved (no, really) on every
 				// call, so to prevent this being reported every time it runs on cron, suppress the output
@@ -323,7 +323,7 @@ class NetcastShell extends AppShell {
 				if ($command == 'GETINCOMING' && $msgs_received == $msgs_skipped) {
 					$something_to_report = false; 
 				}
-				if ($something_to_report) {
+				if ($something_to_report || $this->params['verbose']) {
 					$this->out(__("Incoming messages received: %s, saved: %s, skipped: %s, failed: %s", 
 						$msgs_received, $msgs_saved, $msgs_skipped, $msgs_failed), 1, Shell::NORMAL);
 				} else {
@@ -437,7 +437,7 @@ class NetcastShell extends AppShell {
 		} 
 		$this->out("", 2, Shell::VERBOSE);
 		# skip summary unless verbose
-		if ($msgs_queued) {
+		if ($msgs_queued || $this->params['verbose']) {
 			$this->out(__("Outgoing messages in queue: %s, sent: %s, failed: %s, sent-but-not-updated: %s, skipped: %s", 
 				$msgs_queued, $msgs_sent, $msgs_failed, $msgs_sent_unsaved, $msgs_skipped), 1, Shell::NORMAL);
 		} else {
@@ -548,7 +548,7 @@ class NetcastShell extends AppShell {
 		} 
 		$this->out("", 2, Shell::VERBOSE);
 		# skip summary unless verbose
-		if ($msgs_unknown) {
+		if ($msgs_unknown || $this->params['verbose']) {
 			$this->out(__("Messages to check: %s, checked: %s, updated: %s, failed: %s, skipped: %s", 
 				$msgs_unknown, $msgs_checked, $msgs_updated, $msgs_failed, $msgs_skipped), 1, Shell::NORMAL);
 		} else {
