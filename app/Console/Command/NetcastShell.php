@@ -316,10 +316,19 @@ class NetcastShell extends AppShell {
 			}
 			# skip summary unless verbose
 			if ($msgs_received) {
-				$this->out(__("Incoming messages received: %s, saved: %s, skipped: %s, failed: %s", 
-					$msgs_received, $msgs_saved, $msgs_skipped, $msgs_failed), 1, Shell::NORMAL);
-			} else {
-				$this->out(__("Incoming messages received: 0"), 1, Shell::VERBOSE);
+				$something_to_report = $msgs_received;
+				// annoyingly, Netcast GETINCOMING returns all messages ever recieved (no, really) on every
+				// call, so to prevent this being reported every time it runs on cron, suppress the output
+				// unless there was a new message (i.e., not all messages were simply skipped)
+				if ($command == 'GETINCOMING' && $msgs_received == $msgs_skipped) {
+					$something_to_report = false; 
+				}
+				if ($something_to_report) {
+					$this->out(__("Incoming messages received: %s, saved: %s, skipped: %s, failed: %s", 
+						$msgs_received, $msgs_saved, $msgs_skipped, $msgs_failed), 1, Shell::NORMAL);
+				} else {
+					$this->out(__("Incoming messages received: 0"), 1, Shell::VERBOSE);
+				}
 			}
 			$this->out(__("Done"), 1, Shell::VERBOSE);
 		} else {
