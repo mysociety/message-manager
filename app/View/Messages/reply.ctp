@@ -7,6 +7,7 @@ $(document).ready(function() {
     // taken from message_manager_clients.js
     var _url_root = '/';
     var $boilerplate_replies = $('#mm-boilerplate-replies-box');
+    var $hide_reasons = '';
     
     var populate_boilerplate_strings = function(boilerplate_type, options) {
         $.ajax({

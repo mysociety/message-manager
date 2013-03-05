@@ -439,29 +439,37 @@ class MessagesController extends AppController {
 	}
 	
 	public function hide($id = null) {
-		if (!$this->request->is('post')) {
-			throw new MethodNotAllowedException();
-		}
 		self::_load_record($id);
-		$reason_text = $this->request->data('reason_text');
-		
-		$this->Message->hide($reason_text); 
-		if ($this->Message->save()) {
-			self::_logAction(ActionType::$ACTION_HIDE, $reason_text);
-			$msg = __('Message hidden');
-			if ($this->RequestHandler->accepts('json')) {
-				$this->response->body( json_encode(self::mm_json_response(true, null)) );
-				return $this->response;
+		if ($this->request->is('post')) {
+			$reason_text = $this->request->data('reason_text');
+			$this->Message->hide($reason_text); 
+			if ($this->Message->save()) {
+				self::_logAction(ActionType::$ACTION_HIDE, $reason_text);
+				$msg = __('Message hidden');
+				if ($this->RequestHandler->accepts('json')) {
+					$this->response->body( json_encode(self::mm_json_response(true, null)) );
+					return $this->response;
+				}
+			} else {
+				$msg = __('Failed to hide message');
+				if ($this->RequestHandler->accepts('json')) {
+					$this->response->body( json_encode(self::mm_json_response(false, null, $msg)) );
+					return $this->response;
+				}
 			}
-		} else {
-			$msg = __('Failed to hide message');
+			$this->Session->setFlash($msg);
+			$this->redirect(array('action' => 'view', $id));
+		} else { // GET request
 			if ($this->RequestHandler->accepts('json')) {
-				$this->response->body( json_encode(self::mm_json_response(false, null, $msg)) );
-				return $this->response;
+				throw new MethodNotAllowedException();
+			}
+			if ($this->Message->data['Message']['status'] == Status::$STATUS_HIDDEN) {
+				$this->Session->setFlash(__("Message is already hidden (can't hide it again)"));
+				$this->redirect(array('action' => 'view', $id));
+			} else {
+				$this->set('message', $this->Message->data);
 			}
 		}
-		$this->Session->setFlash($msg);
-		$this->redirect(array('action' => 'view', $id));
 	}
 
 	public function unhide($id = null) {

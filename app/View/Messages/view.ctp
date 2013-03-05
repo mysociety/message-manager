@@ -1,37 +1,37 @@
 <div class="mm-messages view">
 	<h2>
-	    <?php
-	        if ($message['Message']['is_outbound']) {
-	            echo('Outbound');
-	        }
-	    ?>
-	    Message
+		<?php
+			if ($message['Message']['is_outbound']) {
+				echo('Outbound');
+			}
+		?>
+		Message
 	</h2>
 	<dl style="margin-bottom:3em">
 		<?php
-	        if ($message['Message']['to_address']) { ?>
-		    	<dt>
-			    	To
-		    	</dt>
-		    	<dd>
-			    	<?php echo h($message['Message']['to_address'])?>
-			    	&nbsp;
-		    	</dd>
+			if ($message['Message']['to_address']) { ?>
+				<dt>
+					To
+				</dt>
+				<dd>
+					<?php echo h($message['Message']['to_address'])?>
+					&nbsp;
+				</dd>
 		<?php } ?>
 
-	    <?php if ($message['Message']['parent_id']) { ?>
-    		<dt>
-    			In reply to 
-    		</dt>
-    		<dd>
+		<?php if ($message['Message']['parent_id']) { ?>
+			<dt>
+				In reply to 
+			</dt>
+			<dd>
 				<a href="<?php echo $this->Html->url(array('action' => 'view', $message['Message']['parent_id'])); ?>">
 					<span class="message-sender">
 						<?php echo h($message['Parent']['from_address']); ?>
 					</span>
-    				<?php echo h($message['Parent']['message']); ?>
-    			</a>&nbsp;
-    		</dd>
-	    <?php } ?> 
+					<?php echo h($message['Parent']['message']); ?>
+				</a>&nbsp;
+			</dd>
+		<?php } ?> 
 		<dt>
 			Message
 		</dt>
@@ -90,7 +90,7 @@
 			} ?>
 			<?php if (!empty($message['Message']['assigned'])) {
 				echo "<br/>assigned: " . h($message['Message']['assigned']);
- 			} ?>
+			} ?>
 			&nbsp;
 		</dd>
 		<dt>Received</dt>
@@ -106,7 +106,7 @@
 		<dt>Modified</dt>
 		<dd>
 			 <?php
-			 	if ($message['Message']['modified'] != $message['Message']['created']) {
+				if ($message['Message']['modified'] != $message['Message']['created']) {
 					echo h($message['Message']['modified']);
 				} ?>
 			&nbsp;
@@ -176,7 +176,7 @@
 				</table>
 			<?php } else { ?>
 				<em>No failed attempts</em>
-			<?php }  ?>
+			<?php }	 ?>
 		</dd>
 	</dl>
 	
@@ -239,7 +239,7 @@
 				<?php echo $this->Form->postLink($is_locked? __('Unlock') : __('Purge lock'), 
 					array('action' => 'unlock', $message['Message']['id']), null, 
 					__('Are you sure you want to release the lock on this message?',
-			 		$message['Message']['id'])); ?>
+					$message['Message']['id'])); ?>
 			</li>
 		<?php } else { ?>
 			<li>
@@ -263,9 +263,7 @@
 			</li>
 		<?php } else { ?>
 			<li>
-				<?php echo $this->Form->postLink(__('Hide'), 
-					array('action' => 'hide', $message['Message']['id']), null, __('Are you sure you want to hide this message?',
-						$message['Message']['id'])); ?> 
+				<?php echo $this->Html->link(__('Hide'), array('action' => 'hide', $message['Message']['id']));?>
 			</li>
 		<?php } ?>
 		<?php if ($message['Message']['fms_id']) { ?>
@@ -290,18 +288,18 @@
 		<?php if (! $message['Message']['is_outbound']) { ?>
 			<li>
 				<?php echo $this->Html->link(__('Reply'),
-			 		array('action' => 'reply', $message['Message']['id'])); ?>
+					array('action' => 'reply', $message['Message']['id'])); ?>
 			</li>
 		<?php } ?>
 		<?php if ($message['Message']['parent_id']) { ?>
 			<li>
 				<?php echo $this->Html->link(__('Not a reply'),
-			 		array('action' => 'mark_as_not_a_reply', $message['Message']['id'])); ?>
+					array('action' => 'mark_as_not_a_reply', $message['Message']['id'])); ?>
 			</li>
 		<?php } ?>
 		<li>
 			<?php echo $this->Form->postLink(__('Delete'),
-		 		array('action' => 'delete', $message['Message']['id']), null, 
+				array('action' => 'delete', $message['Message']['id']), null, 
 					__('Are you sure you want to delete this message?')); ?>
 		</li>
 		<li> 
