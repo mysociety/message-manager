@@ -5,7 +5,7 @@ $(document).ready(function() {
 
     var _url_root = '/';
     var $boilerplate_replies = $('#mm-boilerplate-replies-box');
-    var $hide_reasons = '';
+    var $hide_reasons = $('#mm-boilerplate-reasons-box');
     
     var populate_boilerplate_strings = function(boilerplate_type, options) {
         $.ajax({
@@ -72,8 +72,15 @@ $(document).ready(function() {
     $('#mm-boilerplate-replies').change(function(e){
         var old_txt = $('#MessageReplyText').val();
         var new_txt = $(this).val().replace(/(^\.\.\.|\.\.\.$)/, old_txt);
-        $('#MessageReplyText').val(new_txt); // load reason_text with boilerplate reason
+        $('#MessageReplyText').val(new_txt); 
+    });
+
+    $hide_reasons.find('select').change(function(e){
+        var old_txt = $('#MessageReasonText').val();
+        var new_txt = $(this).val().replace(/(^\.\.\.|\.\.\.$)/, old_txt);
+        $('#MessageReasonText').val(new_txt);
     });
     
     populate_boilerplate_strings('reply');
+    populate_boilerplate_strings('hide-reason');
 });
