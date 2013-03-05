@@ -1,5 +1,9 @@
-<?php echo $this->Html->script('jquery-1.7.2.min', false); ?>
-<?php echo $this->Html->script('boilerplate', false); ?>
+<?php 
+    echo $this->Html->script('jquery-1.7.2.min', false);
+    echo $this->Html->script('modernizr.custom', false);
+    echo $this->Html->script('message_manager_client', false);
+    echo $this->Html->script('boilerplate', false); 
+?>
 
 <div class="mm-message form">
 	<h2><?php echo __('Hide message'); ?></h2>
@@ -25,7 +29,7 @@
     		</dd>
     	</dl>
 	</div>
-	<div class="input" id="mm-boilerplate-reasons-box">
+	<div class="input" id="mm-boilerplate-hide-reasons-box">
 		<label for="boilerplate-reasons">Use preloaded reason for hiding:</label>
 		<select name="boilerplate-reasons" id="mm-boilerplate-reasons">
 		</select>

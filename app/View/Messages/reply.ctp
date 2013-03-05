@@ -1,5 +1,9 @@
-<?php echo $this->Html->script('jquery-1.7.2.min', false); ?>
-<?php echo $this->Html->script('boilerplate', false); ?>
+<?php 
+    echo $this->Html->script('jquery-1.7.2.min', false);
+    echo $this->Html->script('modernizr.custom', false);
+    echo $this->Html->script('message_manager_client', false);
+    echo $this->Html->script('boilerplate', false); 
+?>
 
 <div class="mm-message form">
 	<h2><?php echo __('Reply to message'); ?></h2>
