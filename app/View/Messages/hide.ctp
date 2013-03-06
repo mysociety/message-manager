@@ -29,7 +29,7 @@
     		</dd>
     	</dl>
 	</div>
-	<div class="input" id="mm-boilerplate-hide-reasons-box">
+	<div class="boilerplate-chooser" id="mm-boilerplate-hide-reasons-box">
 		<label for="boilerplate-reasons">Use preloaded reason for hiding:</label>
 		<select name="boilerplate-reasons" id="mm-boilerplate-reasons">
 		</select>

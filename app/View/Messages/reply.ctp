@@ -29,7 +29,7 @@
 		</dd>
 	</dl>
 	</div>
-	<div class="input" id="mm-boilerplate-replies-box">
+	<div class="boilerplate-chooser" id="mm-boilerplate-replies-box">
 		<label for="boilerplate-replies">Use preloaded reply:</label>
 		<select name="boilerplate-replies" id="mm-boilerplate-replies">
 		</select>

@@ -267,7 +267,11 @@ body.cobrand-default {
   }
   .inline-buttons {
     width: auto;
-  }  
+  } 
+  .mm-message.form .boilerplate-chooser {
+    display: none;
+    margin: 1em 1em 0 1em;
+  }
   #footer {
     a {
       color: #fff;

@@ -210,6 +210,9 @@ body.cobrand-default {
     margin: 1em; }
 #container .inline-buttons {
   width: auto; }
+#container .mm-message.form .boilerplate-chooser {
+  display: none;
+  margin: 1em 1em 0 1em; }
 #container #footer a {
   color: #fff;
   margin-right: 0.5em;
