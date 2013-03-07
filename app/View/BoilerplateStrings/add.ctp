@@ -18,7 +18,6 @@
 </div>
 <div class="actions">
 	<ul>
-		<li><?php echo $this->Html->link(__('List all strings'), array('action' => 'index'));?></li>
 		<?php echo $this->element('sidebar/strings'); ?>
 	</ul>
 </div>
