@@ -122,6 +122,7 @@ class MessageSourcesController extends AppController {
 			$connection_test_result = $netcast->__soapCall("GETCONNECT", array($netcast_id)); 
 			$connection_test_result = MessageSource::decode_netcast_retval($connection_test_result);
 		}
+		$this->set('message_source', $source);
 		$this->set('connection_test_result', $connection_test_result);
 	}
 
@@ -162,6 +163,7 @@ class MessageSourcesController extends AppController {
 				}
 			}
 		}
+		$this->set('message_source', $source);
 		$this->set('subtitle', $subtitle);
 		$this->set('date', $date); // user input (actual param sent is in the subtitle)
 		$this->set('gateway_logs', $gateway_logs);
