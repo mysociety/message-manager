@@ -42,6 +42,7 @@
 <div class="actions">
 	<ul>
 		<li><?php echo $this->Html->link(__('New source'), array('action' => 'add')); ?></li>
-		<li><?php echo $this->Html->link(__('List all sources'), array('action' => 'index')); ?></li>
+		<li>&nbsp;</li>
+        <li><?php echo $this->Html->link(__('List all sources'), array('action' => 'index')); ?></li>
 	</ul>
 </div>

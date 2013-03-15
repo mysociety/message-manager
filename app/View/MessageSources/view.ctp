@@ -52,7 +52,9 @@
 			null, __('Are you sure you want to delete this message source?')); ?> </li>
 			<li><?php echo $this->Html->link(__('Gateway test'), array('action' => 'gateway_test', $message_source['MessageSource']['id'])); ?> </li>
 			<li><?php echo $this->Html->link(__('Gateway logs'), array('action' => 'gateway_logs', $message_source['MessageSource']['id'])); ?> </li>
-			<li><?php echo $this->Html->link(__('List all sources'), array('action' => 'index')); ?> </li>
-		<li><?php echo $this->Html->link(__('New source'), array('action' => 'add')); ?> </li>
+			<li>&nbsp;</li>
+    		<li><?php echo $this->Html->link(__('New source'), array('action' => 'add')); ?> </li>
+			<li>&nbsp;</li>
+            <li><?php echo $this->Html->link(__('List all sources'), array('action' => 'index')); ?> </li>
 	</ul>
 </div>
