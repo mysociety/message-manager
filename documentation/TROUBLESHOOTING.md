@@ -55,6 +55,11 @@ returns more than 0. In future, maybe replies should not be given status
 A reply is a message which has a non-empty `parent_id` and FixMyStreet 
 currently won't let you make a new report from such a message.
 
+## Help/more information
+
+There are Help pages within the application -- once you've installed it, click
+on *help* (the source text is in `app/Views/Pages`).
+
 ### Work-in-Progress
 
 (TODO! add more helpful solutions to common gotchas and hmmms)
