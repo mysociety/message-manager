@@ -42,7 +42,8 @@
     </p>
     <p>
         If the string is of type <code>reply</code>, you can add three dots (<code>...</code>) to indicate that it is a prefix of a suffix.
-        This means it will be added at the start or end of the message (if any), respectively. The ad
+        This means it will be added at the start or end of the message (if any), respectively. This lets you add reply instructions at the end
+        of outgoing messages, for example.
     </p>
     <h3>
         Deleting a string
