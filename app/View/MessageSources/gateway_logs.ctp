@@ -23,7 +23,5 @@
 		<li><?php echo $this->Html->link(__('View source'), array('action' => 'view', $message_source['MessageSource']['id'])); ?> </li>
 		<li><?php echo $this->Html->link(__('Edit source'), array('action' => 'edit', $message_source['MessageSource']['id'])); ?> </li>
 		<li><?php echo $this->Html->link(__('List all sources'), array('action' => 'index')); ?> </li>
-	
-		<?php echo $this->element('sidebar/messages'); ?>
 	</ul>
 </div>

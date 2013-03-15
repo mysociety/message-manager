@@ -39,6 +39,5 @@
 	<ul>
 		<li><?php echo $this->Form->postLink(__('Delete Action'), array('action' => 'delete', $action['Action']['id']), null, __('Are you sure you want to delete # %s?', $action['Action']['id'])); ?> </li>
 		<li><?php echo $this->Html->link(__('View all Actions'), array('action' => 'index')); ?> </li>
-		<?php echo $this->element('sidebar/messages'); ?>
 	</ul>
 </div>

@@ -21,6 +21,5 @@
 			__('Are you sure you want to delete # %s?', $this->Form->value('MessageSource.name'))); ?>
 		</li>
 		<li><?php echo $this->Html->link(__('List sources'), array('action' => 'index'));?></li>
-		<?php echo $this->element('sidebar/messages'); ?>
 	</ul>
 </div>

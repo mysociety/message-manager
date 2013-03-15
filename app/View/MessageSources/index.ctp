@@ -43,6 +43,5 @@
 	<ul>
 		<li><?php echo $this->Html->link(__('New source'), array('action' => 'add')); ?></li>
 		<li><?php echo $this->Html->link(__('List all sources'), array('action' => 'index')); ?></li>
-		<?php echo $this->element('sidebar/messages'); ?>
 	</ul>
 </div>

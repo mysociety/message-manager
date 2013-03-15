@@ -15,6 +15,5 @@
 <div class="actions">
 	<ul>
 		<li><?php echo $this->Html->link(__('List sources'), array('action' => 'index'));?></li>
-		<?php echo $this->element('sidebar/messages'); ?>
 	</ul>
 </div>
