@@ -9,9 +9,11 @@
 <?php if (! empty($connection_test_result)) { ?>
 	<pre style="margin:3em 0;"><?php echo h($connection_test_result); ?></pre>
 <?php } ?>
-
-	
-
+<?php if (! empty($error_msg)) { ?>
+    <div class="error-message">
+        <?php echo h($error_msg); ?>
+    </div>
+<?php } ?>
 </div>
 <div class="actions">
 	<ul>

@@ -113,15 +113,22 @@ class MessageSourcesController extends AppController {
 		$this->set('message_source', $source);
 		$connection_test_result = 'No test was run.';
 		$netcast_id = $this->MessageSource->data['MessageSource']['remote_id'];
+		$error_msg = "";
 		if (empty($url)) {
 			$connection_test_result = 'No test was run: you need to specify a URL';
 		} elseif (! preg_match('/^https?:\/\//', $url)) {
 			$connection_test_result = 'No test was run: URL must start with protocol (http or https)';
 		} else {
-			$netcast = new SoapClient($url);
-			$connection_test_result = $netcast->__soapCall("GETCONNECT", array($netcast_id)); 
-			$connection_test_result = MessageSource::decode_netcast_retval($connection_test_result);
+			try {
+				$netcast = new SoapClient($url);
+				$connection_test_result = $netcast->__soapCall("GETCONNECT", array($netcast_id)); 
+				$connection_test_result = MessageSource::decode_netcast_retval($connection_test_result);
+			}
+			catch (Exception $e) {
+				$error_msg = $e->getMessage();
+			}
 		}
+		$this->set('error_msg', $error_msg);
 		$this->set('message_source', $source);
 		$this->set('connection_test_result', $connection_test_result);
 	}
@@ -137,6 +144,7 @@ class MessageSourcesController extends AppController {
 		$gateway_logs = '';
 		$subtitle = '';
 		$date = 'today';
+		$error_msg = "";
 		if ($this->request->is('post')) {
 			if (isset($this->request->data['date'])) {
 				$date = $this->request->data['date'];
@@ -156,13 +164,19 @@ class MessageSourcesController extends AppController {
 				$date_param =  date('Ymd', $date_param);
 				$subtitle = __("Transaction log for date %s from message source \"%s\"", 
 					$date_param, $this->MessageSource->data['MessageSource']['name']);
-				$netcast = new SoapClient($url);
-				$gateway_logs = $netcast->__soapCall("GETLOGS", array($date_param, $netcast_id)); 
-				if (preg_match("/^RET/", $gateway_logs)) { // netcast return values specifically look like "RET..."
-					$gateway_logs = MessageSource::decode_netcast_retval($gateway_logs);
+				try {
+					$netcast = new SoapClient($url);
+					$gateway_logs = $netcast->__soapCall("GETLOGS", array($date_param, $netcast_id)); 
+					if (preg_match("/^RET/", $gateway_logs)) { // netcast return values specifically look like "RET..."
+						$gateway_logs = MessageSource::decode_netcast_retval($gateway_logs);
+					}
+				}
+				catch (Exception $e) {
+					$error_msg = $e->getMessage();
 				}
 			}
 		}
+		$this->set('error_msg', $error_msg);
 		$this->set('message_source', $source);
 		$this->set('subtitle', $subtitle);
 		$this->set('date', $date); // user input (actual param sent is in the subtitle)

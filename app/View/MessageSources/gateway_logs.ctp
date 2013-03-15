@@ -6,7 +6,11 @@
 <?php if (! empty($gateway_logs)) { ?>
 	<pre style="margin:3em 0;"><?php echo h($gateway_logs); ?></pre>
 <?php } ?>
-
+<?php if (! empty($error_msg)) { ?>
+    <div class="error-message">
+        <?php echo h($error_msg); ?>
+    </div>
+<?php } ?>
 <?php echo $this->Form->create(false);?>
 	<?php
 		echo $this->Form->input('date', array(
