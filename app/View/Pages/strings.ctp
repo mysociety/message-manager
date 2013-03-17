@@ -15,11 +15,10 @@
         Boilerplate strings
     </h2>
     <p>
-        Boilerplate strings are prepared texts that users can use when hiding or replying to a message within FixMyStreet. There are two
-        kinds of boilerplate strings: <em>hide-reasons</em> and <em>replies</em>. Note that although you can 
-        <?php echo $this->Html->link(__('hide messages'), array('action' => 'hiding')); ?> or
-        <?php echo $this->Html->link(__('reply to messages'), array('action' => 'replying')); ?>
-        from within the Message Manager, currently the boilerplate strings are only available from within FixMyStreet.
+        Boilerplate strings are prepared texts that
+        <?php echo $this->Html->link(__('users'), array('action' => 'users')); ?> with
+        <em>can send replies</em> privilege can quickly insert when hiding or replying to a message. 
+        There are two kinds of boilerplate strings: <em>hide-reasons</em> and <em>replies</em>. Note that although you can 
     </p>
     <p>
         To view the strings, click on <strong>Strings</strong> in the navigation menu.
