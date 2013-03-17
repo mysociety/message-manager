@@ -7,15 +7,16 @@ be useful for future integrations.
 
 ## Deploy the MM on a webserver
 
-Installing Message Manager is described in the README.md document. You'll need
-to put it on a webserver (there's a very strong case for it running over
-https), and you'll need it to connect to a database (we use postgres).
+Installing Message Manager is described in the `installation.md` document.
+You'll need to put it on a webserver (there's a very strong case for it
+running over https), and you'll need it to connect to a database (we use
+postgres).
 
 The Message Manager installation includes a couple of SQL files for populating
 the database with initial data (see the files in the `db` directory). Some of
 the steps below assume you've done this. Note that initially this means your
 Message Manager is accessible with default passwords, so you should follow the
-installation instructions in the README for changing the passwords.
+instructions in the installation documentation about changing the passwords.
 
 ## If running MM over https, set env(HTTP)
 
@@ -69,7 +70,7 @@ create new reports. The cobrand includes the Message Manager like this:
 
 You can see this at work by looking at the `message_manager_*` files amongst
 the cobrand's web assets in `web/cobrands/fixmybarangay`, but also
-see`templates/web/fixmybarangay/report/_message_manager.html` to this being
+see`templates/web/fixmybarangay/report/_message_manager.html` for this being
 applied.
 
 ## Add the FMS site to MM config
