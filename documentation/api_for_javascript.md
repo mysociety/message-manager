@@ -39,8 +39,9 @@ classes used... but there's also an implicit dependency on FancyBox too, hmm).
 
 > Summary: the rest of this document describes the JSON API, but it's
 > probably much easier to use `message_manager_client.js` to create a
->`message_manager` object (which has the API calls in it), and call the
-> equivalent methods on that.
+> `message_manager` object (which has the API calls in it), and call the
+> equivalent methods on that. The list of those methods is returned at
+> the bottom of the .js file, as the revealed public methods.
 		
 ## API Summary
 
@@ -57,7 +58,8 @@ classes used... but there's also an implicit dependency on FancyBox too, hmm).
 
 ## Authorisation credentials
 
-Access to the API is either by login (user session) or HTTP Basic Auth by supplying credentials on a per-call basis.
+Access to the API is either by login (user session) or HTTP Basic Auth by
+supplying credentials on a per-call basis.
 
 ## 404 errors for message not found
 
@@ -170,7 +172,8 @@ GET from `/boilerplate_strings/index/[string-type]`
 None -- but note *[string-type]* may currently be either `reply` or
 `hide-reason` (or nothing at all, for all strings).
 
-The types available depend on the strings in the database (that is, this is not a restriction within the code). Currently:
+The types available depend on the strings in the database (that is, this is
+not a restriction within the code). Currently:
 
    * **reply**: boilerplate strings for use as outgoing replies to incoming
      messages
@@ -180,7 +183,9 @@ The types available depend on the strings in the database (that is, this is not 
 
 #### Operation
 
-The boilerplate strings are provided as a handy way for staff to populate common strings. See this being used by `message_manager_client.js` to populate the drop-down menu for replying.
+The boilerplate strings are provided as a handy way for staff to populate
+common strings. See this being used by `message_manager_client.js` to populate
+the drop-down menu for replying.
 
 #### Return value
 
@@ -200,16 +205,15 @@ with it.
 
 The call for boilerplate strings returns an object containing the following:
 
-*   **success**: 
-    which is `true` or `false`
+  * **success**: which is `true` or `false`
 
-*   **data**
-    an array keyed on language code, each of which contains an object which is itself a list of strings keyed on string ID. .
-    
-    One key is special: if (and only if) there are any language codes in the data, `langs` will itself contain an array of the language codes used as keys.
-    
-* **error** (only on failure):
-    a message describing the fault
+  * **data** an array keyed on language code, each of which contains an object
+    which is itself a list of strings keyed on string ID. .
+    One key is special: if (and only if) there are any language codes in the
+    data, `langs` will itself contain an array of the language codes used as
+    keys.
+
+  * **error** (only on failure): a message describing the fault
 
 
 ### Example
@@ -491,7 +495,8 @@ with a lock owned by this user. Like `unlock` described above, this fails
 silently for unchanged locks. Specifically, if there are no locks, the call
 still succeeds.
 
-Nonetheless, check the returned HTTP status code to be sure the operation succeeded.
+Nonetheless, check the returned HTTP status code to be sure the operation
+succeeded.
 
 
 ### Reply to  message
@@ -572,7 +577,8 @@ POST to `/messages/assign_fms_id/id`
 
 Assigns the FMS ID to this the message with id=`id`.
 
-If successful, the message's status will change from `available` to `assigned`.
+If successful, the message's status will change from `available` to
+`assigned`.
 
 #### Return value
 
@@ -608,9 +614,6 @@ Currently, the message's data is not returned on failure:
     }
 
 
-==========
-/messages/mark_as_not_a_reply/msg-id
-
 ### Mark as not-a-reply (detach message from thread)
 	
 #### Method & address
@@ -623,9 +626,13 @@ None.
 
 #### Operation
 
-Detaches the message with id=`id` from its parent message (if any). If it is currently shown as a reply to a message, after making this call it will no longer be a reply. Instead it will be a standalone "new" message.
+Detaches the message with id=`id` from its parent message (if any). If it is
+currently shown as a reply to a message, after making this call it will no
+longer be a reply. Instead it will be a standalone "new" message.
 
-Note that any replies to *this* message (and indeed all subsequent reply threads, that is, replies to those replies, and so on) will remain attached to this message. All this call does is detach the message from its parent.
+Note that any replies to *this* message (and indeed all subsequent reply
+threads, that is, replies to those replies, and so on) will remain attached to
+this message. All this call does is detach the message from its parent.
 
 If the message is not currently marked as a reply, the call will fail.
 
@@ -664,7 +671,8 @@ If the message was detached, `success==true`:
       "data":        null
     }
 
-If the message was not detached because it does not currently have a parent message:
+If the message was not detached because it does not currently have a parent
+message:
 
     {
       "success":     false,
