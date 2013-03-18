@@ -23,6 +23,7 @@
 App::uses('Sanitize', 'Utility');
 App::uses('Router', 'Routing');
 App::uses('CakeResponse', 'Network');
+App::uses('Controller', 'Controller');
 
 /**
  * Exception Renderer.
@@ -141,6 +142,7 @@ class ExceptionRenderer {
  * @return Controller
  */
 	protected function _getController($exception) {
+		App::uses('AppController', 'Controller');
 		App::uses('CakeErrorController', 'Controller');
 		if (!$request = Router::getRequest(true)) {
 			$request = new CakeRequest();
@@ -148,7 +150,13 @@ class ExceptionRenderer {
 		$response = new CakeResponse(array('charset' => Configure::read('App.encoding')));
 		try {
 			$controller = new CakeErrorController($request, $response);
+			$controller->startupProcess();
 		} catch (Exception $e) {
+			if (!empty($controller) && $controller->Components->enabled('RequestHandler')) {
+				$controller->RequestHandler->startup($controller);
+			}
+		}
+		if (empty($controller)) {
 			$controller = new Controller($request, $response);
 			$controller->viewPath = 'Errors';
 		}
@@ -263,6 +271,13 @@ class ExceptionRenderer {
 			$this->controller->render($template);
 			$this->controller->afterFilter();
 			$this->controller->response->send();
+		} catch (MissingViewException $e) {
+			$attributes = $e->getAttributes();
+			if (isset($attributes['file']) && strpos($attributes['file'], 'error500') !== false) {
+				$this->_outputMessageSafe('error500');
+			} else {
+				$this->_outputMessage('error500');
+			}
 		} catch (Exception $e) {
 			$this->_outputMessageSafe('error500');
 		}
@@ -276,13 +291,14 @@ class ExceptionRenderer {
  * @return void
  */
 	protected function _outputMessageSafe($template) {
-		$this->controller->layoutPath = '';
-		$this->controller->subDir = '';
+		$this->controller->layoutPath = null;
+		$this->controller->subDir = null;
 		$this->controller->viewPath = 'Errors/';
-		$this->controller->viewClass = 'View';
+		$this->controller->layout = 'error';
 		$this->controller->helpers = array('Form', 'Html', 'Session');
 
-		$this->controller->render($template);
+		$view = new View($this->controller);
+		$this->controller->response->body($view->render($template, 'error'));
 		$this->controller->response->type('html');
 		$this->controller->response->send();
 	}

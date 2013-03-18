@@ -1,4 +1,5 @@
 <?php
+// @codingStandardsIgnoreFile
 /**
  * Short description for file.
  *
@@ -22,28 +23,28 @@
 	<li>
 		<span style="font-size: 18px">App</span>
 		<ul>
-			<li><a href='<?php echo $cases;?>'>Tests</a></li>
+			<li><a href='<?php echo $cases; ?>'>Tests</a></li>
 		</ul>
 	</li>
 <?php if (!empty($plugins)): ?>
 	<li style="padding-top: 10px">
 		<span style="font-size: 18px">Plugins</span>
-	<?php foreach ($plugins as $plugin): ?>
+	<?php foreach ($plugins as $plugin) : ?>
 			<ul>
 				<li style="padding-top: 10px">
-					<span  style="font-size: 18px"><?php echo $plugin;?></span>
+					<span  style="font-size: 18px"><?php echo $plugin; ?></span>
 					<ul>
-						<li><a href='<?php echo $cases;?>&amp;plugin=<?php echo $plugin; ?>'>Tests</a></li>
+						<li><?php printf('<a href="%s&amp;plugin=%s">Tests</a>', $cases, $plugin); ?></li>
 					</ul>
 				</li>
 			</ul>
 	<?php endforeach; ?>
 	</li>
-<?php endif;?>
+<?php endif; ?>
 	<li style="padding-top: 10px">
 		<span style="font-size: 18px">Core</span>
 		<ul>
-			<li><a href='<?php echo $cases;?>&amp;core=true'>Tests</a></li>
+			<li><a href='<?php echo $cases; ?>&amp;core=true'>Tests</a></li>
 		</ul>
 	</li>
 </ul>

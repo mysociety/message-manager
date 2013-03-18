@@ -78,17 +78,6 @@ class Mysql extends DboSource {
 	protected $_useAlias = true;
 
 /**
- * Index of basic SQL commands
- *
- * @var array
- */
-	protected $_commands = array(
-		'begin'    => 'START TRANSACTION',
-		'commit'   => 'COMMIT',
-		'rollback' => 'ROLLBACK'
-	);
-
-/**
  * List of engine specific additional field parameters used on table creating
  *
  * @var array
@@ -160,7 +149,10 @@ class Mysql extends DboSource {
 			);
 			$this->connected = true;
 		} catch (PDOException $e) {
-			throw new MissingConnectionException(array('class' => $e->getMessage()));
+			throw new MissingConnectionException(array(
+				'class' => get_class($this),
+				'message' => $e->getMessage()
+			));
 		}
 
 		$this->_useAlias = (bool)version_compare($this->getVersion(), "4.1", ">=");
@@ -260,15 +252,6 @@ class Mysql extends DboSource {
  */
 	public function getEncoding() {
 		return $this->_execute('SHOW VARIABLES LIKE ?', array('character_set_client'))->fetchObject()->Value;
-	}
-
-/**
- * Gets the version string of the database server
- *
- * @return string The database encoding
- */
-	public function getVersion() {
-		return $this->_connection->getAttribute(PDO::ATTR_SERVER_VERSION);
 	}
 
 /**
@@ -460,6 +443,12 @@ class Mysql extends DboSource {
 					$col[] = $idx->Column_name;
 					$index[$idx->Key_name]['column'] = $col;
 				}
+				if (!empty($idx->Sub_part)) {
+					if (!isset($index[$idx->Key_name]['length'])) {
+						$index[$idx->Key_name]['length'] = array();
+					}
+					$index[$idx->Key_name]['length'][$idx->Column_name] = $idx->Sub_part;
+				}
 			}
 			// @codingStandardsIgnoreEnd
 			$indices->closeCursor();
@@ -552,13 +541,61 @@ class Mysql extends DboSource {
  * @param string $table Table to alter parameters for.
  * @param array $parameters Parameters to add & drop.
  * @return array Array of table property alteration statements.
- * @todo Implement this method.
  */
 	protected function _alterTableParameters($table, $parameters) {
 		if (isset($parameters['change'])) {
 			return $this->buildTableParameters($parameters['change']);
 		}
 		return array();
+	}
+
+/**
+ * Format indexes for create table
+ *
+ * @param array $indexes An array of indexes to generate SQL from
+ * @param string $table Optional table name, not used
+ * @return array An array of SQL statements for indexes
+ * @see DboSource::buildIndex()
+ */
+	public function buildIndex($indexes, $table = null) {
+		$join = array();
+		foreach ($indexes as $name => $value) {
+			$out = '';
+			if ($name === 'PRIMARY') {
+				$out .= 'PRIMARY ';
+				$name = null;
+			} else {
+				if (!empty($value['unique'])) {
+					$out .= 'UNIQUE ';
+				}
+				$name = $this->startQuote . $name . $this->endQuote;
+			}
+			// length attribute only used for MySQL datasource, for TEXT/BLOB index columns
+			$out .= 'KEY ' . $name . ' (';
+			if (is_array($value['column'])) {
+				if (isset($value['length'])) {
+					$vals = array();
+					foreach ($value['column'] as $column) {
+						$name = $this->name($column);
+						if (isset($value['length'])) {
+							$name .= $this->_buildIndexSubPart($value['length'], $column);
+						}
+						$vals[] = $name;
+					}
+					$out .= implode(', ', $vals);
+				} else {
+					$out .= implode(', ', array_map(array(&$this, 'name'), $value['column']));
+				}
+			} else {
+				$out .= $this->name($value['column']);
+				if (isset($value['length'])) {
+					$out .= $this->_buildIndexSubPart($value['length'], $value['column']);
+				}
+			}
+			$out .= ')';
+			$join[] = $out;
+		}
+		return $join;
 	}
 
 /**
@@ -576,31 +613,35 @@ class Mysql extends DboSource {
 				if ($name == 'PRIMARY') {
 					$out .= 'PRIMARY KEY';
 				} else {
-					$out .= 'KEY ' . $name;
+					$out .= 'KEY ' . $this->startQuote . $name . $this->endQuote;
 				}
 				$alter[] = $out;
 			}
 		}
 		if (isset($indexes['add'])) {
-			foreach ($indexes['add'] as $name => $value) {
-				$out = 'ADD ';
-				if ($name == 'PRIMARY') {
-					$out .= 'PRIMARY ';
-					$name = null;
-				} else {
-					if (!empty($value['unique'])) {
-						$out .= 'UNIQUE ';
-					}
-				}
-				if (is_array($value['column'])) {
-					$out .= 'KEY ' . $name . ' (' . implode(', ', array_map(array(&$this, 'name'), $value['column'])) . ')';
-				} else {
-					$out .= 'KEY ' . $name . ' (' . $this->name($value['column']) . ')';
-				}
-				$alter[] = $out;
+			$add = $this->buildIndex($indexes['add']);
+			foreach ($add as $index) {
+				$alter[] = 'ADD ' . $index;
 			}
 		}
 		return $alter;
+	}
+
+/**
+ * Format length for text indexes
+ *
+ * @param array $lengths An array of lengths for a single index
+ * @param string $column The column for which to generate the index length
+ * @return string Formatted length part of an index field
+ */
+	protected function _buildIndexSubPart($lengths, $column) {
+		if (is_null($lengths)) {
+			return '';
+		}
+		if (!isset($lengths[$column])) {
+			return '';
+		}
+		return '(' . $lengths[$column] . ')';
 	}
 
 /**
@@ -694,6 +735,15 @@ class Mysql extends DboSource {
  */
 	public function getSchemaName() {
 		return $this->config['database'];
+	}
+
+/**
+ * Check if the server support nested transactions
+ *
+ * @return boolean
+ */
+	public function nestedTransactionSupported() {
+		return $this->useNestedTransactions && version_compare($this->getVersion(), '4.1', '>=');
 	}
 
 }

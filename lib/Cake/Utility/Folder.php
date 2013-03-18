@@ -79,7 +79,7 @@ class Folder {
  *
  * @param string $path Path to folder
  * @param boolean $create Create folder if not found
- * @param mixed $mode Mode (CHMOD) to apply to created folder, false to ignore
+ * @param string|boolean $mode Mode (CHMOD) to apply to created folder, false to ignore
  * @link http://book.cakephp.org/2.0/en/core-utility-libraries/file-folder.html#Folder
  */
 	public function __construct($path = false, $create = false, $mode = false) {
@@ -132,7 +132,7 @@ class Folder {
  *
  * @param boolean $sort Whether you want the results sorted, set this and the sort property
  *   to false to get unsorted results.
- * @param mixed $exceptions Either an array or boolean true will not grab dot files
+ * @param array|boolean $exceptions Either an array or boolean true will not grab dot files
  * @param boolean $fullPath True returns the full path
  * @return mixed Contents of current directory as an array, an empty array on failure
  * @link http://book.cakephp.org/2.0/en/core-utility-libraries/file-folder.html#Folder::read
@@ -354,7 +354,9 @@ class Folder {
 		}
 
 		if ($recursive === false && is_dir($path)) {
+			//@codingStandardsIgnoreStart
 			if (@chmod($path, intval($mode, 8))) {
+				//@codingStandardsIgnoreEnd
 				$this->_messages[] = __d('cake_dev', '%s changed to %s', $path, $mode);
 				return true;
 			}
@@ -367,7 +369,7 @@ class Folder {
 			$paths = $this->tree($path);
 
 			foreach ($paths as $type) {
-				foreach ($type as $key => $fullpath) {
+				foreach ($type as $fullpath) {
 					$check = explode(DS, $fullpath);
 					$count = count($check);
 
@@ -375,7 +377,9 @@ class Folder {
 						continue;
 					}
 
+					//@codingStandardsIgnoreStart
 					if (@chmod($fullpath, intval($mode, 8))) {
+						//@codingStandardsIgnoreEnd
 						$this->_messages[] = __d('cake_dev', '%s changed to %s', $fullpath, $mode);
 					} else {
 						$this->_errors[] = __d('cake_dev', '%s NOT changed to %s', $fullpath, $mode);
@@ -394,7 +398,7 @@ class Folder {
  * Returns an array of nested directories and files in each directory
  *
  * @param string $path the directory path to build the tree from
- * @param mixed $exceptions Either an array of files/folder to exclude
+ * @param array|boolean $exceptions Either an array of files/folder to exclude
  *   or boolean true to not grab dot files/folders
  * @param string $type either 'file' or 'dir'. null returns both files and directories
  * @return mixed array of nested directories and files in each directory
@@ -559,13 +563,17 @@ class Folder {
 			foreach ($iterator as $item) {
 				$filePath = $item->getPathname();
 				if ($item->isFile() || $item->isLink()) {
+					//@codingStandardsIgnoreStart
 					if (@unlink($filePath)) {
+						//@codingStandardsIgnoreEnd
 						$this->_messages[] = __d('cake_dev', '%s removed', $filePath);
 					} else {
 						$this->_errors[] = __d('cake_dev', '%s NOT removed', $filePath);
 					}
 				} elseif ($item->isDir() && !$item->isDot()) {
+					//@codingStandardsIgnoreStart
 					if (@rmdir($filePath)) {
+						//@codingStandardsIgnoreEnd
 						$this->_messages[] = __d('cake_dev', '%s removed', $filePath);
 					} else {
 						$this->_errors[] = __d('cake_dev', '%s NOT removed', $filePath);
@@ -575,7 +583,9 @@ class Folder {
 			}
 
 			$path = rtrim($path, DS);
+			//@codingStandardsIgnoreStart
 			if (@rmdir($path)) {
+				//@codingStandardsIgnoreEnd
 				$this->_messages[] = __d('cake_dev', '%s removed', $path);
 			} else {
 				$this->_errors[] = __d('cake_dev', '%s NOT removed', $path);
@@ -595,7 +605,7 @@ class Folder {
  * - `mode` The mode to copy the files/directories with.
  * - `skip` Files/directories to skip.
  *
- * @param mixed $options Either an array of options (see above) or a string of the destination directory.
+ * @param array|string $options Either an array of options (see above) or a string of the destination directory.
  * @return boolean Success
  * @link http://book.cakephp.org/2.0/en/core-utility-libraries/file-folder.html#Folder::copy
  */
@@ -629,7 +639,9 @@ class Folder {
 		}
 
 		$exceptions = array_merge(array('.', '..', '.svn'), $options['skip']);
+		//@codingStandardsIgnoreStart
 		if ($handle = @opendir($fromDir)) {
+			//@codingStandardsIgnoreEnd
 			while (false !== ($item = readdir($handle))) {
 				if (!in_array($item, $exceptions)) {
 					$from = Folder::addPathElement($fromDir, $item);

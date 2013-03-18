@@ -105,12 +105,22 @@ class ControllerTask extends BakeTask {
 		$this->listAll($this->connection, false);
 		ClassRegistry::config('Model', array('ds' => $this->connection));
 		$unitTestExists = $this->_checkUnitTest();
+
+		$admin = false;
+		if (!empty($this->params['admin'])) {
+			$admin = $this->Project->getPrefix();
+		}
+
 		foreach ($this->__tables as $table) {
 			$model = $this->_modelName($table);
 			$controller = $this->_controllerName($model);
 			App::uses($model, 'Model');
 			if (class_exists($model)) {
 				$actions = $this->bakeActions($controller);
+				if ($admin) {
+					$this->out(__d('cake_console', 'Adding %s methods', $admin));
+					$actions .= "\n" . $this->bakeActions($controller, $admin);
+				}
 				if ($this->bake($controller, $actions) && $unitTestExists) {
 					$this->bakeTest($controller);
 				}
@@ -397,11 +407,12 @@ class ControllerTask extends BakeTask {
 
 		if ($this->interactive == true) {
 			$this->out(__d('cake_console', 'Possible Controllers based on your current database:'));
+			$this->hr();
 			$this->_controllerNames = array();
 			$count = count($this->__tables);
 			for ($i = 0; $i < $count; $i++) {
 				$this->_controllerNames[] = $this->_controllerName($this->_modelName($this->__tables[$i]));
-				$this->out($i + 1 . ". " . $this->_controllerNames[$i]);
+				$this->out(sprintf("%2d. %s", $i + 1, $this->_controllerNames[$i]));
 			}
 			return $this->_controllerNames;
 		}

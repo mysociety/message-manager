@@ -116,12 +116,12 @@ class HttpResponse implements ArrayAccess {
 	}
 
 /**
- * If return is 200 (OK)
+ * If return is a valid 2xx (OK or Successful)
  *
  * @return boolean
  */
 	public function isOk() {
-		return $this->code == 200;
+		return in_array($this->code, array(200, 201, 202, 203, 204, 205, 206));
 	}
 
 /**
@@ -178,7 +178,7 @@ class HttpResponse implements ArrayAccess {
  * 'body' and 'header' or false on failure.
  *
  * @param string $body A string containing the body to decode.
- * @param mixed $encoding Can be false in case no encoding is being used, or a string representing the encoding.
+ * @param string|boolean $encoding Can be false in case no encoding is being used, or a string representing the encoding.
  * @return mixed Array of response headers and body or false.
  */
 	protected function _decodeBody($body, $encoding = 'chunked') {
@@ -219,16 +219,12 @@ class HttpResponse implements ArrayAccess {
 
 			$chunkSize = 0;
 			$hexLength = 0;
-			$chunkExtensionName = '';
 			$chunkExtensionValue = '';
 			if (isset($match[0])) {
 				$chunkSize = $match[0];
 			}
 			if (isset($match[1])) {
 				$hexLength = $match[1];
-			}
-			if (isset($match[2])) {
-				$chunkExtensionName = $match[2];
 			}
 			if (isset($match[3])) {
 				$chunkExtensionValue = $match[3];
@@ -237,9 +233,6 @@ class HttpResponse implements ArrayAccess {
 			$body = substr($body, strlen($chunkSize));
 			$chunkLength = hexdec($hexLength);
 			$chunk = substr($body, 0, $chunkLength);
-			if (!empty($chunkExtensionName)) {
-				 // @todo See if there are popular chunk extensions we should implement
-			}
 			$decodedBody .= $chunk;
 			if ($chunkLength !== 0) {
 				$body = substr($body, $chunkLength + strlen("\r\n"));
@@ -291,7 +284,6 @@ class HttpResponse implements ArrayAccess {
  *
  * @param array $header Header array containing one ore more 'Set-Cookie' headers.
  * @return mixed Either false on no cookies, or an array of cookies received.
- * @todo Make this 100% RFC 2965 confirm
  */
 	public function parseCookies($header) {
 		$cookieHeader = $this->getHeader('Set-Cookie', $header);
@@ -334,7 +326,6 @@ class HttpResponse implements ArrayAccess {
  * @param string $token Token to unescape
  * @param array $chars
  * @return string Unescaped token
- * @todo Test $chars parameter
  */
 	protected function _unescapeToken($token, $chars = null) {
 		$regex = '/"([' . implode('', $this->_tokenEscapeChars(true, $chars)) . '])"/';
@@ -348,7 +339,6 @@ class HttpResponse implements ArrayAccess {
  * @param boolean $hex true to get them as HEX values, false otherwise
  * @param array $chars
  * @return array Escape chars
- * @todo Test $chars parameter
  */
 	protected function _tokenEscapeChars($hex = true, $chars = null) {
 		if (!empty($chars)) {
@@ -373,7 +363,7 @@ class HttpResponse implements ArrayAccess {
 /**
  * ArrayAccess - Offset Exists
  *
- * @param mixed $offset
+ * @param string $offset
  * @return boolean
  */
 	public function offsetExists($offset) {
@@ -383,7 +373,7 @@ class HttpResponse implements ArrayAccess {
 /**
  * ArrayAccess - Offset Get
  *
- * @param mixed $offset
+ * @param string $offset
  * @return mixed
  */
 	public function offsetGet($offset) {
@@ -420,7 +410,7 @@ class HttpResponse implements ArrayAccess {
 /**
  * ArrayAccess - Offset Set
  *
- * @param mixed $offset
+ * @param string $offset
  * @param mixed $value
  * @return void
  */
@@ -430,7 +420,7 @@ class HttpResponse implements ArrayAccess {
 /**
  * ArrayAccess - Offset Unset
  *
- * @param mixed $offset
+ * @param string $offset
  * @return void
  */
 	public function offsetUnset($offset) {

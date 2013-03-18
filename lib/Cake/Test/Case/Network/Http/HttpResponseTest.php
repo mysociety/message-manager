@@ -40,7 +40,7 @@ class TestHttpResponse extends HttpResponse {
  * Convenience method for testing protected method
  *
  * @param string $body A string containing the body to decode
- * @param mixed $encoding Can be false in case no encoding is being used, or a string representing the encoding
+ * @param boolean|string $encoding Can be false in case no encoding is being used, or a string representing the encoding
  * @return mixed Array or false
  */
 	public function decodeBody($body, $encoding = 'chunked') {
@@ -157,12 +157,36 @@ class HttpResponseTest extends CakeTestCase {
 		$this->assertFalse($this->HttpResponse->isOk());
 		$this->HttpResponse->code = -1;
 		$this->assertFalse($this->HttpResponse->isOk());
-		$this->HttpResponse->code = 201;
-		$this->assertFalse($this->HttpResponse->isOk());
 		$this->HttpResponse->code = 'what?';
 		$this->assertFalse($this->HttpResponse->isOk());
 		$this->HttpResponse->code = 200;
 		$this->assertTrue($this->HttpResponse->isOk());
+		$this->HttpResponse->code = 201;
+		$this->assertTrue($this->HttpResponse->isOk());
+		$this->HttpResponse->code = 202;
+		$this->assertTrue($this->HttpResponse->isOk());
+		$this->HttpResponse->code = 203;
+		$this->assertTrue($this->HttpResponse->isOk());
+		$this->HttpResponse->code = 204;
+		$this->assertTrue($this->HttpResponse->isOk());
+		$this->HttpResponse->code = 205;
+		$this->assertTrue($this->HttpResponse->isOk());
+		$this->HttpResponse->code = 206;
+		$this->assertTrue($this->HttpResponse->isOk());
+		$this->HttpResponse->code = 207;
+		$this->assertFalse($this->HttpResponse->isOk());
+		$this->HttpResponse->code = 208;
+		$this->assertFalse($this->HttpResponse->isOk());
+		$this->HttpResponse->code = 209;
+		$this->assertFalse($this->HttpResponse->isOk());
+		$this->HttpResponse->code = 210;
+		$this->assertFalse($this->HttpResponse->isOk());
+		$this->HttpResponse->code = 226;
+		$this->assertFalse($this->HttpResponse->isOk());
+		$this->HttpResponse->code = 288;
+		$this->assertFalse($this->HttpResponse->isOk());
+		$this->HttpResponse->code = 301;
+		$this->assertFalse($this->HttpResponse->isOk());
 	}
 
 /**

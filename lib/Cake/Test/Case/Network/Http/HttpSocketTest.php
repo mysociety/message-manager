@@ -84,7 +84,7 @@ class TestHttpSocket extends HttpSocket {
 /**
  * Convenience method for testing protected method
  *
- * @param mixed $uri URI (see {@link _parseUri()})
+ * @param string|array $uri URI (see {@link _parseUri()})
  * @return array Current configuration settings
  */
 	public function configUri($uri = null) {
@@ -94,8 +94,8 @@ class TestHttpSocket extends HttpSocket {
 /**
  * Convenience method for testing protected method
  *
- * @param string $uri URI to parse
- * @param mixed $base If true use default URI config, otherwise indexed array to set 'scheme', 'host', 'port', etc.
+ * @param string|array $uri URI to parse
+ * @param boolean|array $base If true use default URI config, otherwise indexed array to set 'scheme', 'host', 'port', etc.
  * @return array Parsed URI
  */
 	public function parseUri($uri = null, $base = array()) {
@@ -126,7 +126,7 @@ class TestHttpSocket extends HttpSocket {
 /**
  * Convenience method for testing protected method
  *
- * @param mixed $query A query string to parse into an array or an array to return directly "as is"
+ * @param string|array $query A query string to parse into an array or an array to return directly "as is"
  * @return array The $query parsed into a possibly multi-level array. If an empty $query is given, an empty array is returned.
  */
 	public function parseQuery($query) {
@@ -531,13 +531,13 @@ class HttpSocketTest extends CakeTestCase {
 		foreach ($tests as $i => $test) {
 			if (strpos($i, 'reset') === 0) {
 				foreach ($test as $path => $val) {
-					$expectation = Set::insert($expectation, $path, $val);
+					$expectation = Hash::insert($expectation, $path, $val);
 				}
 				continue;
 			}
 
 			if (isset($test['expectation'])) {
-				$expectation = Set::merge($expectation, $test['expectation']);
+				$expectation = Hash::merge($expectation, $test['expectation']);
 			}
 			$this->Socket->request($test['request']);
 
@@ -763,6 +763,38 @@ class HttpSocketTest extends CakeTestCase {
 	}
 
 /**
+ * Test that redirect urls are urldecoded
+ *
+ * @return void
+ */
+	public function testRequestWithRedirectUrlEncoded() {
+		$request = array(
+			'uri' => 'http://localhost/oneuri',
+			'redirect' => 1
+		);
+		$serverResponse1 = "HTTP/1.x 302 Found\r\nDate: Mon, 16 Apr 2007 04:14:16 GMT\r\nServer: CakeHttp Server\r\nContent-Type: text/html\r\nLocation: http://i.cmpnet.com%2Ftechonline%2Fpdf%2Fa.pdf=\r\n\r\n";
+		$serverResponse2 = "HTTP/1.x 200 OK\r\nDate: Mon, 16 Apr 2007 04:14:16 GMT\r\nServer: CakeHttp Server\r\nContent-Type: text/html\r\n\r\n<h1>You have been redirected</h1>";
+
+		$this->Socket->expects($this->at(1))
+			->method('read')
+			->will($this->returnValue($serverResponse1));
+
+		$this->Socket->expects($this->at(3))
+			->method('write')
+			->with($this->logicalAnd(
+				$this->stringContains('Host: i.cmpnet.com'),
+				$this->stringContains('GET /techonline/pdf/a.pdf')
+			));
+
+		$this->Socket->expects($this->at(4))
+			->method('read')
+			->will($this->returnValue($serverResponse2));
+
+		$response = $this->Socket->request($request);
+		$this->assertEquals('<h1>You have been redirected</h1>', $response->body());
+	}
+
+/**
  * testRequestWithRedirect method
  *
  * @return void
@@ -781,6 +813,11 @@ class HttpSocketTest extends CakeTestCase {
 		$this->assertEquals('<h1>You have been redirected</h1>', $response->body());
 	}
 
+/**
+ * Test that redirects with a count limit are decremented.
+ *
+ * @return void
+ */
 	public function testRequestWithRedirectAsInt() {
 		$request = array(
 			'uri' => 'http://localhost/oneuri',
@@ -795,6 +832,11 @@ class HttpSocketTest extends CakeTestCase {
 		$this->assertEquals(1, $this->Socket->request['redirect']);
 	}
 
+/**
+ * Test that redirects after the redirect count reaches 9 are not followed.
+ *
+ * @return void
+ */
 	public function testRequestWithRedirectAsIntReachingZero() {
 		$request = array(
 			'uri' => 'http://localhost/oneuri',
@@ -1509,7 +1551,6 @@ class HttpSocketTest extends CakeTestCase {
  * testBuildCookies method
  *
  * @return void
- * @todo Test more scenarios
  */
 	public function testBuildCookies() {
 		$cookies = array(

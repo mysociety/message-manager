@@ -21,6 +21,8 @@ App::uses('ComponentCollection', 'Controller');
 App::uses('AclComponent', 'Controller/Component');
 App::uses('DbAcl', 'Controller/Component/Acl');
 App::uses('AclNode', 'Model');
+App::uses('Permission', 'Model');
+require_once dirname(dirname(dirname(dirname(__FILE__)))) . DS . 'Model' . DS . 'models.php';
 
 /**
  * AclNodeTwoTestBase class
@@ -107,7 +109,7 @@ class AcoTwoTest extends AclNodeTwoTestBase {
  *
  * @package       Cake.Test.Case.Controller.Component.Acl
  */
-class PermissionTwoTest extends CakeTestModel {
+class PermissionTwoTest extends Permission {
 
 /**
  * name property
@@ -162,6 +164,10 @@ class DbAclTwoTest extends DbAcl {
 		$this->Aro->Permission = new PermissionTwoTest();
 		$this->Aco = new AcoTwoTest();
 		$this->Aro->Permission = new PermissionTwoTest();
+
+		$this->Permission = $this->Aro->Permission;
+		$this->Permission->Aro = $this->Aro;
+		$this->Permission->Aco = $this->Aco;
 	}
 
 }
@@ -477,14 +483,14 @@ class DbAclTest extends CakeTestCase {
 /**
  * debug function - to help editing/creating test cases for the ACL component
  *
- * To check the overall ACL status at any time call $this->__debug();
+ * To check the overall ACL status at any time call $this->_debug();
  * Generates a list of the current aro and aco structures and a grid dump of the permissions that are defined
  * Only designed to work with the db based ACL
  *
  * @param bool $treesToo
  * @return void
  */
-	protected function __debug($printTreesToo = false) {
+	protected function _debug($printTreesToo = false) {
 		$this->Acl->Aro->displayField = 'alias';
 		$this->Acl->Aco->displayField = 'alias';
 		$aros = $this->Acl->Aro->find('list', array('order' => 'lft'));
@@ -512,10 +518,10 @@ class DbAclTest extends CakeTestCase {
 		}
 		foreach ($permissions as $key => $values) {
 			array_unshift($values, $key);
-			$values = array_map(array(&$this, '__pad'), $values);
+			$values = array_map(array(&$this, '_pad'), $values);
 			$permissions[$key] = implode (' ', $values);
 		}
-		$permisssions = array_map(array(&$this, '__pad'), $permissions);
+		$permisssions = array_map(array(&$this, '_pad'), $permissions);
 		array_unshift($permissions, 'Current Permissions :');
 		if ($printTreesToo) {
 			debug(array('aros' => $this->Acl->Aro->generateTreeList(), 'acos' => $this->Acl->Aco->generateTreeList()));
@@ -528,10 +534,10 @@ class DbAclTest extends CakeTestCase {
  * Used by debug to format strings used in the data dump
  *
  * @param string $string
- * @param int $len
+ * @param integer $len
  * @return void
  */
-	protected function __pad($string = '', $len = 14) {
+	protected function _pad($string = '', $len = 14) {
 		return str_pad($string, $len);
 	}
 }

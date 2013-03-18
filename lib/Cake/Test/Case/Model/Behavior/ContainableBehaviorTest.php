@@ -92,7 +92,7 @@ class ContainableBehaviorTest extends CakeTestCase {
 					'Category' => 'name'
 				)
 		)));
-		$this->assertEquals(array('id'), Set::extract('/ArticleFeatured/keep/Featured/fields', $r));
+		$this->assertEquals(array('id'), Hash::extract($r, 'ArticleFeatured.keep.Featured.fields'));
 
 		$r = $this->_containments($this->Article, array(
 			'Comment' => array(
@@ -109,29 +109,29 @@ class ContainableBehaviorTest extends CakeTestCase {
 		$this->assertTrue(Set::matches('/User', $r));
 		$this->assertTrue(Set::matches('/Article/keep/Comment', $r));
 		$this->assertTrue(Set::matches('/Article/keep/User', $r));
-		$this->assertEquals(array('comment', 'published'), Set::extract('/Article/keep/Comment/fields', $r));
-		$this->assertEquals(array('user'), Set::extract('/Article/keep/User/fields', $r));
+		$this->assertEquals(array('comment', 'published'), Hash::extract($r, 'Article.keep.Comment.fields'));
+		$this->assertEquals(array('user'), Hash::extract($r, 'Article.keep.User.fields'));
 		$this->assertTrue(Set::matches('/Comment/keep/Attachment', $r));
-		$this->assertEquals(array('attachment'), Set::extract('/Comment/keep/Attachment/fields', $r));
+		$this->assertEquals(array('attachment'), Hash::extract($r, 'Comment.keep.Attachment.fields'));
 
 		$r = $this->_containments($this->Article, array('Comment' => array('limit' => 1)));
 		$this->assertEquals(array('Comment', 'Article'), array_keys($r));
-		$result = Set::extract('/Comment/keep', $r);
+		$result = Hash::extract($r, 'Comment[keep]');
 		$this->assertEquals(array('keep' => array()), array_shift($result));
 		$this->assertTrue(Set::matches('/Article/keep/Comment', $r));
-		$result = Set::extract('/Article/keep/Comment/.', $r);
+		$result = Hash::extract($r, 'Article.keep');
 		$this->assertEquals(array('limit' => 1), array_shift($result));
 
 		$r = $this->_containments($this->Article, array('Comment.User'));
 		$this->assertEquals(array('User', 'Comment', 'Article'), array_keys($r));
 
-		$result = Set::extract('/User/keep', $r);
+		$result = Hash::extract($r, 'User[keep]');
 		$this->assertEquals(array('keep' => array()), array_shift($result));
 
-		$result = Set::extract('/Comment/keep', $r);
+		$result = Hash::extract($r, 'Comment[keep]');
 		$this->assertEquals(array('keep' => array('User' => array())), array_shift($result));
 
-		$result = Set::extract('/Article/keep', $r);
+		$result = Hash::extract($r, 'Article[keep]');
 		$this->assertEquals(array('keep' => array('Comment' => array())), array_shift($result));
 
 		$r = $this->_containments($this->Tag, array('Article' => array('User' => array('Comment' => array(
@@ -192,7 +192,7 @@ class ContainableBehaviorTest extends CakeTestCase {
 		$this->assertFalse(Set::matches('/Comment[user_id!=2]', $r));
 
 		$r = $this->Article->find('all', array('contain' => 'Comment.id DESC'));
-		$ids = $descIds = Set::extract('/Comment[1]/id', $r);
+		$ids = $descIds = Hash::extract($r, 'Comment[1].id');
 		rsort($descIds);
 		$this->assertEquals($ids, $descIds);
 
@@ -259,6 +259,19 @@ class ContainableBehaviorTest extends CakeTestCase {
 
 		$r = $this->Article->find('all');
 		$this->assertFalse(Set::matches('/Comment/User', $r));
+	}
+
+/**
+ * Test that mixing contain() and the contain find option.
+ *
+ * @return void
+ */
+	public function testContainAndContainOption() {
+		$this->Article->contain();
+		$r = $this->Article->find('all', array(
+			'contain' => array('Comment')
+		));
+		$this->assertTrue(isset($r[0]['Comment']), 'No comment returned');
 	}
 
 /**
@@ -2980,7 +2993,8 @@ class ContainableBehaviorTest extends CakeTestCase {
 				'User' => array(
 					'fields' => array('user')
 				)
-			)
+			),
+			'order' => 'Article.id ASC',
 		));
 		$this->assertTrue(isset($result[0]['Article']['title']), 'title missing %s');
 		$this->assertTrue(isset($result[0]['Article']['body']), 'body missing %s');
@@ -3003,7 +3017,10 @@ class ContainableBehaviorTest extends CakeTestCase {
 				'conditions' => array('created >=' => '2007-03-18 12:24')
 			)
 		));
-		$result = $this->Article->find('all', array('fields' => array('title'), 'order' => array('Article.id' => 'ASC')));
+		$result = $this->Article->find('all', array(
+			'fields' => array('title'),
+			'order' => array('Article.id' => 'ASC')
+		));
 		$expected = array(
 			array(
 				'Article' => array('id' => 1, 'title' => 'First Article'),

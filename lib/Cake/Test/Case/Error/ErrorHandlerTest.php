@@ -48,6 +48,9 @@ class ErrorHandlerTest extends CakeTestCase {
 		$request->base = '';
 		Router::setRequestInfo($request);
 		Configure::write('debug', 2);
+
+		CakeLog::disable('stdout');
+		CakeLog::disable('stderr');
 	}
 
 /**
@@ -56,10 +59,12 @@ class ErrorHandlerTest extends CakeTestCase {
  * @return void
  */
 	public function tearDown() {
+		parent::tearDown();
 		if ($this->_restoreError) {
 			restore_error_handler();
 		}
-		parent::tearDown();
+		CakeLog::enable('stdout');
+		CakeLog::enable('stderr');
 	}
 
 /**
@@ -89,7 +94,6 @@ class ErrorHandlerTest extends CakeTestCase {
 		return array(
 			array(E_USER_NOTICE, 'Notice'),
 			array(E_USER_WARNING, 'Warning'),
-			array(E_USER_ERROR, 'Fatal Error'),
 		);
 	}
 
@@ -120,7 +124,9 @@ class ErrorHandlerTest extends CakeTestCase {
 		$this->_restoreError = true;
 
 		ob_start();
+		//@codingStandardsIgnoreStart
 		@include 'invalid.file';
+		//@codingStandardsIgnoreEnd
 		$result = ob_get_clean();
 		$this->assertTrue(empty($result));
 	}
@@ -134,7 +140,7 @@ class ErrorHandlerTest extends CakeTestCase {
 		Configure::write('debug', 0);
 		Configure::write('Error.trace', false);
 		if (file_exists(LOGS . 'debug.log')) {
-			@unlink(LOGS . 'debug.log');
+			unlink(LOGS . 'debug.log');
 		}
 
 		set_error_handler('ErrorHandler::handleError');
@@ -148,7 +154,9 @@ class ErrorHandlerTest extends CakeTestCase {
 			'/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2} (Notice|Debug): Notice \(8\): Undefined variable:\s+out in \[.+ line \d+\]$/',
 			$result[0]
 		);
-		@unlink(LOGS . 'debug.log');
+		if (file_exists(LOGS . 'debug.log')) {
+			unlink(LOGS . 'debug.log');
+		}
 	}
 
 /**
@@ -160,7 +168,7 @@ class ErrorHandlerTest extends CakeTestCase {
 		Configure::write('debug', 0);
 		Configure::write('Error.trace', true);
 		if (file_exists(LOGS . 'debug.log')) {
-			@unlink(LOGS . 'debug.log');
+			unlink(LOGS . 'debug.log');
 		}
 
 		set_error_handler('ErrorHandler::handleError');
@@ -175,7 +183,9 @@ class ErrorHandlerTest extends CakeTestCase {
 		);
 		$this->assertRegExp('/^Trace:/', $result[1]);
 		$this->assertRegExp('/^ErrorHandlerTest\:\:testHandleErrorLoggingTrace\(\)/', $result[2]);
-		@unlink(LOGS . 'debug.log');
+		if (file_exists(LOGS . 'debug.log')) {
+			unlink(LOGS . 'debug.log');
+		}
 	}
 
 /**
@@ -194,7 +204,7 @@ class ErrorHandlerTest extends CakeTestCase {
 	}
 
 /**
- * test handleException generating a page.
+ * test handleException generating log.
  *
  * @return void
  */
@@ -222,7 +232,7 @@ class ErrorHandlerTest extends CakeTestCase {
  *
  * @return void
  */
-	public function testLoadPluginHanlder() {
+	public function testLoadPluginHandler() {
 		App::build(array(
 			'Plugin' => array(
 				CAKE . 'Test' . DS . 'test_app' . DS . 'Plugin' . DS
@@ -236,6 +246,57 @@ class ErrorHandlerTest extends CakeTestCase {
 		$result = ob_get_clean();
 		$this->assertEquals('Rendered by test plugin', $result);
 		CakePlugin::unload();
+	}
+
+/**
+ * test handleFatalError generating a page.
+ *
+ * @return void
+ */
+	public function testHandleFatalErrorPage() {
+		$this->skipIf(file_exists(APP . 'app_error.php'), 'App error exists cannot run.');
+
+		$originalDebugLevel = Configure::read('debug');
+		$line = __LINE__;
+
+		ob_start();
+		Configure::write('debug', 1);
+		ErrorHandler::handleFatalError(E_ERROR, 'Something wrong', __FILE__, $line);
+		$result = ob_get_clean();
+		$this->assertContains('Something wrong', $result, 'message missing.');
+		$this->assertContains(__FILE__, $result, 'filename missing.');
+		$this->assertContains((string)$line, $result, 'line missing.');
+
+		ob_start();
+		Configure::write('debug', 0);
+		ErrorHandler::handleFatalError(E_ERROR, 'Something wrong', __FILE__, $line);
+		$result = ob_get_clean();
+		$this->assertNotContains('Something wrong', $result, 'message must not appear.');
+		$this->assertNotContains(__FILE__, $result, 'filename must not appear.');
+		$this->assertContains('An Internal Error Has Occurred', $result);
+
+		Configure::write('debug', $originalDebugLevel);
+	}
+
+/**
+ * test handleException generating log.
+ *
+ * @return void
+ */
+	public function testHandleFatalErrorLog() {
+		$this->skipIf(file_exists(APP . 'app_error.php'), 'App error exists cannot run.');
+
+		if (file_exists(LOGS . 'error.log')) {
+			unlink(LOGS . 'error.log');
+		}
+
+		ob_start();
+		ErrorHandler::handleFatalError(E_ERROR, 'Something wrong', __FILE__, __LINE__);
+		ob_clean();
+
+		$log = file(LOGS . 'error.log');
+		$this->assertContains(__FILE__, $log[0], 'missing filename');
+		$this->assertContains('[FatalErrorException] Something wrong', $log[1], 'message missing.');
 	}
 
 }

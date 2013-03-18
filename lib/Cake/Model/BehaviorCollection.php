@@ -55,7 +55,6 @@ class BehaviorCollection extends ObjectCollection implements CakeEventListener {
 /**
  * Attaches a model object and loads a list of behaviors
  *
- * @todo Make this method a constructor instead..
  * @param string $modelName
  * @param array $behaviors
  * @return void
@@ -285,6 +284,7 @@ class BehaviorCollection extends ObjectCollection implements CakeEventListener {
 			'Model.beforeFind' => 'trigger',
 			'Model.afterFind' => 'trigger',
 			'Model.beforeValidate' => 'trigger',
+			'Model.afterValidate' => 'trigger',
 			'Model.beforeSave' => 'trigger',
 			'Model.afterSave' => 'trigger',
 			'Model.beforeDelete' => 'trigger',

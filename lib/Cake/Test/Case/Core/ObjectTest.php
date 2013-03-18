@@ -305,6 +305,7 @@ class ObjectTest extends CakeTestCase {
  * @return void
  */
 	public function setUp() {
+		parent::setUp();
 		$this->object = new TestObject();
 	}
 
@@ -314,7 +315,7 @@ class ObjectTest extends CakeTestCase {
  * @return void
  */
 	public function tearDown() {
-		App::build();
+		parent::tearDown();
 		CakePlugin::unload();
 		unset($this->object);
 	}
@@ -619,6 +620,24 @@ class ObjectTest extends CakeTestCase {
 	}
 
 /**
+ * Test that requestAction handles get parameters correctly.
+ *
+ * @return void
+ */
+	public function testRequestActionGetParameters() {
+		$result = $this->object->requestAction(
+			'/request_action/params_pass?get=value&limit=5'
+		);
+		$this->assertEquals('value', $result->query['get']);
+
+		$result = $this->object->requestAction(
+			array('controller' => 'request_action', 'action' => 'params_pass'),
+			array('url' => array('get' => 'value', 'limit' => 5))
+		);
+		$this->assertEquals('value', $result->query['get']);
+	}
+
+/**
  * test that requestAction does not fish data out of the POST
  * superglobal.
  *
@@ -631,7 +650,6 @@ class ObjectTest extends CakeTestCase {
 			'item' => 'value'
 		));
 		$result = $this->object->requestAction(array('controller' => 'request_action', 'action' => 'post_pass'));
-		$expected = null;
 		$this->assertEmpty($result);
 
 		$result = $this->object->requestAction(

@@ -211,7 +211,7 @@ class DbConfigTask extends AppShell {
 		$this->out(__d('cake_console', 'The following database configuration will be created:'));
 		$this->hr();
 		$this->out(__d('cake_console', "Name:         %s", $name));
-		$this->out(__d('cake_console', "Datasource:       %s", $datasource));
+		$this->out(__d('cake_console', "Datasource:   %s", $datasource));
 		$this->out(__d('cake_console', "Persistent:   %s", $persistent));
 		$this->out(__d('cake_console', "Host:         %s", $host));
 
@@ -315,8 +315,11 @@ class DbConfigTask extends AppShell {
 			$config = array_merge($this->_defaultConfig, $config);
 			extract($config);
 
+			if (strpos($datasource, 'Database/') === false) {
+				$datasource = "Database/{$datasource}";
+			}
 			$out .= "\tpublic \${$name} = array(\n";
-			$out .= "\t\t'datasource' => 'Database/{$datasource}',\n";
+			$out .= "\t\t'datasource' => '{$datasource}',\n";
 			$out .= "\t\t'persistent' => {$persistent},\n";
 			$out .= "\t\t'host' => '{$host}',\n";
 

@@ -229,12 +229,12 @@ class MootoolsEngineHelper extends JsBaseEngineHelper {
  * Requires `Request`.  If you wish to use 'update' key you must have ```Request.HTML```
  * if you wish to do Json requests you will need ```JSON``` and ```Request.JSON```.
  *
- * @param mixed $url
+ * @param string|array $url
  * @param array $options
  * @return string The completed ajax call.
  */
 	public function request($url, $options = array()) {
-		$url = $this->url($url);
+		$url = html_entity_decode($this->url($url), ENT_COMPAT, Configure::read('App.encoding'));
 		$options = $this->_mapOptions('request', $options);
 		$type = $data = null;
 		if (isset($options['type']) || isset($options['update'])) {
@@ -254,7 +254,6 @@ class MootoolsEngineHelper extends JsBaseEngineHelper {
 		$options['url'] = $url;
 		$options = $this->_prepareCallbacks('request', $options);
 		if (!empty($options['dataExpression'])) {
-			$callbacks[] = 'data';
 			unset($options['dataExpression']);
 		} elseif (!empty($data)) {
 			$data = $this->object($data);

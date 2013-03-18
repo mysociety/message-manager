@@ -229,15 +229,15 @@ class PrototypeEngineHelper extends JsBaseEngineHelper {
 /**
  * Create an Ajax or Ajax.Updater call.
  *
- * @param mixed $url
+ * @param string|array $url
  * @param array $options
  * @return string The completed ajax call.
  */
 	public function request($url, $options = array()) {
-		$url = '"' . $this->url($url) . '"';
+		$url = html_entity_decode($this->url($url), ENT_COMPAT, Configure::read('App.encoding'));
+		$url = '"' . $url . '"';
 		$options = $this->_mapOptions('request', $options);
 		$type = '.Request';
-		$data = null;
 		if (isset($options['type']) && strtolower($options['type']) == 'json') {
 			unset($options['type']);
 		}

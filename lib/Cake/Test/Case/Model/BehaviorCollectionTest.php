@@ -39,7 +39,7 @@ class TestBehavior extends ModelBehavior {
 /**
  * setup method
  *
- * @param mixed $model
+ * @param Model $model
  * @param array $config
  * @return void
  */
@@ -54,8 +54,8 @@ class TestBehavior extends ModelBehavior {
 /**
  * beforeFind method
  *
- * @param mixed $model
- * @param mixed $query
+ * @param Model $model
+ * @param array $query
  * @return void
  */
 	public function beforeFind(Model $model, $query) {
@@ -66,24 +66,21 @@ class TestBehavior extends ModelBehavior {
 		switch ($settings['beforeFind']) {
 			case 'on':
 				return false;
-			break;
 			case 'test':
 				return null;
-			break;
 			case 'modify':
 				$query['fields'] = array($model->alias . '.id', $model->alias . '.name', $model->alias . '.mytime');
 				$query['recursive'] = -1;
 				return $query;
-			break;
 		}
 	}
 
 /**
  * afterFind method
  *
- * @param mixed $model
- * @param mixed $results
- * @param mixed $primary
+ * @param Model $model
+ * @param array $results
+ * @param boolean $primary
  * @return void
  */
 	public function afterFind(Model $model, $results, $primary) {
@@ -94,23 +91,19 @@ class TestBehavior extends ModelBehavior {
 		switch ($settings['afterFind']) {
 			case 'on':
 				return array();
-			break;
 			case 'test':
 				return true;
-			break;
 			case 'test2':
 				return null;
-			break;
 			case 'modify':
-				return Set::extract($results, "{n}.{$model->alias}");
-			break;
+				return Hash::extract($results, "{n}.{$model->alias}");
 		}
 	}
 
 /**
  * beforeSave method
  *
- * @param mixed $model
+ * @param Model $model
  * @return void
  */
 	public function beforeSave(Model $model) {
@@ -121,22 +114,19 @@ class TestBehavior extends ModelBehavior {
 		switch ($settings['beforeSave']) {
 			case 'on':
 				return false;
-			break;
 			case 'test':
 				return true;
-			break;
 			case 'modify':
 				$model->data[$model->alias]['name'] .= ' modified before';
 				return true;
-			break;
 		}
 	}
 
 /**
  * afterSave method
  *
- * @param mixed $model
- * @param mixed $created
+ * @param Model $model
+ * @param boolean $created
  * @return void
  */
 	public function afterSave(Model $model, $created) {
@@ -157,7 +147,6 @@ class TestBehavior extends ModelBehavior {
 			break;
 			case 'test2':
 				return false;
-			break;
 			case 'modify':
 				$model->data[$model->alias]['name'] .= ' ' . $string;
 			break;
@@ -167,7 +156,7 @@ class TestBehavior extends ModelBehavior {
 /**
  * beforeValidate method
  *
- * @param mixed $model
+ * @param Model $model
  * @return void
  */
 	public function beforeValidate(Model $model) {
@@ -179,25 +168,42 @@ class TestBehavior extends ModelBehavior {
 			case 'on':
 				$model->invalidate('name');
 				return true;
-			break;
 			case 'test':
 				return null;
-			break;
 			case 'whitelist':
 				$this->_addToWhitelist($model, array('name'));
 				return true;
-			break;
 			case 'stop':
 				$model->invalidate('name');
 				return false;
-			break;
+		}
+	}
+
+/**
+ * afterValidate method
+ *
+ * @param Model $model
+ * @param bool $cascade
+ * @return void
+ */
+	public function afterValidate(Model $model) {
+		$settings = $this->settings[$model->alias];
+		if (!isset($settings['afterValidate']) || $settings['afterValidate'] == 'off') {
+			return parent::afterValidate($model);
+		}
+		switch ($settings['afterValidate']) {
+			case 'on':
+				return false;
+			case 'test':
+				$model->data = array('foo');
+				return true;
 		}
 	}
 
 /**
  * beforeDelete method
  *
- * @param mixed $model
+ * @param Model $model
  * @param bool $cascade
  * @return void
  */
@@ -209,24 +215,21 @@ class TestBehavior extends ModelBehavior {
 		switch ($settings['beforeDelete']) {
 			case 'on':
 				return false;
-			break;
 			case 'test':
 				return null;
-			break;
 			case 'test2':
 				echo 'beforeDelete success';
 				if ($cascade) {
 					echo ' (cascading) ';
 				}
 				return true;
-			break;
 		}
 	}
 
 /**
  * afterDelete method
  *
- * @param mixed $model
+ * @param Model $model
  * @return void
  */
 	public function afterDelete(Model $model) {
@@ -244,7 +247,7 @@ class TestBehavior extends ModelBehavior {
 /**
  * onError method
  *
- * @param mixed $model
+ * @param Model $model
  * @return void
  */
 	public function onError(Model $model, $error) {
@@ -258,7 +261,7 @@ class TestBehavior extends ModelBehavior {
 /**
  * beforeTest method
  *
- * @param mixed $model
+ * @param Model $model
  * @return void
  */
 	public function beforeTest(Model $model) {
@@ -272,7 +275,7 @@ class TestBehavior extends ModelBehavior {
 /**
  * testMethod method
  *
- * @param mixed $model
+ * @param Model $model
  * @param bool $param
  * @return void
  */
@@ -285,7 +288,7 @@ class TestBehavior extends ModelBehavior {
 /**
  * testData method
  *
- * @param mixed $model
+ * @param Model $model
  * @return void
  */
 	public function testData(Model $model) {
@@ -299,8 +302,8 @@ class TestBehavior extends ModelBehavior {
 /**
  * validateField method
  *
- * @param mixed $model
- * @param mixed $field
+ * @param Model $model
+ * @param string|array $field
  * @return void
  */
 	public function validateField(Model $model, $field) {
@@ -310,9 +313,9 @@ class TestBehavior extends ModelBehavior {
 /**
  * speakEnglish method
  *
- * @param mixed $model
- * @param mixed $method
- * @param mixed $query
+ * @param Model $model
+ * @param string $method
+ * @param string $query
  * @return void
  */
 	public function speakEnglish(Model $model, $method, $query) {
@@ -763,21 +766,22 @@ class BehaviorCollectionTest extends CakeTestCase {
 	public function testBehaviorBelongsToFindCallbacks() {
 		$this->skipIf($this->db instanceof Sqlserver, 'This test is not compatible with SQL Server.');
 
+		$conditions = array('order' => 'Apple.id ASC');
 		$Apple = new Apple();
 		$Apple->unbindModel(array('hasMany' => array('Child'), 'hasOne' => array('Sample')), false);
-		$expected = $Apple->find('all');
+		$expected = $Apple->find('all', $conditions);
 
 		$Apple->unbindModel(array('belongsTo' => array('Parent')));
-		$wellBehaved = $Apple->find('all');
+		$wellBehaved = $Apple->find('all', $conditions);
 		$Apple->Parent->Behaviors->attach('Test');
 		$Apple->unbindModel(array('belongsTo' => array('Parent')));
-		$this->assertSame($Apple->find('all'), $wellBehaved);
+		$this->assertSame($Apple->find('all', $conditions), $wellBehaved);
 
 		$Apple->Parent->Behaviors->attach('Test', array('before' => 'off'));
-		$this->assertSame($expected, $Apple->find('all'));
+		$this->assertSame($expected, $Apple->find('all', $conditions));
 
 		$Apple->Parent->Behaviors->attach('Test', array('before' => 'test'));
-		$this->assertSame($expected, $Apple->find('all'));
+		$this->assertSame($expected, $Apple->find('all', $conditions));
 
 		$Apple->Parent->Behaviors->attach('Test', array('before' => 'modify'));
 		$expected2 = array(
@@ -793,22 +797,23 @@ class BehaviorCollectionTest extends CakeTestCase {
 		);
 		$result2 = $Apple->find('all', array(
 			'fields' => array('Apple.id', 'Parent.id', 'Parent.name', 'Parent.mytime'),
-			'conditions' => array('Apple.id <' => '4')
+			'conditions' => array('Apple.id <' => '4'),
+			'order' => 'Apple.id ASC',
 		));
 		$this->assertEquals($expected2, $result2);
 
 		$Apple->Parent->Behaviors->disable('Test');
-		$result = $Apple->find('all');
+		$result = $Apple->find('all', $conditions);
 		$this->assertEquals($expected, $result);
 
 		$Apple->Parent->Behaviors->attach('Test', array('after' => 'off'));
-		$this->assertEquals($expected, $Apple->find('all'));
+		$this->assertEquals($expected, $Apple->find('all', $conditions));
 
 		$Apple->Parent->Behaviors->attach('Test', array('after' => 'test'));
-		$this->assertEquals($expected, $Apple->find('all'));
+		$this->assertEquals($expected, $Apple->find('all', $conditions));
 
 		$Apple->Parent->Behaviors->attach('Test', array('after' => 'test2'));
-		$this->assertEquals($expected, $Apple->find('all'));
+		$this->assertEquals($expected, $Apple->find('all', $conditions));
 	}
 
 /**
@@ -839,7 +844,7 @@ class BehaviorCollectionTest extends CakeTestCase {
 		$this->assertSame($expected, $result);
 
 		$Sample->Behaviors->attach('Test', array('beforeSave' => 'modify'));
-		$expected = Set::insert($record, 'Sample.name', 'sample99 modified before');
+		$expected = Hash::insert($record, 'Sample.name', 'sample99 modified before');
 		$Sample->create();
 		$result = $Sample->save($record);
 		$expected['Sample']['id'] = $Sample->id;
@@ -849,14 +854,14 @@ class BehaviorCollectionTest extends CakeTestCase {
 		$this->assertSame($record, $Sample->save($record));
 
 		$Sample->Behaviors->attach('Test', array('beforeSave' => 'off', 'afterSave' => 'on'));
-		$expected = Set::merge($record, array('Sample' => array('aftersave' => 'modified after on create')));
+		$expected = Hash::merge($record, array('Sample' => array('aftersave' => 'modified after on create')));
 		$Sample->create();
 		$result = $Sample->save($record);
 		$expected['Sample']['id'] = $Sample->id;
 		$this->assertEquals($expected, $result);
 
 		$Sample->Behaviors->attach('Test', array('beforeSave' => 'modify', 'afterSave' => 'modify'));
-		$expected = Set::merge($record, array('Sample' => array('name' => 'sample99 modified before modified after on create')));
+		$expected = Hash::merge($record, array('Sample' => array('name' => 'sample99 modified before modified after on create')));
 		$Sample->create();
 		$result = $Sample->save($record);
 		$expected['Sample']['id'] = $Sample->id;
@@ -865,6 +870,7 @@ class BehaviorCollectionTest extends CakeTestCase {
 		$Sample->Behaviors->attach('Test', array('beforeSave' => 'off', 'afterSave' => 'test'));
 		$Sample->create();
 		$expected = $record;
+		unset($expected['Sample']['name']);
 		$result = $Sample->save($record);
 		$expected['Sample']['id'] = $Sample->id;
 		$this->assertSame($expected, $result);
@@ -881,12 +887,12 @@ class BehaviorCollectionTest extends CakeTestCase {
 		$record2 = $Sample->read(null, 1);
 
 		$Sample->Behaviors->attach('Test', array('afterSave' => 'on'));
-		$expected = Set::merge($record2, array('Sample' => array('aftersave' => 'modified after')));
+		$expected = Hash::merge($record2, array('Sample' => array('aftersave' => 'modified after')));
 		$Sample->create();
 		$this->assertSame($expected, $Sample->save($record2));
 
 		$Sample->Behaviors->attach('Test', array('afterSave' => 'modify'));
-		$expected = Set::merge($record2, array('Sample' => array('name' => 'sample1 modified after')));
+		$expected = Hash::merge($record2, array('Sample' => array('name' => 'sample1 modified after')));
 		$Sample->create();
 		$this->assertSame($expected, $Sample->save($record2));
 	}
@@ -964,6 +970,27 @@ class BehaviorCollectionTest extends CakeTestCase {
 		$Apple->whitelist = array('unknown');
 		$Apple->validates();
 		$this->assertSame($Apple->whitelist, array('unknown', 'name'));
+	}
+
+/**
+ * testBehaviorValidateAfterCallback method
+ *
+ * @return void
+ */
+	public function testBehaviorValidateAfterCallback() {
+		$Apple = new Apple();
+
+		$Apple->Behaviors->attach('Test');
+		$this->assertSame($Apple->validates(), true);
+
+		$Apple->Behaviors->attach('Test', array('afterValidate' => 'on'));
+		$this->assertSame($Apple->validates(), true);
+		$this->assertSame($Apple->validationErrors, array());
+
+		$Apple->Behaviors->attach('Test', array('afterValidate' => 'test'));
+		$Apple->data = array('bar');
+		$Apple->validates();
+		$this->assertEquals(array('foo'), $Apple->data);
 	}
 
 /**

@@ -11,8 +11,7 @@
  * @since         CakePHP(tm) v 1.3
  * @license       MIT License (http://www.opensource.org/licenses/mit-license.php)
  */
-
-App::uses('Set', 'Utility');
+App::uses('Hash', 'Utility');
 
 /**
  * A single Route used by the Router to connect requests to
@@ -497,9 +496,9 @@ class CakeRoute {
 			$named = array();
 			foreach ($params['named'] as $key => $value) {
 				if (is_array($value)) {
-					$flat = Set::flatten($value, '][');
+					$flat = Hash::flatten($value, '%5D%5B');
 					foreach ($flat as $namedKey => $namedValue) {
-						$named[] = $key . "[$namedKey]" . $separator . rawurlencode($namedValue);
+						$named[] = $key . "%5B{$namedKey}%5D" . $separator . rawurlencode($namedValue);
 					}
 				} else {
 					$named[] = $key . $separator . rawurlencode($value);

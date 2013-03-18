@@ -1,9 +1,5 @@
 <?php
 /**
- * TranslateBehaviorTest file
- *
- * PHP 5
- *
  * CakePHP(tm) Tests <http://book.cakephp.org/2.0/en/development/testing.html>
  * Copyright 2005-2012, Cake Software Foundation, Inc. (http://cakefoundation.org)
  *
@@ -12,7 +8,6 @@
  *
  * @copyright     Copyright 2005-2012, Cake Software Foundation, Inc. (http://cakefoundation.org)
  * @link          http://book.cakephp.org/2.0/en/development/testing.html CakePHP(tm) Tests
- * @package       Cake.Test.Case.Model.Behavior
  * @since         CakePHP(tm) v 1.2.0.5669
  * @license       MIT License (http://www.opensource.org/licenses/mit-license.php)
  */
@@ -47,15 +42,6 @@ class TranslateBehaviorTest extends CakeTestCase {
 	);
 
 /**
- * tearDown method
- *
- * @return void
- */
-	public function tearDown() {
-		ClassRegistry::flush();
-	}
-
-/**
  * Test that count queries with conditions get the correct joins
  *
  * @return void
@@ -70,7 +56,7 @@ class TranslateBehaviorTest extends CakeTestCase {
 				'I18n__content.locale' => 'eng'
 			)
 		));
-		$this->assertEqual(3, $result);
+		$this->assertEquals(3, $result);
 	}
 
 /**
@@ -417,8 +403,12 @@ class TranslateBehaviorTest extends CakeTestCase {
 				)
 			)
 		);
-
 		$this->assertEquals($expected, $result);
+
+		$TestModel = new TranslatedItem();
+		$TestModel->locale = array('pt-br');
+		$result = $TestModel->find('all');
+		$this->assertCount(3, $result, '3 records should have been found, no SQL error.');
 	}
 
 /**
@@ -432,7 +422,7 @@ class TranslateBehaviorTest extends CakeTestCase {
 		$TestModel = new TranslatedItem();
 		$TestModel->locale = 'rus';
 		$result = $TestModel->read(null, 1);
-		$this->assertFalse($result);
+		$this->assertSame(array(), $result);
 
 		$TestModel->locale = array('rus');
 		$result = $TestModel->read(null, 1);
@@ -470,10 +460,10 @@ class TranslateBehaviorTest extends CakeTestCase {
 			Configure::write('debug', 0);
 
 			$result = $TestModel->find('list', array('recursive' => 1, 'callbacks' => false));
-			$this->assertEquals(array(), $result);
+			$this->assertSame(array(), $result);
 
 			$result = $TestModel->find('list', array('recursive' => 1, 'callbacks' => 'after'));
-			$this->assertEquals(array(), $result);
+			$this->assertSame(array(), $result);
 			Configure::write('debug', $debug);
 		}
 
@@ -537,6 +527,104 @@ class TranslateBehaviorTest extends CakeTestCase {
 		$TestModel->save();
 		$result = $TestModel->read();
 		$expected = array('TranslatedItem' => array_merge($data, array('id' => $TestModel->id, 'locale' => 'spa')));
+		$this->assertEquals($expected, $result);
+	}
+
+/**
+ * test save multiple locales method
+ *
+ * @return void
+ */
+	public function testSaveMultipleLocales() {
+		$this->loadFixtures('Translate', 'TranslatedItem');
+
+		$TestModel = new TranslatedItem();
+		$data = array(
+			'slug' => 'fourth_translated',
+			'title' => array(
+				'eng' => 'Title #4',
+				'spa' => 'Leyenda #4',
+			),
+			'content' => array(
+				'eng' => 'Content #4',
+				'spa' => 'Contenido #4',
+			),
+			'translated_article_id' => 1,
+		);
+		$TestModel->create();
+		$TestModel->save($data);
+
+		$translations = array('title' => 'Title', 'content' => 'Content');
+		$TestModel->bindTranslation($translations, false);
+		$TestModel->locale = array('eng', 'spa');
+		$result = $TestModel->read();
+
+		$this->assertCount(2, $result['Title']);
+		$this->assertEquals($result['Title'][0]['locale'], 'eng');
+		$this->assertEquals($result['Title'][0]['content'], 'Title #4');
+		$this->assertEquals($result['Title'][1]['locale'], 'spa');
+		$this->assertEquals($result['Title'][1]['content'], 'Leyenda #4');
+
+		$this->assertCount(2, $result['Content']);
+	}
+
+/**
+ * testSaveAssociatedCreate method
+ *
+ * @return void
+ */
+	public function testSaveAssociatedMultipleLocale() {
+		$this->loadFixtures('Translate', 'TranslatedItem');
+
+		$TestModel = new TranslatedItem();
+		$data = array(
+			'slug' => 'fourth_translated',
+			'title' => array(
+				'eng' => 'Title #4',
+				'spa' => 'Leyenda #4',
+			),
+			'content' => array(
+				'eng' => 'Content #4',
+				'spa' => 'Contenido #4',
+			),
+			'translated_article_id' => 1,
+		);
+		$TestModel->create();
+		$TestModel->saveAssociated($data);
+
+		$translations = array('title' => 'Title', 'content' => 'Content');
+		$TestModel->bindTranslation($translations, false);
+		$TestModel->locale = array('eng', 'spa');
+		$result = $TestModel->read();
+		$this->assertCount(2, $result['Title']);
+		$this->assertCount(2, $result['Content']);
+	}
+
+/**
+ * Test that saving only some of the translated fields allows the record to be found again.
+ *
+ * @return void
+ */
+	public function testSavePartialFields() {
+		$this->loadFixtures('Translate', 'TranslatedItem');
+
+		$TestModel = new TranslatedItem();
+		$TestModel->locale = 'spa';
+		$data = array(
+			'slug' => 'fourth_translated',
+			'title' => 'Leyenda #4',
+		);
+		$TestModel->create($data);
+		$TestModel->save();
+		$result = $TestModel->read();
+		$expected = array(
+			'TranslatedItem' => array(
+				'id' => $TestModel->id,
+				'translated_article_id' => null,
+				'locale' => 'spa',
+				'content' => '',
+			) + $data
+		);
 		$this->assertEquals($expected, $result);
 	}
 
@@ -678,8 +766,8 @@ class TranslateBehaviorTest extends CakeTestCase {
 		$translations = array('title' => 'Title', 'content' => 'Content');
 		$TestModel->bindTranslation($translations, false);
 		$result = $TestModel->read(null, 1);
-		$result['Title'] = Set::sort($result['Title'], '{n}.id', 'asc');
-		$result['Content'] = Set::sort($result['Content'], '{n}.id', 'asc');
+		$result['Title'] = Hash::sort($result['Title'], '{n}.id', 'asc');
+		$result['Content'] = Hash::sort($result['Content'], '{n}.id', 'asc');
 		$expected = array(
 			'TranslatedItem' => array(
 				'id' => 1,
@@ -1015,4 +1103,60 @@ class TranslateBehaviorTest extends CakeTestCase {
 		$TestModel = new TranslatedItem();
 		$TestModel->bindTranslation(array('name' => 'name'));
 	}
+
+/**
+ * Test that translations can be bound and unbound dynamically.
+ *
+ * @return void
+ */
+	public function testUnbindTranslation() {
+		$this->loadFixtures('Translate', 'TranslatedItem');
+		$Model = new TranslatedItem();
+		$Model->unbindTranslation();
+		$Model->bindTranslation(array('body', 'slug'), false);
+
+		$result = $Model->Behaviors->Translate->settings['TranslatedItem'];
+		$this->assertEquals(array('body', 'slug'), $result);
+
+		$Model->unbindTranslation(array('body'));
+		$result = $Model->Behaviors->Translate->settings['TranslatedItem'];
+		$this->assertNotContains('body', $result);
+
+		$Model->unbindTranslation('slug');
+		$result = $Model->Behaviors->Translate->settings['TranslatedItem'];
+		$this->assertNotContains('slug', $result);
+	}
+
+/**
+ * Test that additional records are not inserted for associated translations.
+ *
+ * @return void
+ */
+	public function testNoExtraRowsForAssociatedTranslations() {
+		$this->loadFixtures('Translate', 'TranslatedItem');
+		$TestModel = new TranslatedItem();
+		$TestModel->locale = 'spa';
+		$TestModel->unbindTranslation();
+		$TestModel->bindTranslation(array('name' => 'nameTranslate'));
+
+		$data = array(
+			'TranslatedItem' => array(
+				'slug' => 'spanish-name',
+				'name' => 'Spanish name',
+			),
+		);
+		$TestModel->create($data);
+		$TestModel->save();
+
+		$Translate = $TestModel->translateModel();
+		$results = $Translate->find('all', array(
+			'conditions' => array(
+				'locale' => $TestModel->locale,
+				'foreign_key' => $TestModel->id
+			)
+		));
+		$this->assertCount(1, $results, 'Only one field should be saved');
+		$this->assertEquals('name', $results[0]['TranslateTestModel']['field']);
+	}
+
 }

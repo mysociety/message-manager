@@ -182,7 +182,10 @@ class Router {
  * @throws RouterException
  */
 	protected static function _validateRouteClass($routeClass) {
-		if (!class_exists($routeClass) || !is_subclass_of($routeClass, 'CakeRoute')) {
+		if (
+			$routeClass != 'CakeRoute' &&
+			(!class_exists($routeClass) || !is_subclass_of($routeClass, 'CakeRoute'))
+		) {
 			throw new RouterException(__d('cake_dev', 'Route classes must extend CakeRoute'));
 		}
 		return $routeClass;
@@ -256,18 +259,28 @@ class Router {
  * $options offers four 'special' keys. `pass`, `named`, `persist` and `routeClass`
  * have special meaning in the $options array.
  *
- * `pass` is used to define which of the routed parameters should be shifted into the pass array.  Adding a
- * parameter to pass will remove it from the regular route array. Ex. `'pass' => array('slug')`
+ * - `pass` is used to define which of the routed parameters should be shifted into the pass array.  Adding a
+ *   parameter to pass will remove it from the regular route array. Ex. `'pass' => array('slug')`
+ * - `persist` is used to define which route parameters should be automatically included when generating
+ *   new urls. You can override persistent parameters by redefining them in a url or remove them by
+ *   setting the parameter to `false`.  Ex. `'persist' => array('lang')`
+ * - `routeClass` is used to extend and change how individual routes parse requests and handle reverse routing,
+ *   via a custom routing class. Ex. `'routeClass' => 'SlugRoute'`
+ * - `named` is used to configure named parameters at the route level. This key uses the same options
+ *   as Router::connectNamed()
  *
- * `persist` is used to define which route parameters should be automatically included when generating
- * new urls. You can override persistent parameters by redefining them in a url or remove them by
- * setting the parameter to `false`.  Ex. `'persist' => array('lang')`
+ * You can also add additional conditions for matching routes to the $defaults array.
+ * The following conditions can be used:
  *
- * `routeClass` is used to extend and change how individual routes parse requests and handle reverse routing,
- * via a custom routing class. Ex. `'routeClass' => 'SlugRoute'`
+ * - `[type]` Only match requests for specific content types.
+ * - `[method]` Only match requests with specific HTTP verbs.
+ * - `[server]` Only match when $_SERVER['SERVER_NAME'] matches the given value.
  *
- * `named` is used to configure named parameters at the route level. This key uses the same options
- * as Router::connectNamed()
+ * Example of using the `[method]` condition:
+ *
+ * `Router::connect('/tasks', array('controller' => 'tasks', 'action' => 'index', '[method]' => 'GET'));`
+ *
+ * The above route will only be matched for GET requests. POST requests will fail to match this route.
  *
  * @param string $route A string describing the template of the route
  * @param array $defaults An array describing the default route parameters. These parameters will be used by default
@@ -457,7 +470,7 @@ class Router {
  *    integer values and UUIDs.
  * - 'prefix' - URL prefix to use for the generated routes.  Defaults to '/'.
  *
- * @param mixed $controller A controller name or array of controller names (i.e. "Posts" or "ListItems")
+ * @param string|array $controller A controller name or array of controller names (i.e. "Posts" or "ListItems")
  * @param array $options Options to use when generating REST routes
  * @return array Array of mapped resources
  */
@@ -515,7 +528,7 @@ class Router {
 		$ext = null;
 		$out = array();
 
-		if ($url && strpos($url, '/') !== 0) {
+		if (strlen($url) && strpos($url, '/') !== 0) {
 			$url = '/' . $url;
 		}
 		if (strpos($url, '?') !== false) {
@@ -630,7 +643,7 @@ class Router {
  * @return array Parameter information
  */
 	public static function getParams($current = false) {
-		if ($current) {
+		if ($current && self::$_requests) {
 			return self::$_requests[count(self::$_requests) - 1]->params;
 		}
 		if (isset(self::$_requests[0])) {
@@ -729,11 +742,11 @@ class Router {
  * - `#` - Allows you to set url hash fragments.
  * - `full_base` - If true the `FULL_BASE_URL` constant will be prepended to generated urls.
  *
- * @param mixed $url Cake-relative URL, like "/products/edit/92" or "/presidents/elect/4"
+ * @param string|array $url Cake-relative URL, like "/products/edit/92" or "/presidents/elect/4"
  *   or an array specifying any of the following: 'controller', 'action',
  *   and/or 'plugin', in addition to named arguments (keyed array elements),
  *   and standard URL arguments (indexed array elements)
- * @param mixed $full If (bool) true, the full base URL will be prepended to the result.
+ * @param bool|array $full If (bool) true, the full base URL will be prepended to the result.
  *   If an array accepts the following keys
  *    - escape - used when making urls embedded in html escapes query string '&'
  *    - full - if true the full base URL will be prepended.
@@ -891,7 +904,7 @@ class Router {
 			}
 		}
 
-		list($args, $named) = array(Set::filter($args, true), Set::filter($named, true));
+		list($args, $named) = array(Hash::filter($args), Hash::filter($named));
 		foreach (self::$_prefixes as $prefix) {
 			$prefixed = $prefix . '_';
 			if (!empty($url[$prefix]) && strpos($url['action'], $prefixed) === 0) {
@@ -925,7 +938,7 @@ class Router {
 		if (!empty($named)) {
 			foreach ($named as $name => $value) {
 				if (is_array($value)) {
-					$flattend = Set::flatten($value, '][');
+					$flattend = Hash::flatten($value, '][');
 					foreach ($flattend as $namedKey => $namedValue) {
 						$output .= '/' . $name . "[$namedKey]" . self::$_namedConfig['separator'] . rawurlencode($namedValue);
 					}
@@ -1016,7 +1029,7 @@ class Router {
  * and replace any double /'s.  It will not unify the casing and underscoring
  * of the input value.
  *
- * @param mixed $url URL to normalize Either an array or a string url.
+ * @param array|string $url URL to normalize Either an array or a string url.
  * @return string Normalized URL
  */
 	public static function normalize($url = '/') {
@@ -1102,18 +1115,37 @@ class Router {
 	public static function parseExtensions() {
 		self::$_parseExtensions = true;
 		if (func_num_args() > 0) {
-			self::$_validExtensions = func_get_args();
+			self::setExtensions(func_get_args(), false);
 		}
 	}
 
 /**
- * Get the list of extensions that can be parsed by Router.  To add more
- * extensions use Router::parseExtensions()
+ * Get the list of extensions that can be parsed by Router.
+ * To initially set extensions use `Router::parseExtensions()`
+ * To add more see `setExtensions()`
  *
  * @return array Array of extensions Router is configured to parse.
  */
 	public static function extensions() {
 		return self::$_validExtensions;
+	}
+
+/**
+ * Set/add valid extensions.
+ * To have the extensions parsed you still need to call `Router::parseExtensions()`
+ *
+ * @param array $extensions List of extensions to be added as valid extension
+ * @param boolean $merge Default true will merge extensions. Set to false to override current extensions
+ * @return array
+ */
+	public static function setExtensions($extensions, $merge = true) {
+		if (!is_array($extensions)) {
+			return self::$_validExtensions;
+		}
+		if (!$merge) {
+			return self::$_validExtensions = $extensions;
+		}
+		return self::$_validExtensions = array_merge(self::$_validExtensions, $extensions);
 	}
 
 }

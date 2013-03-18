@@ -17,6 +17,8 @@
  * @license       MIT License (http://www.opensource.org/licenses/mit-license.php)
  */
 
+App::uses('ConsoleOutput', 'Console');
+App::uses('ConsoleInput', 'Console');
 App::uses('ShellDispatcher', 'Console');
 App::uses('Shell', 'Console');
 App::uses('CakeSchema', 'Model');
@@ -88,6 +90,10 @@ class ControllerTaskTest extends CakeTestCase {
 			array($out, $out, $in)
 		);
 		$this->Task->Test = $this->getMock('TestTask', array(), array($out, $out, $in));
+
+		if (!defined('ARTICLE_MODEL_CREATED')) {
+			$this->markTestSkipped('Could not run as an Article, Tag or Comment model was already loaded.');
+		}
 	}
 
 /**
@@ -115,10 +121,10 @@ class ControllerTaskTest extends CakeTestCase {
 
 		$this->Task->connection = 'test';
 		$this->Task->interactive = true;
-		$this->Task->expects($this->at(1))->method('out')->with('1. BakeArticles');
-		$this->Task->expects($this->at(2))->method('out')->with('2. BakeArticlesBakeTags');
-		$this->Task->expects($this->at(3))->method('out')->with('3. BakeComments');
-		$this->Task->expects($this->at(4))->method('out')->with('4. BakeTags');
+		$this->Task->expects($this->at(2))->method('out')->with(' 1. BakeArticles');
+		$this->Task->expects($this->at(3))->method('out')->with(' 2. BakeArticlesBakeTags');
+		$this->Task->expects($this->at(4))->method('out')->with(' 3. BakeComments');
+		$this->Task->expects($this->at(5))->method('out')->with(' 4. BakeTags');
 
 		$expected = array('BakeArticles', 'BakeArticlesBakeTags', 'BakeComments', 'BakeTags');
 		$result = $this->Task->listAll('test');
@@ -179,7 +185,7 @@ class ControllerTaskTest extends CakeTestCase {
 	public function testDoHelpersNo() {
 		$this->Task->expects($this->any())->method('in')->will($this->returnValue('n'));
 		$result = $this->Task->doHelpers();
-		$this->assertEquals(array(), $result);
+		$this->assertSame(array(), $result);
 	}
 
 /**
@@ -216,7 +222,7 @@ class ControllerTaskTest extends CakeTestCase {
 	public function testDoComponentsNo() {
 		$this->Task->expects($this->any())->method('in')->will($this->returnValue('n'));
 		$result = $this->Task->doComponents();
-		$this->assertEquals(array(), $result);
+		$this->assertSame(array(), $result);
 	}
 
 /**
@@ -338,7 +344,6 @@ class ControllerTaskTest extends CakeTestCase {
  * @return void
  */
 	public function testBakeActionsUsingSessions() {
-		$this->skipIf(!defined('ARTICLE_MODEL_CREATED'), 'Testing bakeActions requires Article, Comment & Tag Model to be undefined.');
 
 		$result = $this->Task->bakeActions('BakeArticles', null, true);
 
@@ -377,7 +382,6 @@ class ControllerTaskTest extends CakeTestCase {
  * @return void
  */
 	public function testBakeActionsWithNoSessions() {
-		$this->skipIf(!defined('ARTICLE_MODEL_CREATED'), 'Testing bakeActions requires Article, Tag, Comment Models to be undefined.');
 
 		$result = $this->Task->bakeActions('BakeArticles', null, false);
 
@@ -509,9 +513,7 @@ class ControllerTaskTest extends CakeTestCase {
 		if ($count != count($this->fixtures)) {
 			$this->markTestSkipped('Additional tables detected.');
 		}
-		if (!defined('ARTICLE_MODEL_CREATED')) {
-			$this->markTestSkipped('Execute into all could not be run as an Article, Tag or Comment model was already loaded.');
-		}
+
 		$this->Task->connection = 'test';
 		$this->Task->path = '/my/path/';
 		$this->Task->args = array('all');
@@ -529,14 +531,44 @@ class ControllerTaskTest extends CakeTestCase {
 	}
 
 /**
+ * Test execute() with all and --admin
+ *
+ * @return void
+ */
+	public function testExecuteIntoAllAdmin() {
+		$count = count($this->Task->listAll('test'));
+		if ($count != count($this->fixtures)) {
+			$this->markTestSkipped('Additional tables detected.');
+		}
+
+		$this->Task->connection = 'test';
+		$this->Task->path = '/my/path/';
+		$this->Task->args = array('all');
+		$this->Task->params['admin'] = true;
+
+		$this->Task->Project->expects($this->any())
+			->method('getPrefix')
+			->will($this->returnValue('admin_'));
+		$this->Task->expects($this->any())
+			->method('_checkUnitTest')
+			->will($this->returnValue(true));
+		$this->Task->Test->expects($this->once())->method('bake');
+
+		$filename = '/my/path/BakeArticlesController.php';
+		$this->Task->expects($this->once())->method('createFile')->with(
+			$filename,
+			$this->stringContains('function admin_index')
+		)->will($this->returnValue(true));
+
+		$this->Task->execute();
+	}
+
+/**
  * test that `cake bake controller foos` works.
  *
  * @return void
  */
 	public function testExecuteWithController() {
-		if (!defined('ARTICLE_MODEL_CREATED')) {
-			$this->markTestSkipped('Execute with scaffold param requires no Article, Tag or Comment model to be defined');
-		}
 		$this->Task->connection = 'test';
 		$this->Task->path = '/my/path/';
 		$this->Task->args = array('BakeArticles');
@@ -568,9 +600,6 @@ class ControllerTaskTest extends CakeTestCase {
  * @return void
  */
 	public function testExecuteWithControllerNameVariations($name) {
-		if (!defined('ARTICLE_MODEL_CREATED')) {
-			$this->markTestSkipped('Execute with scaffold param requires no Article, Tag or Comment model to be defined.');
-		}
 		$this->Task->connection = 'test';
 		$this->Task->path = '/my/path/';
 		$this->Task->args = array($name);
@@ -588,9 +617,6 @@ class ControllerTaskTest extends CakeTestCase {
  * @return void
  */
 	public function testExecuteWithPublicParam() {
-		if (!defined('ARTICLE_MODEL_CREATED')) {
-			$this->markTestSkipped('Execute with public param requires no Article, Tag or Comment model to be defined.');
-		}
 		$this->Task->connection = 'test';
 		$this->Task->path = '/my/path/';
 		$this->Task->args = array('BakeArticles');
@@ -610,9 +636,6 @@ class ControllerTaskTest extends CakeTestCase {
  * @return void
  */
 	public function testExecuteWithControllerAndBoth() {
-		if (!defined('ARTICLE_MODEL_CREATED')) {
-			$this->markTestSkipped('Execute with controller and both requires no Article, Tag or Comment model to be defined.');
-		}
 		$this->Task->Project->expects($this->any())->method('getPrefix')->will($this->returnValue('admin_'));
 		$this->Task->connection = 'test';
 		$this->Task->path = '/my/path/';
@@ -632,9 +655,6 @@ class ControllerTaskTest extends CakeTestCase {
  * @return void
  */
 	public function testExecuteWithControllerAndAdmin() {
-		if (!defined('ARTICLE_MODEL_CREATED')) {
-			$this->markTestSkipped('Execute with controller and admin requires no Article, Tag or Comment model to be defined.');
-		}
 		$this->Task->Project->expects($this->any())->method('getPrefix')->will($this->returnValue('admin_'));
 		$this->Task->connection = 'test';
 		$this->Task->path = '/my/path/';

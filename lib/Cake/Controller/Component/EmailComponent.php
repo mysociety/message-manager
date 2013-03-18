@@ -279,7 +279,7 @@ class EmailComponent extends Component {
 /**
  * Send an email using the specified content, template and layout
  *
- * @param mixed $content Either an array of text lines, or a string with contents
+ * @param string|array $content Either an array of text lines, or a string with contents
  *  If you are rendering a template this variable will be sent to the templates as `$content`
  * @param string $template Template to use when sending email
  * @param string $layout Layout to use to enclose email body
@@ -288,6 +288,7 @@ class EmailComponent extends Component {
 	public function send($content = null, $template = null, $layout = null) {
 		$lib = new CakeEmail();
 		$lib->charset = $this->charset;
+		$lib->headerCharset = $this->charset;
 
 		$lib->from($this->_formatAddresses((array)$this->from));
 		if (!empty($this->to)) {
@@ -305,7 +306,7 @@ class EmailComponent extends Component {
 		if (!empty($this->return)) {
 			$lib->returnPath($this->_formatAddresses((array)$this->return));
 		}
-		if (!empty($readReceipt)) {
+		if (!empty($this->readReceipt)) {
 			$lib->readReceipt($this->_formatAddresses((array)$this->readReceipt));
 		}
 

@@ -24,13 +24,6 @@ App::uses('CakePlugin', 'Core');
 App::uses('L10n', 'I18n');
 App::uses('Multibyte', 'I18n');
 
-if (function_exists('mb_internal_encoding')) {
-	$encoding = Configure::read('App.encoding');
-	if (!empty($encoding)) {
-		mb_internal_encoding($encoding);
-	}
-}
-
 /**
  * I18n handles translation of Text and time format strings.
  *
@@ -385,7 +378,7 @@ class I18n {
 				$this->_domains[$domain][$this->_lang][$this->category]["%plural-c"] = $switch;
 				unset($this->_domains[$domain][$this->_lang][$this->category]["%po-header"]);
 			}
-			$this->_domains = Set::pushDiff($this->_domains, $merge);
+			$this->_domains = Hash::mergeDiff($this->_domains, $merge);
 
 			if (isset($this->_domains[$domain][$this->_lang][$this->category][null])) {
 				unset($this->_domains[$domain][$this->_lang][$this->category][null]);

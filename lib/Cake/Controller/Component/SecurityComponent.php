@@ -19,10 +19,11 @@
 
 App::uses('Component', 'Controller');
 App::uses('String', 'Utility');
+App::uses('Hash', 'Utility');
 App::uses('Security', 'Utility');
 
 /**
- * The Security Component creates an easy way to integrate tighter security in 
+ * The Security Component creates an easy way to integrate tighter security in
  * your application. It provides methods for various tasks like:
  *
  * - Restricting which HTTP methods your application accepts.
@@ -217,6 +218,10 @@ class SecurityComponent extends Component {
 			$controller->request->params['requested'] != 1
 		);
 
+		if ($this->_action == $this->blackHoleCallback) {
+			return $this->blackhole($controller, 'auth');
+		}
+
 		if ($isPost && $isNotRequestAction && $this->validatePost) {
 			if ($this->_validatePost($controller) === false) {
 				return $this->blackHole($controller, 'auth');
@@ -228,7 +233,7 @@ class SecurityComponent extends Component {
 			}
 		}
 		$this->generateToken($controller->request);
-		if ($isPost) {
+		if ($isPost && is_array($controller->request->data)) {
 			unset($controller->request->data['_Token']);
 		}
 	}
@@ -308,11 +313,10 @@ class SecurityComponent extends Component {
  * @throws BadRequestException
  */
 	public function blackHole(Controller $controller, $error = '') {
-		if ($this->blackHoleCallback == null) {
+		if (!$this->blackHoleCallback) {
 			throw new BadRequestException(__d('cake_dev', 'The request has been black-holed'));
-		} else {
-			return $this->_callback($controller, $this->blackHoleCallback, array($error));
 		}
+		return $this->_callback($controller, $this->blackHoleCallback, array($error));
 	}
 
 /**
@@ -443,7 +447,7 @@ class SecurityComponent extends Component {
 		$unlocked = explode('|', $unlocked);
 
 		$lockedFields = array();
-		$fields = Set::flatten($check);
+		$fields = Hash::flatten($check);
 		$fieldList = array_keys($fields);
 		$multi = array();
 
@@ -584,12 +588,13 @@ class SecurityComponent extends Component {
  * @param string $method Method to execute
  * @param array $params Parameters to send to method
  * @return mixed Controller callback method's response
+ * @throws BadRequestException When a the blackholeCallback is not callable.
  */
 	protected function _callback(Controller $controller, $method, $params = array()) {
 		if (is_callable(array($controller, $method))) {
 			return call_user_func_array(array(&$controller, $method), empty($params) ? null : $params);
 		} else {
-			return null;
+			throw new BadRequestException(__d('cake_dev', 'The request has been black-holed'));
 		}
 	}
 
