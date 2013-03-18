@@ -41,6 +41,25 @@
 		'mask' => 0666, // [optional] permission mask to use when creating cache files
 	));
  
+	// Enable the Dispatcher filters for plugin assets, and
+	// CacheHelper.
+	Configure::write('Dispatcher.filters', array(
+	    'AssetDispatcher',
+	    'CacheDispatcher'
+	));
+
+	// Add logging configuration.
+	CakeLog::config('debug', array(
+	    'engine' => 'FileLog',
+	    'types' => array('notice', 'info', 'debug'),
+	    'file' => 'debug',
+	));
+	CakeLog::config('error', array(
+	    'engine' => 'FileLog',
+	    'types' => array('warning', 'error', 'critical', 'alert', 'emergency'),
+	    'file' => 'error',
+	));
+
  /* APC (http://pecl.php.net/package/APC)
  *
  * 	 Cache::config('default', array(
