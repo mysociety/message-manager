@@ -105,6 +105,11 @@ class PagesController extends AppController {
 			}
 			$this->set('action_types', $action_types);
 		}
+		$user_tags = "";
+		if ($this->Auth->loggedIn()) {
+			$user_tags = $this->Auth->user('allowed_tags'); 
+		}
+		$this->set('user_tags', $user_tags);
 		$this->render(implode('/', $path));
 	}
 	

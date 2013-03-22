@@ -44,22 +44,28 @@
 				<?php echo $this->Html->link(__('change your password'), array('controller' => 'Users', 'action' => 'change_password')); ?>
 				(also via <strong>password</strong> link at the top right).
 			</p>
+			<p>
+				<strong>Allowed tags</strong> for your account: <?php echo $this->MessageUtils->pretty_tag_list_html($user_tags) ?>
+			</p>
 		</div>
 		<div class="home-block">
 			<h3>Tags</h3>
-			<dl>
-				<?php $tags = Configure::read('tags'); 
-				foreach ($tags as $tag => $full) { ?>
-					<dt><?php echo strtoupper(h($tag)); ?></dt>
-					<dd><?php echo h($full); ?></dd>
-				<?php } ?>
-			</dl>
-			<p>
-				The first word of an incoming message is used as a <em>tag</em> if it matches any of the values above.
-				<br/>
-				Tags <?php echo(Configure::read('remove_tags_when_matched')?"will be":"will not be"); ?>
-				stripped from the start of incoming messages when they are received.
-			</p>
+			<?php $tags = Configure::read('tags'); 
+				if (! empty($tags)) { ?>
+				<p>
+					The following tags are configured for this Message Manager:
+				</p>
+				<dl>
+					<?php foreach ($tags as $tag => $full) { ?>
+						<dt><?php echo strtoupper(h($tag)); ?></dt>
+						<dd><?php echo h($full); ?></dd>
+					<?php } ?>
+				</dl>
+			<?php } else { ?>
+				<p>
+					No tags are currently configured for this Message Manager.
+				</p>
+			<? } ?>
 		</div>
 		<div class="home-block">
 			<h3>Settings</h3>
