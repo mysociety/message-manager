@@ -39,6 +39,11 @@
 					<?php if (!empty($fms_url)) { echo("(such as <a href='$fms_url'>$fms_url</a>).");} ?>
 				</p>
 			<?php } ?>
+			<p>
+				You can 
+				<?php echo $this->Html->link(__('change your password'), array('controller' => 'Users', 'action' => 'change_password')); ?>
+				(also via <strong>password</strong> link at the top right).
+			</p>
 		</div>
 		<div class="home-block">
 			<h3>Tags</h3>
