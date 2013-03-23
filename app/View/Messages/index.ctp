@@ -11,8 +11,6 @@
 	        <th> </th>
 	    </tr>
 
-	    <!-- Here is where we loop through our $posts array, printing out post info -->
-
 	    <?php $c_locks = 0; foreach ($messages as $message): ?>
 	    <tr>
 	        <td><?php echo h($message['Message']['created']); ?></td>
