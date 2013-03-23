@@ -49,7 +49,7 @@ class MessagesController extends AppController {
 		Controller::loadModel('Group'); 
 		Controller::loadModel('Status'); 
 		Controller::loadModel('Message');
-	}
+}
 	
 	// index shows all messages... maybe filtered on is_outbound;
 	// note: convenience utility: send ?recover_tree=1 to force a TreeBehaviour rebuild on Messages
@@ -616,6 +616,39 @@ class MessagesController extends AppController {
 			'type' => 'text',
 			'body' => $response_text . "\n" 
 		)); 
+	}
+	
+	/* 
+		use GET, not POST, to ensure the pagination works 
+		currently only searching on message text
+	*/
+	public function search() {
+		$search_term = "";
+		$conditions = array();
+		if ($this->request->is('post')) {
+			$search_term = $this->request->data('q');
+			// XXX probably better to redirect, actually
+		} else {
+			$search_term = $this->request->query('q');
+		}
+		if ($search_term) {
+			array_push($conditions, array(
+					'Message.message LIKE' => "%$search_term%"
+				)
+			);
+		}
+		if (empty($conditions)) {
+			$this->set('title', __("Search messages") );
+		} else {
+			$this->set('title', __('Search results for "%s"', h($search_term)));
+			$this->paginate = array(
+				'recursive' => 0,
+				'conditions' => $conditions,
+			);
+			$this->set('messages', $this->paginate('Message'));
+		}
+		$this->set('search_term', $search_term);
+		$this->set('show_results', !empty($conditions));
 	}
 	
 	// purge all expired locks from the data
