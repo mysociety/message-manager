@@ -51,8 +51,8 @@ Then the safest approach is probably to rebuilt most of it like this:
 3. Repopulate the ARO-ACO mappings (i.e., *who* can do *what*):
 
    * First, you'll need to edit the PHP to edit the line in
-     `apps/Controllers/User.php` that says `$ENABLE_INIT_DB = false` which
-     prevents this usually running)
+     `app/Controller/UsersController.php` that says 
+     `$ENABLE_INIT_DB = false` which prevents this usually running)
 
    * Then, in the browser hit `/users/initdb` (if it works, you'll see a
      plain text "all done" response and nothing else)
@@ -63,6 +63,11 @@ Then the safest approach is probably to rebuilt most of it like this:
 
 4. **important!** Remember to dump the data from the ACO and AROS_ACOS tables
     and update `db/intial_auth.sql` so it contains the latest values.
+    To help you, the dump command will be something like this:
+    
+```bash
+pg_dump --inserts --data-only --table=aros_acos --table=acos -U username databasename > tmp/mm-auth.sql
+```
 
 That's it. In future we might move the `/users/initdb` call into a
 command-line shell, which is where it should be!
