@@ -213,6 +213,17 @@ body.cobrand-default {
 #container .mm-message.form .boilerplate-chooser {
   display: none;
   margin: 1em 1em 0 1em; }
+#container #mini-search {
+  font-size: 80%;
+  text-align: right;
+  border: 1px solid #996666; }
+  #container #mini-search div, #container #mini-search label, #container #mini-search input, #container #mini-search .submit {
+    padding: 0.5em;
+    display: inline-block;
+    margin: 0;
+    vertical-align: middle; }
+  #container #mini-search input[type=text] {
+    max-width: 10em; }
 #container #footer a {
   color: #fff;
   margin-right: 0.5em;

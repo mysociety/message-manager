@@ -1,5 +1,16 @@
 <div class="mm-messages">
 	<h2><?php echo $title ?></h2>
+	<div id="mini-search">
+		<?php echo $this->Form->create('Message', array('type' => 'get', 'action' => 'search'));?>
+			<div>
+				<?php
+					echo $this->Form->input('search_term', 
+						array('name' => 'q', 'type' => 'text', 'escape' => false, 'label' => "Message contains", 'value' => ''));
+				?>
+			</div>
+			<?php echo $this->Form->submit(__('Search')); ?>
+		<?php echo $this->Form->end(); ?>
+	</div>
 	<table>
 	    <tr>
 	        <th><?php echo $this->Paginator->sort('created');?></th>

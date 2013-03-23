@@ -272,6 +272,20 @@ body.cobrand-default {
     display: none;
     margin: 1em 1em 0 1em;
   }
+  #mini-search {
+    font-size:80%;
+    text-align: right;
+    border: 1px solid $pale_back_color;
+    div, label, input, .submit {
+      padding: 0.5em;
+      display: inline-block;
+      margin: 0;
+      vertical-align: middle;
+    }
+    input[type=text] {
+      max-width: 10em;
+    }
+  }
   #footer {
     a {
       color: #fff;
