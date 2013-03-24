@@ -32,6 +32,11 @@
 			<?php echo($user['User']['can_reply']? "yes":"no"); ?>
 			&nbsp;
 		</dd>
+		<dt><?php echo __('Notes'); ?></dt>
+		<dd>
+			<?php echo(h($user['User']['user_notes'])); ?>
+			&nbsp;
+		</dd>
 		<dt><?php echo __('Created'); ?></dt>
 		<dd>
 			<?php echo h($user['User']['created']); ?>

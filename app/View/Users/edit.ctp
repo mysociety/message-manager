@@ -12,6 +12,7 @@
 		echo $this->Form->input('allowed_tags', array('label' => 'Allowed tags: user only sees messages which have these tags.<br/>Use the special tag "' .
 								 Configure::read('no_tag_symbol') . '" to match untagged messages.<br/>Leave this whole entry blank to match every message.'));
 		echo $this->Form->input('can_reply', array('label'=>'Can send replies?'));
+		echo $this->Form->input('user_notes', array('label'=>'Notes'));
 	?>
 	</fieldset>
 <?php echo $this->Form->end(__('Submit'));?>
