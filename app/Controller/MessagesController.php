@@ -75,6 +75,8 @@ class MessagesController extends AppController {
 			'recursive' => 0,
 			'conditions' => $conditions,
 		);
+		$this->set('show_results', true);
+		$this->set('search_term', "");
 		$this->set('title', $title);
 		$this->set('messages', $this->paginate('Message'));
 	}
@@ -621,6 +623,7 @@ class MessagesController extends AppController {
 	/* 
 		use GET, not POST, to ensure the pagination works 
 		currently only searching on message text
+		also note this currently uses the index view
 	*/
 	public function search() {
 		$search_term = "";
@@ -649,6 +652,7 @@ class MessagesController extends AppController {
 		}
 		$this->set('search_term', $search_term);
 		$this->set('show_results', !empty($conditions));
+		$this->render('index');
 	}
 	
 	// purge all expired locks from the data
