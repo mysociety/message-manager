@@ -116,7 +116,8 @@ CREATE TABLE users (
   can_reply boolean not null default '0',
   created timestamp default null,
   modified timestamp default null,
-  email varchar(132) DEFAULT null
+  email varchar(132) DEFAULT null,
+  user_notes text null default null
 );
 create unique index users_username_idx on users(username);
 

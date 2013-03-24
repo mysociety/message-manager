@@ -1,0 +1,1 @@
+ALTER TABLE  `users` ADD  `user_notes` TEXT NULL DEFAULT NULL;
