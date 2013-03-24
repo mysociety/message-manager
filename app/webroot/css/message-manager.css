@@ -216,7 +216,8 @@ body.cobrand-default {
 #container #mini-search {
   font-size: 80%;
   text-align: right;
-  border: 1px solid #996666; }
+  border: 1px solid #996666;
+  margin-bottom: 1em; }
   #container #mini-search div, #container #mini-search label, #container #mini-search input, #container #mini-search .submit {
     padding: 0.5em;
     display: inline-block;
