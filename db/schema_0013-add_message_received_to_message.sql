@@ -1,0 +1,1 @@
+ALTER TABLE  `messages` ADD  `message_received` TEXT NULL DEFAULT NULL;

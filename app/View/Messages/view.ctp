@@ -1,3 +1,4 @@
+<?php echo $this->Html->script('jquery-1.7.2.min', false); ?>
 <div class="mm-messages view">
 	<h2>
 		<?php
@@ -32,6 +33,19 @@
 				</a>&nbsp;
 			</dd>
 		<?php } ?> 
+		<dt>
+		    <a href="#" class="show-raw-text">Show raw text</a>
+		</dt>
+		<dd class="raw-text">
+			<?php echo h($message['Message']['message_received'])?> &nbsp;
+		</dd>
+		<dt>
+			Tag
+		</dt>
+		<dd>
+			<?php echo h($message['Message']['tag'])?>
+			&nbsp;
+		</dd>
 		<dt>
 			Message
 		</dt>
@@ -134,13 +148,6 @@
 		<dt>Sender token</dt>
 		<dd>
 			<?php echo h($message['Message']['sender_token'])?>
-			&nbsp;
-		</dd>
-		<dt>
-			Tag
-		</dt>
-		<dd>
-			<?php echo h($message['Message']['tag'])?>
 			&nbsp;
 		</dd>
 		<dt>
@@ -313,4 +320,13 @@
 		</li>
 	</ul>
 </div>
-
+<script>
+$(document).ready(function() {
+    $('.raw-text').hide();
+    $('a.show-raw-text').on('click', function(e){
+       e.preventDefault();
+       $('.raw-text').slideDown();
+       $(this).replaceWith('Raw text');
+    });
+});
+</script>

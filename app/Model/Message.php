@@ -84,6 +84,9 @@ class Message extends AppModel {
 	//   and storing in the record
 	//   For example, incoming messages like "LUZ Hole in the road..." becomes
 	//   tag: LUZ, message: "Hole in the road..."
+	//
+	// * original (raw) message text
+	//   If this is the creation of a new record, store the original, unchanged text
 	
 	public function beforeSave() {
 		if (!empty($this->data['Message']['from_address'])) {
@@ -95,6 +98,9 @@ class Message extends AppModel {
 		}
 		if (!empty($this->data['Message']['message'])) {
 			$message_text = $this->data['Message']['message'];
+			if (! $this->getID()) { // it's a create (not an edit)
+				$this->data['Message']['message_received'] = $message_text;
+			}
 			if (!empty($message_text)) {
 				$tag_data = Message::separate_out_tags($message_text);
 				foreach ($tag_data as $key => $value) {
