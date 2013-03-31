@@ -26,7 +26,9 @@
 			</dd>
 		</dl>
 		<hr/>
+		
 		<?php
+		    echo $this->Form->input('message');	
 			// echo $this->Form->input('status',array('type'=>'radio','options'=>$statuses));	
 			echo $this->Form->input('tag', array('style' => "width:5em;"));	
 			echo $this->Form->input('parent_id', array(
