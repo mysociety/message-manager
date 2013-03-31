@@ -61,6 +61,7 @@ CREATE TABLE messages (
   from_address varchar(128) default null,
   to_address varchar(128) default null,
   sender_token varchar(255) default null,
+  message_received text null default null,
   message text,
   created timestamp default null,
   received timestamp default null,
