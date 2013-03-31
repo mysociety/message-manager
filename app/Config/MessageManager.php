@@ -127,6 +127,16 @@ $config = array(
 	'allow_usergroup_edits' => false,
 
 	/*-----------------------------------------------
+	 * It's not obvious that admin staff should ever
+	 * be able to change the text of messages... but
+	 * if you want to allow it (for example, moderation
+	 * before being displayed in public), set this to true.
+	 * The original message text is stored in the record
+	 * so you don't lose data even if edits are allowed.
+	 *-----------------------------------------------*/
+	'allow_message_text_edits' => false,
+
+	/*-----------------------------------------------
 	 * show_debug_output: set to true if this is a 
 	 * staging or dev site (and you want debug output
 	 * on errors), or false for production. 
