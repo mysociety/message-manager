@@ -22,8 +22,14 @@
         and then click on <strong>Edit</strong>.
     </p>
     <p>
-        The only fields of the message that you can edit are its <strong>tag</strong> and <strong>parent</strong>.
-        Currently Message Manager does not support users editing any other fields, including the message text.
+        The only fields of the message that you can edit are its <strong>tag</strong> and <strong>parent</strong>.        
+        You can edit the <strong>message&nbsp;text</strong> depending on the config setting
+        <code>allow_message_text_edits</code>, which is currently set to 
+        <?php echo Configure::read('allow_message_text_edits')?"allow":"disallow"; ?>
+        such edits.
+    </p>
+    <p>
+        Currently Message Manager does not support users editing any other fields.
     </p>
     <h3>
         Changing the tag
