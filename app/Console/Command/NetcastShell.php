@@ -202,10 +202,14 @@ class NetcastShell extends AppShell {
 
 	public function gateway_list() {
 		$sources = $this->MessageSource->find('all', array('fields' => array('id', 'name', 'url')));
-		foreach ($sources as $s) {
+		if (count($sources)==0) {
+			$this->out(__("No message sources found."), 1, Shell::NORMAL);
+		} else {
 			$this->out(sprintf("%4s %24s  %s", "id", "name", "url"), 1, Shell::NORMAL);
 			$this->out(sprintf("%4s %24s  %s", "----", "------------------------", "---"), 1, Shell::NORMAL);
-			$this->out(sprintf("%4s %24s  %s", $s['MessageSource']['id'], $s['MessageSource']['name'], $s['MessageSource']['url']), 1, Shell::QUIET);
+			foreach ($sources as $s) {
+				$this->out(sprintf("%4s %24s  %s", $s['MessageSource']['id'], $s['MessageSource']['name'], $s['MessageSource']['url']), 1, Shell::QUIET);
+			}
 		}
 		$this->out(__("Done"), 1, Shell::VERBOSE);
 	}
