@@ -28,13 +28,14 @@
 		<hr/>
 		
 		<?php
-		    if (Configure::read('allow_message_text_edits')) {
-    		    echo $this->Form->input('message', array(
-    				'label' => "Message text (don't edit this unless you are certain you really, really need to)"
-    			));	
-		    }
+			if (Configure::read('allow_message_text_edits') && $is_admin_group) {
+				echo $this->Form->input('message', array(
+					'label' => "Message text (don't edit this unless you are certain you really, really need to)"
+				)); 
+			}
+			// this suppressed because we're not allowing status edits
 			// echo $this->Form->input('status',array('type'=>'radio','options'=>$statuses));	
-			echo $this->Form->input('tag', array('style' => "width:5em;"));	
+			echo $this->Form->input('tag', array('style' => "width:5em;")); 
 			echo $this->Form->input('parent_id', array(
 				'type' => 'text',
 				'style' => 'width:5em;',

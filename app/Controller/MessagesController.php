@@ -217,7 +217,7 @@ class MessagesController extends AppController {
 		$this->redirect(array('action' => 'view', $id));
 	}
 
-	// edit lets managers change status or tag (but nothing else)
+	// edit lets managers change parent or tag and possibly message text (but nothing else)
 	public function edit($id = null) {
 		$this->Message->id = $id;
 		if (!$this->Message->exists()) {
@@ -226,14 +226,11 @@ class MessagesController extends AppController {
 		$is_admin_group = ($this->Auth->user('group_id') == Group::$ADMIN_GROUP_ID)? 1 : 0;
 		if ($this->request->is('post') || $this->request->is('put')) {
 			$saved_ok = false;
-			if (! $is_admin_group) {
-				// currently only the tag is editable by managers
-				$this->Message->set('tag', $this->request->data['Message']['tag']);
-				$this->Message->set('parent_id', $this->request->data['Message']['parent_id']);
-				$save_ok = $this->Message->save();
-			} else { // admins can edit anything (if the view exists)
-				$saved_ok = $this->Message->save($this->request->data);
+			$editable_fields = array('tag', 'parent_id'); 
+			if (Configure::read('allow_message_text_edits') && $is_admin_group) {
+				array_push($editable_fields, 'message');
 			}
+			$saved_ok = $this->Message->save($this->request->data, $editable_fields);
 			if ($saved_ok) {
 				$this->Session->setFlash(__('The message has been updated'));
 				$this->redirect(array('action' => 'view', $id));
@@ -242,9 +239,9 @@ class MessagesController extends AppController {
 			}
 		} else {
 			$this->request->data = $this->Message->read(null, $id);
+			// actually, don't allow status edit: there are buttons for that which are better (i.e., reverting when unhiding)
+			// $this->set('statuses', $this->Message->Status->find('list', array('conditions' => array('name !=' => 'unknown')))); // populate the drop-down
 		}
-		// actually, don't allow status edit: there are buttons for that which are better (i.e., reverting when unhiding)
-		// $this->set('statuses', $this->Message->Status->find('list', array('conditions' => array('name !=' => 'unknown')))); // populate the drop-down
 		$this->set('message', $this->Message->findById($id));
 		$this->set('is_admin_group', $is_admin_group);
 	}
