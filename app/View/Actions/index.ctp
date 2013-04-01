@@ -12,7 +12,7 @@
 		<div>
 			<?php
 				echo $this->Form->input('search_term', 
-					array('name' => 'q', 'type' => 'text', 'escape' => false, 'label' => "Action text contains", 'value' => $search_term));
+					array('name' => 'q', 'type' => 'text', 'escape' => false, 'label' => "Action text contains", 'value' => htmlspecialchars($search_term)));
 			?>
 		</div>
 		<?php echo $this->Form->submit(__('Search')); ?>
@@ -21,11 +21,12 @@
 
 <div class="mm-action-choices">
 	Types available:
-	<?php 
-		echo $this->Html->link(__('all'), array('action' => 'index'), 
+	<?php
+		$q = empty($search_term)? "": ("?q=" . htmlspecialchars($search_term));
+		echo $this->Html->link(__('all'), "index$q", 
 			array('title' => 'activity of all types', 'style' => 'border-width:2px'));
 		foreach ($action_types as $name => $desc) {
-			echo $this->Html->link($name, array('action' => 'index', $name), array('title' => $desc, 'class' => ($name == $type? 'active':'not-active')));
+			echo $this->Html->link($name, "index/$name$q", array('title' => $desc, 'class' => ($name == $type? 'active':'not-active')));
 		}
 	?>
 </div>
