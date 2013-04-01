@@ -37,11 +37,25 @@ class ActionsController extends AppController {
 		if ($type && ! $action_type_found) {
 			throw new NotFoundException(__('No such action type (%s)', $type));
 		}
+
+		$search_term = $this->request->query('q');
+		if ($search_term) {
+			array_push($conditions, array(
+					'Action.note LIKE' => "%$search_term%"
+				)
+			);
+			$title = __('%s, search results for "%s"', $title, h($search_term));
+			$this->set('show_results', True);
+		} else {
+			$this->set('show_results', False);			
+		}
+		$this->set('search_term', $search_term);
 		$this->paginate = array(
 			'conditions' => $conditions
 		);
+		$this->set('actions', $this->paginate('Action'));
 		$this->set('action_types', $action_types);
-		$this->set('actions', $this->paginate());
+		
 		$this->set('title', $title);
 		$this->set('subtitle', $subtitle);
     }
