@@ -55,9 +55,10 @@ class ActionsController extends AppController {
 		);
 		$this->set('actions', $this->paginate('Action'));
 		$this->set('action_types', $action_types);
-		
+		$this->set('type', $type);
 		$this->set('title', $title);
 		$this->set('subtitle', $subtitle);
+		
     }
 
     public function view($id = null) {

@@ -358,6 +358,10 @@ body.cobrand-default {
       padding: 0.2em 0.5em;
       border: 1px solid $pale_back_color;
       margin: 4px 8px 4px 0;
+      &.active {
+        background-color: $pale_back_color;
+        color: white;
+      }
       &:hover {
         background-color: $dummy_back_color;
       }

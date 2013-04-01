@@ -281,6 +281,9 @@ body.cobrand-default {
     padding: 0.2em 0.5em;
     border: 1px solid #996666;
     margin: 4px 8px 4px 0; }
+    #container div.mm-string-choices a.active, #container div.mm-action-choices a.active {
+      background-color: #996666;
+      color: white; }
     #container div.mm-string-choices a:hover, #container div.mm-action-choices a:hover {
       background-color: #eeeeee; }
 #container div.mm-string-choices {

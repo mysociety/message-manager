@@ -25,7 +25,7 @@
 		echo $this->Html->link(__('all'), array('action' => 'index'), 
 			array('title' => 'activity of all types', 'style' => 'border-width:2px'));
 		foreach ($action_types as $name => $desc) {
-			echo $this->Html->link($name, array('action' => 'index', $name), array('title' => $desc));
+			echo $this->Html->link($name, array('action' => 'index', $name), array('title' => $desc, 'class' => ($name == $type? 'active':'not-active')));
 		}
 	?>
 </div>
