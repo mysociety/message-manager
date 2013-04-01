@@ -7,6 +7,18 @@
 		echo(__("Actions found: %s", count($actions)));
 	} ?>
 </strong></p>
+<div id="mini-search">
+	<?php echo $this->Form->create('Action', array('type' => 'get'));?>
+		<div>
+			<?php
+				echo $this->Form->input('search_term', 
+					array('name' => 'q', 'type' => 'text', 'escape' => false, 'label' => "Action text contains", 'value' => $search_term));
+			?>
+		</div>
+		<?php echo $this->Form->submit(__('Search')); ?>
+	<?php echo $this->Form->end(); ?>
+</div>
+
 <div class="mm-action-choices">
 	Types available:
 	<?php 
