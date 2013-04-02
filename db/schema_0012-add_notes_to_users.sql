@@ -1,1 +1,1 @@
-ALTER TABLE  `users` ADD  `user_notes` TEXT NULL DEFAULT NULL;
+ALTER TABLE  users ADD  user_notes TEXT NULL DEFAULT NULL;
