@@ -32,7 +32,8 @@ MAILTO=!!(*= $user *)!!@mysociety.org
 
 # as this is hitting live SMS gateway now, make all these conditional on being on production:
 
-!!(* if ($vhost eq 'message-manager.fixmybarangay.com') { *)!!
+# 2-May-2014 don't run any cronjobs, prior to decommissioning the service entirely: NEVER
+!!(* if ($vhost eq 'NEVER.message-manager.fixmybarangay.com') { *)!!
 
 3,8,13,18,23,28,33,38,43,48,52,58 * * * * !!(*= $user *)!! run-with-lockfile -n /data/vhost/!!(*= $vhost *)!!/get-sms-status.lock "/data/vhost/!!(*= $vhost *)!!/message-manager/app/Console/cakeshell netcast get_sms_status -p netcast-gateway -cli /usr/bin -console /data/vhost/!!(*= $vhost *)!!/message-manager/app/Console -app /data/vhost/!!(*= $vhost *)!!/message-manager/app" || echo "stalled?"
 
